@@ -32,6 +32,8 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseWebAssemblyDebugging();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
         else
         {
@@ -47,6 +49,8 @@ public class Program
 
         app.UseRouting();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         app.MapRazorPages();
         app.MapControllers();

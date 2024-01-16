@@ -3,7 +3,10 @@ using How.Shared;
 
 namespace How.Server.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
 [ApiController]
+// [Authorize]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {

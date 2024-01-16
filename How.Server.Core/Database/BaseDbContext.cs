@@ -1,8 +1,10 @@
 namespace How.Server.Core.Database;
 
+using Entities.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-public class BaseDbContext : DbContext
+public class BaseDbContext : IdentityDbContext<HowUser>
 {
     public BaseDbContext(DbContextOptions options) : base(options)
     {
