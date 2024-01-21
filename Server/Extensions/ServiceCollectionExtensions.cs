@@ -4,6 +4,7 @@ using Core.Database;
 using Core.Database.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using IdentityRole = Microsoft.AspNetCore.Identity.IdentityRole;
 
 public static class ServiceCollectionExtensions
 {

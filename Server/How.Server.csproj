@@ -11,6 +11,10 @@
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
@@ -21,6 +25,10 @@
     <ProjectReference Include="..\Client\How.Client.csproj" />
     <ProjectReference Include="..\How.Server.Core\How.Server.Core.csproj" />
     <ProjectReference Include="..\Shared\How.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20240121213211_Initial.Designer.cs" />
   </ItemGroup>
 
 
