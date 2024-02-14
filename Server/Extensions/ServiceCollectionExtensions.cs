@@ -75,4 +75,20 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddCookies(this IServiceCollection services)
+    {
+        services.ConfigureApplicationCookie(o =>
+        {
+            // Cookie settings
+            o.Cookie.HttpOnly = true;
+            o.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+
+            o.LoginPath = "/Identity/Account/Login";
+            o.AccessDeniedPath = "Identity/Account/AccessDenied";
+            o.SlidingExpiration = true;
+        });
+
+        return services;
+    }
 }
