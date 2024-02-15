@@ -4,14 +4,16 @@ using Core.Database;
 using Core.Database.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using IdentityRole = Microsoft.AspNetCore.Identity.IdentityRole;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection SetupServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDataAccess(configuration)
-            .AddSwaggerGen();
+            .AddIdentity()
+            .AddSwagger()
+            .AddCookies();
+        
         return services;
     }
 
@@ -49,7 +51,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddIdentity(this IServiceCollection services)
     {
-        services.AddIdentity<HowUser, IdentityRole>()
+        services.AddIdentity<HowUser, HowRole>()
             .AddEntityFrameworkStores<BaseDbContext>();
 
         services.Configure<IdentityOptions>(o =>
@@ -59,7 +61,7 @@ public static class ServiceCollectionExtensions
             o.Password.RequireLowercase = true;
             o.Password.RequireNonAlphanumeric = true;
             o.Password.RequireUppercase = true;
-            o.Password.RequiredLength = 12;
+            o.Password.RequiredLength = 8;
             o.Password.RequiredUniqueChars = 4;
             
             // Lockout settings.
@@ -81,12 +83,14 @@ public static class ServiceCollectionExtensions
         services.ConfigureApplicationCookie(o =>
         {
             // Cookie settings
-            o.Cookie.HttpOnly = true;
+            o.Cookie.HttpOnly = false;
             o.ExpireTimeSpan = TimeSpan.FromMinutes(30);
 
-            o.LoginPath = "/Identity/Account/Login";
-            o.AccessDeniedPath = "Identity/Account/AccessDenied";
-            o.SlidingExpiration = true;
+            o.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = 401;
+                return Task.CompletedTask;
+            };
         });
 
         return services;

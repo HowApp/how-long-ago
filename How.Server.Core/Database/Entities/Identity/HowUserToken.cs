@@ -4,5 +4,4 @@ using Microsoft.AspNetCore.Identity;
 
 public class HowUserToken : IdentityUserToken<int>
 {
-    public virtual HowUser User { get; set; }
 }

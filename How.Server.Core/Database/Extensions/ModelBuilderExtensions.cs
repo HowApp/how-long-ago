@@ -1,8 +1,9 @@
 namespace How.Server.Core.Database.Extensions;
 
+using System.Globalization;
 using Entities.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.NameTranslation;
 
 public static class ModelBuilderExtensions
 {
@@ -18,40 +19,85 @@ public static class ModelBuilderExtensions
                 .ForEach(fk => fk.DeleteBehavior = DeleteBehavior.Restrict);
         }
     }
+    
+    public static ModelBuilder UseSnakeCaseNamingConvention(this ModelBuilder modelBuilder)
+    {
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            // table
+            var tableName = entity.GetTableName();
+            var translatedTableName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(tableName, CultureInfo.InvariantCulture);
+            entity.SetTableName(translatedTableName);
+
+            // column
+            foreach (var property in entity.GetProperties())
+            {
+                var columnName = property.GetColumnName();
+                var translatedName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(columnName, CultureInfo.InvariantCulture);
+                property.SetColumnName(translatedName);
+            }
+
+            // primary and alternate key
+            foreach (var key in entity.GetKeys())
+            {
+                var keyName = key.GetName();
+                var translatedName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(keyName, CultureInfo.InvariantCulture);
+                key.SetName(translatedName);
+            }
+
+            // foreign key
+            foreach (var key in entity.GetForeignKeys())
+            {
+                var constraintName = key.GetConstraintName();
+                var translatedName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(constraintName, CultureInfo.InvariantCulture);
+                key.SetConstraintName(translatedName);
+            }
+
+            // index
+            foreach (var index in entity.GetIndexes())
+            {
+                var indexName = index.GetDatabaseName();
+                var translatedName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(indexName, CultureInfo.InvariantCulture);
+                index.SetDatabaseName(translatedName);
+            }
+        }
+
+        return modelBuilder;
+    }
 
     public static void SetIdentityName(this ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<IdentityUser>(b =>
+        modelBuilder.Entity<HowUser>(b =>
         {
             b.ToTable("Users");
         });
 
-        modelBuilder.Entity<IdentityUserClaim<int>>(b =>
+        modelBuilder.Entity<HowUserClaim>(b =>
         {
             b.ToTable("UserClaims");
         });
 
-        modelBuilder.Entity<IdentityUserLogin<int>>(b =>
+        modelBuilder.Entity<HowUserLogin>(b =>
         {
             b.ToTable("UserLogins");
         });
 
-        modelBuilder.Entity<IdentityUserToken<int>>(b =>
+        modelBuilder.Entity<HowUserToken>(b =>
         {
             b.ToTable("UserTokens");
         });
 
-        modelBuilder.Entity<IdentityRole>(b =>
+        modelBuilder.Entity<HowRole>(b =>
         {
             b.ToTable("Roles");
         });
 
-        modelBuilder.Entity<IdentityRoleClaim<int>>(b =>
+        modelBuilder.Entity<HowRoleClaim>(b =>
         {
             b.ToTable("RoleClaims");
         });
 
-        modelBuilder.Entity<IdentityUserRole<int>>(b =>
+        modelBuilder.Entity<HowUserRole>(b =>
         {
             b.ToTable("UserRoles");
         });
@@ -61,31 +107,13 @@ public static class ModelBuilderExtensions
     {
         modelBuilder.Entity<HowUser>(b =>
         {
-            // Each User can have many UserClaims
-            b.HasMany(e => e.Claims)
-                .WithOne(e => e.User)
-                .HasForeignKey(uc => uc.UserId)
-                .IsRequired();
-
-            // Each User can have many UserLogins
-            b.HasMany(e => e.Logins)
-                .WithOne(e => e.User)
-                .HasForeignKey(ul => ul.UserId)
-                .IsRequired();
-
-            // Each User can have many UserTokens
-            b.HasMany(e => e.Tokens)
-                .WithOne(e => e.User)
-                .HasForeignKey(ut => ut.UserId)
-                .IsRequired();
-
             // Each User can have many entries in the UserRole join table
             b.HasMany(e => e.UserRoles)
                 .WithOne(e => e.User)
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
         });
-
+        
         modelBuilder.Entity<HowRole>(b =>
         {
             // Each Role can have many entries in the UserRole join table
@@ -93,12 +121,12 @@ public static class ModelBuilderExtensions
                 .WithOne(e => e.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
-
-            // Each Role can have many associated RoleClaims
-            b.HasMany(e => e.RoleClaims)
-                .WithOne(e => e.Role)
-                .HasForeignKey(rc => rc.RoleId)
-                .IsRequired();
+        });
+        
+        modelBuilder.Entity<HowUserRole>(b =>
+        {
+            // Primary key
+            b.HasKey(r => new { r.UserId, r.RoleId });
         });
     }
 }

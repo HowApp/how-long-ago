@@ -27,5 +27,6 @@ public class BaseDbContext : IdentityDbContext<
         modelBuilder.SetIdentityRule();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseDbContext).Assembly);
         modelBuilder.SetOnDeleteRule();
+        modelBuilder.UseSnakeCaseNamingConvention();
     }
 }

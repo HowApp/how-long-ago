@@ -4,5 +4,4 @@ using Microsoft.AspNetCore.Identity;
 
 public class HowUserClaim : IdentityUserClaim<int>
 {
-    public virtual HowUser User { get; set; }
 }

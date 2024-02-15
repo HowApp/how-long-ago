@@ -31,5 +31,9 @@
     <Compile Remove="Migrations\20240121213211_Initial.Designer.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 
 </Project>
