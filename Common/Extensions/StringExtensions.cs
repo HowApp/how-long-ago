@@ -1,4 +1,4 @@
-namespace How.Server.Common.Extensions;
+namespace How.Common.Extensions;
 
 using System.Text.RegularExpressions;
 

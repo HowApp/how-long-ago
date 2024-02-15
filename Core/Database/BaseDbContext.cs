@@ -1,4 +1,4 @@
-namespace How.Server.Core.Database;
+namespace How.Core.Database;
 
 using Entities.Identity;
 using Extensions;

@@ -1,4 +1,4 @@
-namespace How.Server.Core.Database.Entities.Identity;
+namespace How.Core.Database.Entities.Identity;
 
 using Microsoft.AspNetCore.Identity;
 

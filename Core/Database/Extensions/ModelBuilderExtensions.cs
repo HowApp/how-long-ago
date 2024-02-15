@@ -1,4 +1,4 @@
-namespace How.Server.Core.Database.Extensions;
+namespace How.Core.Database.Extensions;
 
 using System.Globalization;
 using Entities.Identity;

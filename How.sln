@@ -8,9 +8,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "How.Client", "Client\How.Cl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "How.Shared", "Shared\How.Shared.csproj", "{933C740C-D03B-4740-A974-5A09FC447491}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "How.Server.Common", "How.Server.Common\How.Server.Common.csproj", "{88FFBEB2-25D7-4BC4-A7DD-3424903B51AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "How.Common", "Common\How.Common.csproj", "{88FFBEB2-25D7-4BC4-A7DD-3424903B51AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "How.Server.Core", "How.Server.Core\How.Server.Core.csproj", "{0F05479C-5AB5-4E15-B610-2D30326861CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "How.Core", "Core\How.Core.csproj", "{0F05479C-5AB5-4E15-B610-2D30326861CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
