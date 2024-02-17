@@ -2,6 +2,8 @@ namespace How.Server.Extensions;
 
 using Core.Database;
 using Core.Database.Entities.Identity;
+using Core.Services.AccountServices;
+using Core.Services.UserServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddDataAccess(configuration)
             .AddIdentity()
+            .AddCustomServices()
             .AddSwagger()
             .AddCookies();
         
@@ -35,6 +38,14 @@ public static class ServiceCollectionExtensions
         services.AddDbContextFactory<BaseDbContext>(o => 
             o.UseNpgsql(connectionString), 
             ServiceLifetime.Scoped);
+        
+        return services;
+    }
+
+    public static IServiceCollection AddCustomServices(this IServiceCollection services)
+    {
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IAccountService, AccountService>();
         
         return services;
     }

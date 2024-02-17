@@ -1,99 +1,90 @@
 namespace How.Server.Controllers;
 
-using System.Net;
-using Core.Database.Entities.Identity;
+using Common.ResultClass;
+using Core.Models.ServicesModel.AccountService;
+using Core.Services.AccountServices;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO.Auth;
 
 [Route("api/[controller]/[action]")]
 public class AccountController : BaseController
 {
-    private readonly UserManager<HowUser> _userManager;
-    private readonly SignInManager<HowUser> _signInManager;
+    private readonly IAccountService _accountService;
 
-    public AccountController(
-        UserManager<HowUser> userManager, 
-        SignInManager<HowUser> signInManager)
+    public AccountController(IAccountService accountService)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
+        _accountService = accountService;
     }
 
     [HttpPost]
     public async Task<IActionResult> Login(LoginRequestDTO request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
-
-        if (user is null)
+        var model = new LoginRequestModel
         {
-            return BadRequest("User not found!");
-        }
+            Email = request.Email,
+            Password = request.Password,
+            RememberMe = request.RememberMe
+        };
+        
+        var result = await _accountService.Login(model);
 
-        var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-
-        if (!signInResult.Succeeded)
-        {
-            return BadRequest("Invalid Password!");
-        }
-
-        await _signInManager.SignInAsync(user, request.RememberMe);
-
-        return Ok();
+        return HttpResult(result);
     }
 
     [HttpPost]
     public async Task<IActionResult> Register(RegisterRequestDTO request)
     {
-        var user = new HowUser
+        var model = new RegisterRequestModel
         {
-            UserName = request.UserName,
             Email = request.Email,
-            EmailConfirmed = true
+            UserName = request.UserName,
+            Password = request.Password
         };
 
-        var result = await _userManager.CreateAsync(user, request.Password);
+        var result = await _accountService.Register(model);
 
-        if (!result.Succeeded)
+        if (result.Failure)
         {
-            return BadRequest(string.Join(';', result.Errors.Select(e =>e.Description)));
+            return HttpResult(result);
         }
 
-        return await Login(
-            new LoginRequestDTO
-            {
-                Email = request.Email,
-                Password = request.Password,
-                RememberMe = false
-            });
+        var httpResult = new SuccessResult<RegisterResponseDTO>(new RegisterResponseDTO
+        {
+            Email = result.Data.Email,
+            Password = result.Data.Password
+        });
+
+        return HttpResult(httpResult);
     }
 
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
-        return Ok();
+        var result = await _accountService.Logout();
+
+        return HttpResult(result);
     }
 
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> CurrentUserInfo()
     {
-        if (User.Identity is null)
+        var result = await _accountService.GetCurrentUserInfo();
+
+        if (result.Failure)
         {
-            return BadRequest();
+            return HttpResult(result);
         }
+
+        var httpResult = new SuccessResult<CurrentUserResponseDTO>(new CurrentUserResponseDTO
+        {
+            IsAuthenticate = result.Data.IsAuthenticate,
+            UserName = result.Data.UserName,
+            Claims = result.Data.Claims
+        });
         
-        return StatusCode(
-            (int)HttpStatusCode.OK,
-            new CurrentUserDTO
-            {
-                IsAuthenticate = User.Identity.IsAuthenticated,
-                UserName = User.Identity.Name ?? string.Empty,
-                Claims = User.Claims.ToDictionary(c => c.Type, c => c.Value)
-            }
-        );
+        return HttpResult(httpResult);
     }
 }

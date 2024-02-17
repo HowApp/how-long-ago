@@ -1,6 +1,6 @@
-namespace How.Shared.DTO.Auth;
+namespace How.Core.Models.ServicesModel.AccountService;
 
-public class CurrentUserDTO
+public class CurrentUserResponseModel
 {
     public bool IsAuthenticate { get; set; }
     public string UserName { get; set; }

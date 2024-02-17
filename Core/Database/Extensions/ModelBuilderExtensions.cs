@@ -25,7 +25,7 @@ public static class ModelBuilderExtensions
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             // table
-            var tableName = entity.GetTableName();
+            var tableName = entity.GetTableName() ?? string.Empty;
             var translatedTableName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(tableName, CultureInfo.InvariantCulture);
             entity.SetTableName(translatedTableName);
 
@@ -40,7 +40,7 @@ public static class ModelBuilderExtensions
             // primary and alternate key
             foreach (var key in entity.GetKeys())
             {
-                var keyName = key.GetName();
+                var keyName = key.GetName() ?? string.Empty;
                 var translatedName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(keyName, CultureInfo.InvariantCulture);
                 key.SetName(translatedName);
             }
@@ -48,7 +48,7 @@ public static class ModelBuilderExtensions
             // foreign key
             foreach (var key in entity.GetForeignKeys())
             {
-                var constraintName = key.GetConstraintName();
+                var constraintName = key.GetConstraintName() ?? string.Empty;
                 var translatedName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(constraintName, CultureInfo.InvariantCulture);
                 key.SetConstraintName(translatedName);
             }
@@ -56,7 +56,7 @@ public static class ModelBuilderExtensions
             // index
             foreach (var index in entity.GetIndexes())
             {
-                var indexName = index.GetDatabaseName();
+                var indexName = index.GetDatabaseName() ?? string.Empty;
                 var translatedName = NpgsqlSnakeCaseNameTranslator.ConvertToSnakeCase(indexName, CultureInfo.InvariantCulture);
                 index.SetDatabaseName(translatedName);
             }
