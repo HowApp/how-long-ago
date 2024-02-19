@@ -14,10 +14,10 @@ public class Program
 
         // Add services to the container.
 
+        builder.Services.SetupServices(builder.Configuration);
+        
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
-
-        builder.Services.SetupServices(builder.Configuration);
         
         var app = builder.Build();
 

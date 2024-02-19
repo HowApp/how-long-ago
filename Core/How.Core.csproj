@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Common\How.Common.csproj" />
+      <ProjectReference Include="..\Shared\How.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

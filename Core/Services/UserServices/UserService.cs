@@ -12,5 +12,5 @@ public class UserService : IUserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public ClaimsPrincipal User => _httpContextAccessor.HttpContext?.User;
+    public ClaimsPrincipal User => _httpContextAccessor.HttpContext.User;
 }

@@ -2,8 +2,41 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>Hello, world!</h1>
+        
+        Welcome to your new app.
+        
+        <h1>Hello @UserName !!</h1>
+        <p>Welcome to Blazor Learner.</p>
+        <SurveyPrompt Title="How is Blazor working for you?"/>
+    </Authorized>
+        <Authorizing>
+            <h1>Loading ...</h1>
+        </Authorizing>
+</AuthorizeView>
 
-Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code{
+    string? UserName { get; set; }
+    
+    [CascadingParameter]
+    Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState?.User;
+
+            if (user?.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                UserName = user.Identity.Name;
+            }
+        }
+    }
+}

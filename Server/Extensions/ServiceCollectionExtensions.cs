@@ -4,6 +4,7 @@ using Core.Database;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
 using Core.Services.UserServices;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -103,6 +104,9 @@ public static class ServiceCollectionExtensions
                 return Task.CompletedTask;
             };
         });
+        //
+        // services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
+        // services.AddAuthorization();
 
         return services;
     }

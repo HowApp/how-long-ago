@@ -1,41 +1,30 @@
 namespace How.Server.Controllers;
 
 using System.Net;
-using Common.ResultClass;
+// using Common.ResultClass;
 using Microsoft.AspNetCore.Mvc;
+using Common.ResultType;
 
 [ApiController]
 public class BaseController : ControllerBase
 {
-    protected IActionResult HttpResult(Result resultIncome)
+    protected IActionResult HttpResult(Result result)
     {
-        if (resultIncome.Success)
+        if (result.Succeeded)
         {
-            return Ok();
-        }
-
-        if (resultIncome is ErrorResult errorResult)
-        {
-            var result = new HttpErrorResult(errorResult.Message, errorResult.Errors, HttpStatusCode.BadRequest);
-            return StatusCode((int)HttpStatusCode.BadRequest, result);
+            return Ok(result);
         }
         
-        return StatusCode((int)HttpStatusCode.BadRequest);
+        return StatusCode((int)HttpStatusCode.BadRequest, result);
     }
     
-    protected IActionResult HttpResult<T>(Result<T> resultIncome)
+    protected IActionResult HttpResult<T>(Result<T> result)
     {
-        if (resultIncome.Success)
+        if (result.Succeeded)
         {
-            return Ok(resultIncome);
-        }
-
-        if (resultIncome is ErrorResult<T> errorResult)
-        {
-            var result = new HttpErrorResult(errorResult.Message, errorResult.Errors, HttpStatusCode.BadRequest);
-            return StatusCode((int)HttpStatusCode.BadRequest, result);
+            return Ok(result);
         }
         
-        return StatusCode((int)HttpStatusCode.BadRequest);
+        return StatusCode((int)HttpStatusCode.BadRequest, result);
     }
 }

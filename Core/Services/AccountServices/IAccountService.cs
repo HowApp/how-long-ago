@@ -1,7 +1,8 @@
 namespace How.Core.Services.AccountServices;
 
-using Common.ResultClass;
+// using Common.ResultClass;
 using Models.ServicesModel.AccountService;
+using Common.ResultType;
 
 public interface IAccountService
 {

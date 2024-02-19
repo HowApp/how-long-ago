@@ -1,10 +1,11 @@
 namespace How.Core.Services.AccountServices;
 
-using Common.ResultClass;
+using Common.Constants;
 using Database.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Models.ServicesModel.AccountService;
+using Common.ResultType;
 using UserServices;
 
 public class AccountService : IAccountService
@@ -34,7 +35,7 @@ public class AccountService : IAccountService
 
             if (user is null)
             {
-                return new ErrorResult("User not found!");
+                return Result.Failure(new Error(ErrorType.Account, "User not found!"));
             }
 
             var signInResult = await _signInManager.CheckPasswordSignInAsync(
@@ -44,17 +45,19 @@ public class AccountService : IAccountService
 
             if (!signInResult.Succeeded)
             {
-                return new ErrorResult("Invalid Password!");
+                return Result.Failure(new Error(ErrorType.Account,"Invalid Password!"));
             }
-
+            
             await _signInManager.SignInAsync(user, requestModel.RememberMe);
 
-            return new SuccessResult();
+            return Result.Success();
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return new ErrorResult($"Error while executing {nameof(Login)}!");
+            return Result.Failure(new Error(
+                ErrorType.Account,
+                $"Error while executing {nameof(Login)}!"));
         }
     }
 
@@ -73,11 +76,11 @@ public class AccountService : IAccountService
 
             if (!result.Succeeded)
             {
-                return ErrorResultExtensions.FromIdentityErrors<RegisterResponseModel>(
+                return FailedResultExtensions.FromIdentityErrors<RegisterResponseModel>(
                     "Error while creating new User!", result.Errors);
             }
 
-            return new SuccessResult<RegisterResponseModel>(new RegisterResponseModel
+            return Result.Success(new RegisterResponseModel
             {
                 Email = requestModel.UserName,
                 Password = requestModel.Email,
@@ -87,7 +90,9 @@ public class AccountService : IAccountService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return new ErrorResult<RegisterResponseModel>($"Error while executing {nameof(Register)}!");
+            return Result.Failure<RegisterResponseModel>(new Error(
+                ErrorType.Account,
+                $"Error while executing {nameof(Register)}!"));
         }
     }
 
@@ -97,12 +102,14 @@ public class AccountService : IAccountService
         {
             await _signInManager.SignOutAsync();
 
-            return new SuccessResult();
+            return Result.Success();
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return new ErrorResult($"Error while executing {nameof(Logout)}!");
+            return Result.Failure(new Error(
+                ErrorType.Account,
+                $"Error while executing {nameof(Logout)}!"));
         }
     }
 
@@ -114,7 +121,9 @@ public class AccountService : IAccountService
 
             if (user.Identity is null)
             {
-                return new ErrorResult<CurrentUserResponseModel>("User not found!");
+                return Result.Failure<CurrentUserResponseModel>(new Error(
+                    ErrorType.Account,
+                    "User not found!"));
             }
 
             var result = new CurrentUserResponseModel
@@ -124,13 +133,14 @@ public class AccountService : IAccountService
                 Claims = user.Claims.ToDictionary(c => c.Type, c => c.Value)
             };
 
-            return new SuccessResult<CurrentUserResponseModel>(result);
+            return Result.Success(result);
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return new ErrorResult<CurrentUserResponseModel>(
-                $"Error while executing {nameof(GetCurrentUserInfo)}!");
+            return Result.Failure<CurrentUserResponseModel>(new Error(
+                ErrorType.Account,
+                $"Error while executing {nameof(GetCurrentUserInfo)}!"));
         }
     }
 }

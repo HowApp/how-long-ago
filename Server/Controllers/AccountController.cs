@@ -1,11 +1,11 @@
 namespace How.Server.Controllers;
 
-using Common.ResultClass;
 using Core.Models.ServicesModel.AccountService;
 using Core.Services.AccountServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO.Auth;
+using Common.ResultType;
 
 [Route("api/[controller]/[action]")]
 public class AccountController : BaseController
@@ -44,12 +44,12 @@ public class AccountController : BaseController
 
         var result = await _accountService.Register(model);
 
-        if (result.Failure)
+        if (result.Failed)
         {
             return HttpResult(result);
         }
 
-        var httpResult = new SuccessResult<RegisterResponseDTO>(new RegisterResponseDTO
+        var httpResult = Result.Success(new RegisterResponseDTO
         {
             Email = result.Data.Email,
             Password = result.Data.Password
@@ -67,18 +67,17 @@ public class AccountController : BaseController
         return HttpResult(result);
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> CurrentUserInfo()
     {
         var result = await _accountService.GetCurrentUserInfo();
 
-        if (result.Failure)
+        if (result.Failed)
         {
             return HttpResult(result);
         }
 
-        var httpResult = new SuccessResult<CurrentUserResponseDTO>(new CurrentUserResponseDTO
+        var httpResult = Result.Success(new CurrentUserResponseDTO
         {
             IsAuthenticate = result.Data.IsAuthenticate,
             UserName = result.Data.UserName,
