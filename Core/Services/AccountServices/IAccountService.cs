@@ -7,7 +7,7 @@ using Common.ResultType;
 public interface IAccountService
 {
     Task<Result> Login(LoginRequestModel requestModel);
-    Task<Result<RegisterResponseModel>> Register(RegisterRequestModel requestModel);
+    Task<Result> Register(RegisterRequestModel requestModel);
     Task<Result> Logout();
     Task<Result<CurrentUserResponseModel>> GetCurrentUserInfo();
 }

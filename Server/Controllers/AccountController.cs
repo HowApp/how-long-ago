@@ -49,13 +49,7 @@ public class AccountController : BaseController
             return HttpResult(result);
         }
 
-        var httpResult = Result.Success(new RegisterResponseDTO
-        {
-            Email = result.Data.Email,
-            Password = result.Data.Password
-        });
-
-        return HttpResult(httpResult);
+        return HttpResult(result);
     }
 
     [Authorize]

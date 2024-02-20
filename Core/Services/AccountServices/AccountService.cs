@@ -61,7 +61,7 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<Result<RegisterResponseModel>> Register(RegisterRequestModel requestModel)
+    public async Task<Result> Register(RegisterRequestModel requestModel)
     {
         try
         {
@@ -76,16 +76,11 @@ public class AccountService : IAccountService
 
             if (!result.Succeeded)
             {
-                return FailedResultExtensions.FromIdentityErrors<RegisterResponseModel>(
+                return FailedResultExtensions.FromIdentityErrors(
                     "Error while creating new User!", result.Errors);
             }
 
-            return Result.Success(new RegisterResponseModel
-            {
-                Email = requestModel.UserName,
-                Password = requestModel.Email,
-                RememberMe = false
-            });
+            return Result.Success();
         }
         catch (Exception e)
         {

@@ -1,9 +1,13 @@
 namespace How.Client.ResultClient;
 
-public class ResultClient<Tdata>
+public class ResultResponse
 {
-    public Tdata? Data { get; set; }
     public bool Succeed { get; set; }
     public bool Failed { get; set; }
     public Dictionary<string, string> Error { get; set; }
+}
+
+public class ResultResponse<TData> : ResultResponse
+{
+    public TData? Data { get; set; }
 }
