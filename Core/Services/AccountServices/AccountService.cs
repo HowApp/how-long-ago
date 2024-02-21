@@ -85,7 +85,7 @@ public class AccountService : IAccountService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<RegisterResponseModel>(new Error(
+            return Result.Failure(new Error(
                 ErrorType.Account,
                 $"Error while executing {nameof(Register)}!"));
         }

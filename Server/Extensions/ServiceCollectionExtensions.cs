@@ -1,10 +1,10 @@
 namespace How.Server.Extensions;
 
+using Common.Configurations;
 using Core.Database;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
 using Core.Services.UserServices;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection SetupServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDataAccess(configuration)
+            .AddConfigurations(configuration)
             .AddIdentity()
             .AddCustomServices()
             .AddSwagger()
@@ -40,6 +41,13 @@ public static class ServiceCollectionExtensions
             o.UseNpgsql(connectionString), 
             ServiceLifetime.Scoped);
         
+        return services;
+    }
+
+    public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<AdminCredentials>(configuration.GetSection("AdminCredentials"));
+
         return services;
     }
 
@@ -104,9 +112,6 @@ public static class ServiceCollectionExtensions
                 return Task.CompletedTask;
             };
         });
-        //
-        // services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
-        // services.AddAuthorization();
 
         return services;
     }

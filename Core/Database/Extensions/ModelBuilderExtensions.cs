@@ -4,6 +4,7 @@ using System.Globalization;
 using Entities.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.NameTranslation;
+using Seeds;
 
 public static class ModelBuilderExtensions
 {
@@ -105,6 +106,8 @@ public static class ModelBuilderExtensions
 
     public static void SetIdentityRule(this ModelBuilder modelBuilder)
     {
+        modelBuilder.SeedRoles();
+        
         modelBuilder.Entity<HowUser>(b =>
         {
             // Each User can have many entries in the UserRole join table

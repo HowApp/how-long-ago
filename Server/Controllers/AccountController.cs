@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO.Auth;
 using Common.ResultType;
+using Shared;
 
 [Route("api/[controller]/[action]")]
 public class AccountController : BaseController

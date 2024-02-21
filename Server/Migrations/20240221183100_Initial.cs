@@ -4,6 +4,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace How.Server.Migrations
 {
     /// <inheritdoc />
@@ -17,6 +19,7 @@ namespace How.Server.Migrations
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:IdentitySequenceOptions", "'3', '1', '', '', 'False', '1'")
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     normalized_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -157,6 +160,15 @@ namespace How.Server.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "roles",
+                columns: new[] { "id", "concurrency_stamp", "name", "normalized_name" },
+                values: new object[,]
+                {
+                    { 1, "88d484e2-ee7a-49b8-95e6-e34qw5rqb625", "User", "USER" },
+                    { 2, "8b6258e2-ee7a-49b8-95e6-e34qw5rqd484", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
