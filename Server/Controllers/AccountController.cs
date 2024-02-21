@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO.Auth;
 using Common.ResultType;
-using Shared;
 
-[Route("api/[controller]/[action]")]
+// [Route("api/[controller]/[action]")]
+[Route("api/[controller]/")]
 public class AccountController : BaseController
 {
     private readonly IAccountService _accountService;
@@ -18,6 +18,7 @@ public class AccountController : BaseController
         _accountService = accountService;
     }
 
+    [Route("login")]
     [HttpPost]
     public async Task<IActionResult> Login(LoginRequestDTO request)
     {
@@ -33,6 +34,7 @@ public class AccountController : BaseController
         return HttpResult(result);
     }
 
+    [Route("register")]
     [HttpPost]
     public async Task<IActionResult> Register(RegisterRequestDTO request)
     {
@@ -54,6 +56,7 @@ public class AccountController : BaseController
     }
 
     [Authorize]
+    [Route("logout")]
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
@@ -62,6 +65,7 @@ public class AccountController : BaseController
         return HttpResult(result);
     }
 
+    [Route("current-user-info")]
     [HttpGet]
     public async Task<IActionResult> CurrentUserInfo()
     {
