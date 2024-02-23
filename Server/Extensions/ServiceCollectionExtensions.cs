@@ -13,11 +13,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection SetupServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var baseAppSettings = new BaseApplicationSettings();
+        configuration.Bind(nameof(BaseApplicationSettings), baseAppSettings);
+        
         services.AddCors(options =>
         {
             options.AddPolicy(AppConstants.CorsPolicy, builder =>
             {
-                builder.AllowAnyOrigin()
+                builder.WithOrigins(baseAppSettings.AllowedOrigins)
+                    .AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             });
