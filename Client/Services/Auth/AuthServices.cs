@@ -6,29 +6,28 @@ using ResultClient;
 
 public class AuthServices : ClientAPI, IAuthServices
 {
-
     public AuthServices(HttpClient httpClient) : base(httpClient)
     {
     }
 
     public async Task Login(LoginRequestDTO request)
     {
-        await PostAsync<ResultResponse, LoginRequestDTO>("api/Account/Login", request);
+        await PostAsync<ResultResponse, LoginRequestDTO>("api/account/login", request);
     }
 
     public async Task Register(RegisterRequestDTO request)
     {
-        await PostAsync<ResultResponse, RegisterRequestDTO>("api/Account/Register", request);
+        await PostAsync<ResultResponse, RegisterRequestDTO>("api/account/register", request);
     }
 
     public async Task Logout()
     {
-        await PostAsync<ResultResponse>("api/Account/Logout");
+        await PostAsync<ResultResponse>("api/account/logout");
     }
 
     public async Task<CurrentUser> CurrentUserInfo()
     {
-        var response = await GetAsync<ResultResponse<CurrentUserResponseDTO>>("api/Account/CurrentUserInfo");
+        var response = await GetAsync<ResultResponse<CurrentUserResponseDTO>>("api/account/current-user-info");
 
         if (response.Data is null)
         {

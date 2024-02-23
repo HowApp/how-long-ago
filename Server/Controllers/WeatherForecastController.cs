@@ -3,6 +3,7 @@ using How.Shared;
 
 namespace How.Server.Controllers;
 
+using Common.Constants;
 using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
@@ -23,6 +24,7 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
+    [Authorize(Roles = AppConstants.Role.Admin.Name)]
     [HttpGet]
     public IEnumerable<WeatherForecast> Get()
     {

@@ -2,6 +2,7 @@
 namespace How.Server;
 
 using Common.Configurations;
+using Common.Constants;
 using Core.Database;
 using Core.Database.Seeds;
 using Extensions;
@@ -49,9 +50,8 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        app.UseBlazorFrameworkFiles();
-        app.UseStaticFiles();
-
+        app.UseCors(AppConstants.CorsPolicy);
+        
         app.UseRouting();
 
         app.UseAuthentication();
@@ -59,7 +59,11 @@ public class Program
 
         app.MapRazorPages();
         app.MapControllers();
-        app.MapFallbackToFile("index.html");
+        
+        app.UseStaticFiles();
+        
+        // app.UseBlazorFrameworkFiles();
+        // app.MapFallbackToFile("index.html");
 
         await app.RunAsync();
     }

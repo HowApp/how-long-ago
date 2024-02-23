@@ -2,10 +2,19 @@ namespace How.Common.Constants;
 
 public static class AppConstants
 {
-    public static class Role
+    public const string CorsPolicy = "HowApplicationCors";
+    public struct Role
     {
-         public static readonly (int Id, string Name) User = new (1, "User");
-         public static readonly (int Id, string Name) Admin = new (2, "Admin");
+        public struct User
+        {
+            public const int Id = 1;
+            public const string Name = "User";
+        }
+        
+        public struct Admin
+        {
+            public const int Id = 2;
+            public const string Name = "Admin";
+        }
     }
-
 }

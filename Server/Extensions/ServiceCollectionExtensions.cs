@@ -1,6 +1,7 @@
 namespace How.Server.Extensions;
 
 using Common.Configurations;
+using Common.Constants;
 using Core.Database;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
@@ -12,6 +13,16 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection SetupServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddCors(options =>
+        {
+            options.AddPolicy(AppConstants.CorsPolicy, builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
+        
         services.AddDataAccess(configuration)
             .AddConfigurations(configuration)
             .AddIdentity()
@@ -59,8 +70,10 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     private static IServiceCollection AddSwagger(this IServiceCollection services)
     {
+        services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
             c.EnableAnnotations();

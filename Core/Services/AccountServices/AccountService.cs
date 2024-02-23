@@ -80,6 +80,14 @@ public class AccountService : IAccountService
                     "Error while creating new User!", result.Errors);
             }
 
+            var addRoleToUser = await _userManager.AddToRoleAsync(user, AppConstants.Role.User.Name);
+
+            if (!addRoleToUser.Succeeded)
+            {
+                return FailedResultExtensions.FromIdentityErrors(
+                    "Error while adding role to User!", addRoleToUser.Errors);
+            }
+            
             return Result.Success();
         }
         catch (Exception e)

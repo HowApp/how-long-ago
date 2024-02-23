@@ -2,13 +2,10 @@ namespace How.Server.Controllers;
 
 using Core.Models.ServicesModel.AccountService;
 using Core.Services.AccountServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO.Auth;
 using Common.ResultType;
 
-// [Route("api/[controller]/[action]")]
-[Route("api/[controller]/")]
 public class AccountController : BaseController
 {
     private readonly IAccountService _accountService;
@@ -18,7 +15,7 @@ public class AccountController : BaseController
         _accountService = accountService;
     }
 
-    [Route("login")]
+    [Route("api/account/login")]
     [HttpPost]
     public async Task<IActionResult> Login(LoginRequestDTO request)
     {
@@ -34,7 +31,7 @@ public class AccountController : BaseController
         return HttpResult(result);
     }
 
-    [Route("register")]
+    [Route("api/account/register")]
     [HttpPost]
     public async Task<IActionResult> Register(RegisterRequestDTO request)
     {
@@ -55,8 +52,7 @@ public class AccountController : BaseController
         return HttpResult(result);
     }
 
-    [Authorize]
-    [Route("logout")]
+    [Route("api/account/logout")]
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
@@ -64,8 +60,8 @@ public class AccountController : BaseController
 
         return HttpResult(result);
     }
-
-    [Route("current-user-info")]
+    
+    [Route("api/account/current-user-info")]
     [HttpGet]
     public async Task<IActionResult> CurrentUserInfo()
     {
