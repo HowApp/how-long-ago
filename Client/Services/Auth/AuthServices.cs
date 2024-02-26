@@ -4,30 +4,33 @@ using ClientAPI;
 using How.Shared.DTO.Auth;
 using ResultClient;
 
-public class AuthServices : ClientAPI, IAuthServices
+public class AuthServices : IAuthServices
 {
-    public AuthServices(HttpClient httpClient) : base(httpClient)
+    private readonly AuthorizedClientAPI _authorizedClientApi;
+    
+    public AuthServices(AuthorizedClientAPI authorizedClientApi)
     {
+        _authorizedClientApi = authorizedClientApi;
     }
 
     public async Task Login(LoginRequestDTO request)
     {
-        await PostAsync<ResultResponse, LoginRequestDTO>("api/account/login", request);
+        await _authorizedClientApi.PostAsync<ResultResponse, LoginRequestDTO>("api/account/login", request);
     }
 
     public async Task Register(RegisterRequestDTO request)
     {
-        await PostAsync<ResultResponse, RegisterRequestDTO>("api/account/register", request);
+        await _authorizedClientApi.PostAsync<ResultResponse, RegisterRequestDTO>("api/account/register", request);
     }
 
     public async Task Logout()
     {
-        await PostAsync<ResultResponse>("api/account/logout");
+        await _authorizedClientApi.PostAsync<ResultResponse>("api/account/logout");
     }
 
     public async Task<CurrentUser> CurrentUserInfo()
     {
-        var response = await GetAsync<ResultResponse<CurrentUserResponseDTO>>("api/account/current-user-info");
+        var response = await _authorizedClientApi.GetAsync<ResultResponse<CurrentUserResponseDTO>>("api/account/current-user-info");
 
         if (response.Data is null)
         {

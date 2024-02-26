@@ -21,9 +21,9 @@ public static class ServiceCollectionExtensions
             options.AddPolicy(AppConstants.CorsPolicy, builder =>
             {
                 builder.WithOrigins(baseAppSettings.AllowedOrigins)
-                    .AllowAnyOrigin()
                     .AllowAnyMethod()
-                    .AllowAnyHeader();
+                    .AllowAnyHeader()
+                    .AllowCredentials();
             });
         });
         

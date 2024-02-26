@@ -3,11 +3,11 @@ namespace How.Client.Services.ClientAPI;
 using System.Net.Http.Json;
 using ResultClient;
 
-public abstract class ClientAPI
+public abstract class BaseClientAPI
 {
     private readonly HttpClient _httpClient;
-
-    protected ClientAPI(HttpClient httpClient)
+    
+    protected BaseClientAPI(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }

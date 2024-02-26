@@ -3,7 +3,6 @@ namespace How.Client.Services.Provider;
 using System.Security.Claims;
 using Auth;
 using How.Shared.DTO.Auth;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 
 public class CustomStateProvider : AuthenticationStateProvider
@@ -16,6 +15,25 @@ public class CustomStateProvider : AuthenticationStateProvider
         _apiAuthServices = authServices;
     }
 
+    public async Task Logout()
+    {
+        await _apiAuthServices.Logout();
+        _currentUser = null;
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
+    public async Task Login(LoginRequestDTO request)
+    {
+        await _apiAuthServices.Login(request);
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
+    public async Task Register(RegisterRequestDTO request)
+    {
+        await _apiAuthServices.Register(request);
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+    
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var identity = new ClaimsIdentity();
@@ -41,24 +59,6 @@ public class CustomStateProvider : AuthenticationStateProvider
         return new AuthenticationState(new ClaimsPrincipal(identity));
     }
 
-    public async Task Logout()
-    {
-        await _apiAuthServices.Logout();
-        _currentUser = null;
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-    }
-
-    public async Task Login(LoginRequestDTO request)
-    {
-        await _apiAuthServices.Login(request);
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-    }
-
-    public async Task Register(RegisterRequestDTO request)
-    {
-        await _apiAuthServices.Register(request);
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-    }
     private async Task<CurrentUser> GetCurrentUser()
     {
         if (_currentUser is not null && _currentUser.IsAuthenticate) 

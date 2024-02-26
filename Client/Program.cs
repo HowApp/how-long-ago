@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-
 namespace How.Client;
 
 using Extensions;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Services.ClientAPI;
+using Services.CookieHandler;
 
 public class Program
 {
@@ -19,13 +20,25 @@ public class Program
         builder.Services.AddOptions();
         builder.Services.AddAuthorizationCore();
         
-        var url = builder.Configuration.GetValue<string>("AppConfigurations:ApiUrl");
         builder.Services.AddScoped(sp => 
             new HttpClient
             {
-                BaseAddress = new Uri(url?? builder.HostEnvironment.BaseAddress)
+                BaseAddress = new Uri(builder.Configuration.GetValue<string>("AppConfigurations:FrontendUrl") ?? 
+                                      builder.HostEnvironment.BaseAddress)
             });
 
+        builder.Services.AddHttpClient<AuthorizedClientAPI>(client =>
+        {
+            client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("AppConfigurations:BackendUrl") ??
+                                         builder.HostEnvironment.BaseAddress);
+        }).AddHttpMessageHandler<CookieHandler>();
+        
+        builder.Services.AddHttpClient<AnonymousClientAPI>(client =>
+        {
+            client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("AppConfigurations:BackendUrl") ??
+                                         builder.HostEnvironment.BaseAddress);
+        });
+        
         await builder.Build().RunAsync();
     }
 }

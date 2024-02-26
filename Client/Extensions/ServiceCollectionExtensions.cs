@@ -3,6 +3,7 @@ namespace How.Client.Extensions;
 using Configuration;
 using Microsoft.AspNetCore.Components.Authorization;
 using Services.Auth;
+using Services.CookieHandler;
 using Services.Provider;
 
 public static class ServiceCollectionExtensions
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
     
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
+        services.AddScoped<CookieHandler>();
         services.AddScoped<CustomStateProvider>();
         services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<CustomStateProvider>());
         services.AddScoped<IAuthServices, AuthServices>();
