@@ -19,7 +19,7 @@ public class Program
 
         builder.Services.SetupServices(builder.Configuration);
         
-        builder.Services.AddControllersWithViews();
+        // builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
         
         var app = builder.Build();

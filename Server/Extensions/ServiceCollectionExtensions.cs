@@ -2,11 +2,15 @@ namespace How.Server.Extensions;
 
 using Common.Configurations;
 using Common.Constants;
+using Common.Filters;
 using Core.Database;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
 using Core.Services.UserServices;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 public static class ServiceCollectionExtensions
@@ -25,6 +29,18 @@ public static class ServiceCollectionExtensions
                     .AllowAnyHeader()
                     .AllowCredentials();
             });
+        });
+
+        services.AddControllersWithViews(options =>
+        {
+            options.Filters.Add<ModelStateValidationFilter>();
+        });
+        
+        services.AddFluentValidationAutoValidation().AddValidatorsFromAssemblyContaining<BaseDbContext>();
+        
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
         });
         
         services.AddDataAccess(configuration)

@@ -1,4 +1,4 @@
-namespace How.Common.Constants;
+namespace How.Common.Extensions;
 
 using Microsoft.AspNetCore.Identity;
 using ResultType;
