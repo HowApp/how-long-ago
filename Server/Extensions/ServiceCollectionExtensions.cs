@@ -125,7 +125,7 @@ public static class ServiceCollectionExtensions
             // User settings.
             o.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            o.User.RequireUniqueEmail = false;
+            o.User.RequireUniqueEmail = true;
         });
 
         return services;
