@@ -1,16 +1,38 @@
 namespace How.Server.Controllers;
 
 using Common.ResultType;
+using Core.CQRS.Queries.Test;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO.Test;
 
 public class TestController : BaseController
 {
-    [Route("api/Test/create")]
+    private readonly ISender _sender;
+
+    public TestController(ISender sender)
+    {
+        _sender = sender;
+    }
+
     [HttpPost]
+    [Route("api/test/create")]
     public async Task<IActionResult> Create(TestPostRequestDTO request)
     {
         var result = Result.Success();
+        
+        return HttpResult(result);
+    }
+    
+    [HttpGet]
+    [Route("api/test/get")]
+    public async Task<IActionResult> Get([FromQuery]TestPostRequestDTO request)
+    {
+        var query = new TestQuery
+        {
+            Number = request.Id
+        };
+        var result = await _sender.Send(query);
         
         return HttpResult(result);
     }

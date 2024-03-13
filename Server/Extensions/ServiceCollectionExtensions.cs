@@ -3,6 +3,7 @@ namespace How.Server.Extensions;
 using Common.Configurations;
 using Common.Constants;
 using Common.Filters;
+using Core;
 using Core.Database;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
@@ -84,6 +85,9 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
+        services.AddMediatR(cfg => 
+            cfg.RegisterServicesFromAssembly(typeof(AssemblyCoreReference).Assembly));
+        
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IAccountService, AccountService>();
         
