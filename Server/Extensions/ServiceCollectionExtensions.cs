@@ -2,14 +2,16 @@ namespace How.Server.Extensions;
 
 using Common.Configurations;
 using Common.Constants;
-using Common.Filters;
 using Core;
 using Core.Database;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
 using Core.Services.UserServices;
+using Core.Services.Storage;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hosting.Filters;
+using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddControllersWithViews(options =>
         {
             options.Filters.Add<ModelStateValidationFilter>();
+            options.Filters.Add<ExceptionFilter>();
         });
         
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssemblyContaining<BaseDbContext>();
@@ -85,11 +88,15 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
-        services.AddMediatR(cfg => 
-            cfg.RegisterServicesFromAssembly(typeof(AssemblyCoreReference).Assembly));
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(AssemblyCoreReference).Assembly);
+            cfg.NotificationPublisher = new TaskWhenAllPublisher();
+        });
         
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IAccountService, AccountService>();
+        services.AddTransient<IStorageService, StorageService>();
         
         return services;
     }
@@ -141,7 +148,7 @@ public static class ServiceCollectionExtensions
         {
             // Cookie settings
             o.Cookie.HttpOnly = false;
-            o.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            o.ExpireTimeSpan = TimeSpan.FromMinutes(60);
 
             o.Events.OnRedirectToLogin = context =>
             {

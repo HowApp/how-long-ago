@@ -77,7 +77,7 @@ public class AccountService : IAccountService
 
             if (!result.Succeeded)
             {
-                return FailedResultExtensions.FromIdentityErrors(
+                return ResultExtensions.FromIdentityErrors(
                     "Error while creating new User!", result.Errors);
             }
 
@@ -85,7 +85,7 @@ public class AccountService : IAccountService
 
             if (!addRoleToUser.Succeeded)
             {
-                return FailedResultExtensions.FromIdentityErrors(
+                return ResultExtensions.FromIdentityErrors(
                     "Error while adding role to User!", addRoleToUser.Errors);
             }
             

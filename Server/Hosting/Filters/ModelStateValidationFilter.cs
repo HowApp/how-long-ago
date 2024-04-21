@@ -1,8 +1,8 @@
-namespace How.Common.Filters;
+namespace How.Server.Hosting.Filters;
 
+using Common.ResultType;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using ResultType;
 
 public class ModelStateValidationFilter : IActionFilter
 {

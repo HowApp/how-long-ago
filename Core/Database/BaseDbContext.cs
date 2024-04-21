@@ -1,3 +1,5 @@
+using How.Core.Database.Entities.Storage;
+
 namespace How.Core.Database;
 
 using Entities.Identity;
@@ -18,6 +20,8 @@ public class BaseDbContext : IdentityDbContext<
     public BaseDbContext(DbContextOptions<BaseDbContext> options) : base(options)
     {
     }
+
+    public DbSet<AppFile> AppFiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

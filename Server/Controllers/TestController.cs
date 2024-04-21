@@ -2,6 +2,7 @@ namespace How.Server.Controllers;
 
 using Common.ResultType;
 using Core.CQRS.Queries.Test;
+using Core.DTO.Test;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO.Test;
@@ -35,5 +36,12 @@ public class TestController : BaseController
         var result = await _sender.Send(query);
         
         return HttpResult(result);
+    }
+
+    [HttpPost]
+    [Route("api/test/upload-image")]
+    public async Task<IActionResult> UploadImage([FromForm] TestPostImageRequestDTO file)
+    {
+        return Ok();
     }
 }

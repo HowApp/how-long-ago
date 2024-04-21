@@ -11,7 +11,7 @@ public class Result
         Succeeded = false;
         Error = error;
     }
-    
+
     public Result()
     {
         Succeeded = true;

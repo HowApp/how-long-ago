@@ -10,6 +10,6 @@ public class Error : Dictionary<string, object>
         ErrorType = errorType ?? throw new ArgumentNullException(nameof(errorType));
         ErrorMessage = errorMessage ?? throw new ArgumentNullException(nameof(errorMessage));
         
-        Add(ErrorType, ErrorMessage);
+        this.Add(ErrorType, ErrorMessage);
     }
 }
