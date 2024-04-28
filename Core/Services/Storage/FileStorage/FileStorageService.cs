@@ -1,4 +1,4 @@
-﻿namespace How.Core.Services.Storage;
+﻿namespace How.Core.Services.Storage.FileStorage;
 
 using System.Net;
 using Common.Helpers;
@@ -10,18 +10,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Models.ServicesModel.StorageService;
 
-public class StorageService : IStorageService
+public class FileStorageService : IFileStorageService
 {
-    private readonly ILogger<StorageService> _logger;
+    private readonly ILogger<FileStorageService> _logger;
     private readonly BaseDbContext _dbContext;
 
-    public StorageService(ILogger<StorageService> logger, BaseDbContext dbContext)
+    public FileStorageService(ILogger<FileStorageService> logger, BaseDbContext dbContext)
     {
         _logger = logger;
         _dbContext = dbContext;
     }
 
-    public async Task<Result> PostImageToDatabase(IFormFile file)
+    public async Task<Result> PostFileToDatabase(IFormFile file)
     {
         try
         {
@@ -68,11 +68,11 @@ public class StorageService : IStorageService
             _logger.LogError(e.Message);
             return Result.Failure(new Error(
                 ErrorType.Storage,
-                $"Error while executing {nameof(PostImageToDatabase)}"));
+                $"Error while executing {nameof(PostFileToDatabase)}"));
         }
     }
 
-    public async Task<Result<GetImageFromDatabaseByteResult>> GetImageFromDatabaseByte(string fileHash)
+    public async Task<Result<GetImageFromDatabaseByteResult>> GetFileFromDatabaseByte(string fileHash)
     {
         try
         {
@@ -107,11 +107,11 @@ public class StorageService : IStorageService
             _logger.LogError(e.Message);
             return Result.Failure<GetImageFromDatabaseByteResult>(new Error(
                 ErrorType.Storage,
-                $"Error while executing {nameof(GetImageFromDatabaseByte)}"));
+                $"Error while executing {nameof(GetFileFromDatabaseByte)}"));
         }
     }
 
-    public async Task<Result<GetImageFromDatabaseStreamResult>> GetImageFromDatabaseStream(string fileHash)
+    public async Task<Result<GetImageFromDatabaseStreamResult>> GetFileFromDatabaseStream(string fileHash)
     {
         try
         {
@@ -145,7 +145,7 @@ public class StorageService : IStorageService
             _logger.LogError(e.Message);
             return Result.Failure<GetImageFromDatabaseStreamResult>(new Error(
                 ErrorType.Storage,
-                $"Error while executing {nameof(GetImageFromDatabaseStream)}"));
+                $"Error while executing {nameof(GetFileFromDatabaseStream)}"));
         }
     }
 }

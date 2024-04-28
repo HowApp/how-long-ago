@@ -7,7 +7,8 @@ using Core.Database;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
 using Core.Services.UserServices;
-using Core.Services.Storage;
+using Core.Services.Storage.FileStorage;
+using Core.Services.Storage.ImageStorage;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hosting.Filters;
@@ -96,7 +97,8 @@ public static class ServiceCollectionExtensions
         
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IAccountService, AccountService>();
-        services.AddTransient<IStorageService, StorageService>();
+        services.AddTransient<IFileStorageService, FileStorageService>();
+        services.AddTransient<IImageStorageService, ImageStorageService>();
         
         return services;
     }

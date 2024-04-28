@@ -17,4 +17,9 @@ public static class AppConstants
             public const string Name = "Admin";
         }
     }
+
+    public static class Images
+    {
+        public const int ThumbnailResolution = 340;
+    }
 }
