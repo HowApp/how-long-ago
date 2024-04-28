@@ -11,12 +11,19 @@ public static class ImageHelper
 {
     private const int ThumbnailResolution = AppConstants.Images.ThumbnailResolution;
     
-    public static ReducedImageModel GetReducedImage(byte[] resourceImage, int resizedWidth = ThumbnailResolution)
+    private static WebpEncoder Encoder() => new WebpEncoder
+    {
+        FileFormat = WebpFileFormatType.Lossy,
+        Quality = 85,
+        Method = WebpEncodingMethod.Fastest,
+        UseAlphaCompression = false,
+    };
+    
+    public static ImageHelperModel GetReducedImage(Stream resourceImage, int resizedWidth = ThumbnailResolution)
     {
         using var outStream = new MemoryStream();
         using var image = Image.Load(resourceImage);
-        var format = image.Metadata.DecodedImageFormat;
-
+        
         float nPercent;
         var width = image.Width;
         var height = image.Height;
@@ -29,8 +36,8 @@ public static class ImageHelper
         {
             if (height < resizedWidth)
             {
-                image.Save(outStream, format);
-                return new ReducedImageModel
+                image.SaveAsWebp(outStream, Encoder());
+                return new ImageHelperModel
                 {
                     ImageData = outStream.ToArray(),
                     Width = image.Width,
@@ -44,8 +51,8 @@ public static class ImageHelper
         {
             if (width < resizedWidth)
             {
-                image.Save(outStream, format);
-                return new ReducedImageModel
+                image.SaveAsWebp(outStream, Encoder());
+                return new ImageHelperModel
                 {
                     ImageData = outStream.ToArray(),
                     Width = image.Width,
@@ -60,9 +67,9 @@ public static class ImageHelper
         var destHeight = (int)(height * nPercent);
 
         image.Mutate(i => i.Resize(destWidth, destHeight));
-        image.SaveAsWebp(outStream);
+        image.SaveAsWebp(outStream, Encoder());
 
-        return new ReducedImageModel
+        return new ImageHelperModel
         {
             ImageData = outStream.ToArray(),
             Width = image.Width,
@@ -70,7 +77,7 @@ public static class ImageHelper
         };
     }
 
-    public static (int Width, int Height) GetImageResolution(byte[] resourceImage)
+    public static (int Width, int Height) GetImageResolution(Stream resourceImage)
     {
         using var image = Image.Load(resourceImage);
 
@@ -80,24 +87,18 @@ public static class ImageHelper
         return (width, height);
     }
 
-    public static byte[] ConvertImageToWebp(byte[] resourceImage)
+    public static ImageHelperModel ConvertImageToWebp(Stream resourceImage)
     {
-        var format = Image.DetectFormat(resourceImage);
+        var outStream = new MemoryStream();
+        using var image = Image.Load(resourceImage);
 
-        if (format.DefaultMimeType != WebpFormat.Instance.DefaultMimeType)
+        image.SaveAsWebp(outStream, Encoder());
+
+        return new ImageHelperModel
         {
-            var outStream = new MemoryStream();
-            using var image = Image.Load(resourceImage);
-
-            image.SaveAsWebp(outStream);
-
-            var result = outStream.ToArray();
-
-            outStream.Dispose();
-
-            return result;
-        }
-
-        return resourceImage;
+            ImageData = outStream.ToArray(),
+            Width = image.Width,
+            Height = image.Height
+        };
     }
 }

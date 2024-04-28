@@ -25,36 +25,40 @@ public class ImageStorageService : IImageStorageService
     {
         try
         {
-            await using var memoryStream = new MemoryStream();
-            await file.CopyToAsync(memoryStream);
+            await using var originalStream = new MemoryStream();
+            await file.CopyToAsync(originalStream);
 
             // Check the content length in case the file's only
             // content was a BOM and the content is actually
             // empty after removing the BOM.
-            if (memoryStream.Length == 0)
+            if (originalStream.Length == 0)
             {
                 return Result.Failure(new Error(
                     ErrorType.Storage,
                     $"File is empty!"));
             }
 
-            var convertedImage = ImageHelper.ConvertImageToWebp(memoryStream.ToArray());
-            var convertedImageResolution = ImageHelper.GetImageResolution(convertedImage);
+            originalStream.Position = 0;
 
-            var reducedImage = ImageHelper.GetReducedImage(convertedImage);
+            var convertedImage = ImageHelper.ConvertImageToWebp(originalStream);
+            
+            await using var convertedStream = new MemoryStream(convertedImage.ImageData);
+            var reducedImage = ImageHelper.GetReducedImage(convertedStream);
             
             // Don't trust the file name sent by the client. To display
             // the file name, HTML-encode the value.
             var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
+            
             var trustedImageNameForDisplay = $"{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
             var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
+            
             var imageHash = HashHelper.ComputeMd5($"{DateTime.UtcNow}-{trustedImageNameForDisplay}");
             var thumbnailHash = HashHelper.ComputeMd5($"{DateTime.UtcNow}-{trustedThumbnailNameForDisplay}");
             
             var item = new StorageImage
             {
-                ImageHeight = convertedImageResolution.Height,
-                ImageWidth = convertedImageResolution.Width,
+                ImageHeight = convertedImage.Height,
+                ImageWidth = convertedImage.Width,
                 ThumbnailHeight = reducedImage.Height,
                 ThumbnailWidth = reducedImage.Width,
                 Image = new AppFile
@@ -62,8 +66,8 @@ public class ImageStorageService : IImageStorageService
                     FileHash = imageHash,
                     FileName = trustedImageNameForDisplay,
                     Extension = extensions,
-                    FileSize = convertedImage.Length,
-                    Content = convertedImage
+                    FileSize = convertedImage.ImageData.Length,
+                    Content = convertedImage.ImageData
                 },
                 Thumbnail = new AppFile
                 {
@@ -78,6 +82,8 @@ public class ImageStorageService : IImageStorageService
             _dbContext.StorageImages.Add(item);
             await _dbContext.SaveChangesAsync(CancellationToken.None);
 
+            GC.Collect();
+            
             return Result.Success();
         }
         catch (Exception e)

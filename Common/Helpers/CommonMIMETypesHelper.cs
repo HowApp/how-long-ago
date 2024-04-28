@@ -8,15 +8,16 @@ public static class CommonMIMETypesHelper
     
     private static readonly Dictionary<string, string> MIMETypes = new Dictionary<string, string>()
     {
-        {".png", "image/png"},
-        {".jpg", "image/jpeg"},
-        {".jpeg", "image/jpeg"},
-        {".webp", "image/webp"},
-        {".txt", "text/plain"},
+        {"png", "image/png"},
+        {"jpg", "image/jpeg"},
+        {"jpeg", "image/jpeg"},
+        {"webp", "image/webp"},
+        {"txt", "text/plain"},
     };
 
     public static string GetMIMEType(string ext)
     {
+        ext = ext.Replace(".", "");
         if (!MIMETypes.TryGetValue(ext, out var mimeType))
         {
             return DefaultMIMEType;

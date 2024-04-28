@@ -1,6 +1,6 @@
 namespace How.Core.Infrastructure.Models;
 
-public class ReducedImageModel
+public class ImageHelperModel
 {
     public byte[] ImageData { get; set; }
     public int Width { get; set; }
