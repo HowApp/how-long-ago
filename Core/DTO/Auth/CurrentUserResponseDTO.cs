@@ -1,6 +1,6 @@
-namespace How.Shared.DTO.Auth;
+namespace How.Core.DTO.Auth;
 
-public class CurrentUser
+public class CurrentUserResponseDTO
 {
     public bool IsAuthenticate { get; set; }
     public string UserName { get; set; }

@@ -3,8 +3,8 @@ namespace How.Server.Controllers;
 using Core.Models.ServicesModel.AccountService;
 using Core.Services.AccountServices;
 using Microsoft.AspNetCore.Mvc;
-using Shared.DTO.Auth;
 using Common.ResultType;
+using Core.DTO.Auth;
 
 public class AccountController : BaseController
 {

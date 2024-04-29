@@ -5,7 +5,6 @@ using Core.CQRS.Queries.Test;
 using Core.DTO.Test;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Shared.DTO.Test;
 
 public class TestController : BaseController
 {

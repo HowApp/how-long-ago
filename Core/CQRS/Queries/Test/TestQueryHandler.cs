@@ -2,8 +2,8 @@ namespace How.Core.CQRS.Queries.Test;
 
 using Common.CQRS;
 using Common.ResultType;
+using DTO.Test;
 using Microsoft.Extensions.Logging;
-using Shared.DTO.Test;
 
 public sealed class TestQueryHandler : IQueryHandler<TestQuery, Result<TestPostResponseDTO>>
 {

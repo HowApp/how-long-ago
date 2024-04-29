@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\How.Client.csproj" />
     <ProjectReference Include="..\Core\How.Core.csproj" />
-    <ProjectReference Include="..\Shared\How.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

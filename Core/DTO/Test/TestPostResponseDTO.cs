@@ -1,4 +1,4 @@
-namespace How.Shared.DTO.Test;
+namespace How.Core.DTO.Test;
 
 public sealed class TestPostResponseDTO
 {

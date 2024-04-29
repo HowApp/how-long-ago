@@ -13,8 +13,4 @@
       <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.2" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Shared\How.Shared.csproj" />
-    </ItemGroup>
-
 </Project>

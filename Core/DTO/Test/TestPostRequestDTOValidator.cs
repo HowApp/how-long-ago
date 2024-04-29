@@ -1,7 +1,6 @@
-namespace How.Core.Services.TestService.Validators;
+namespace How.Core.DTO.Test;
 
 using FluentValidation;
-using Shared.DTO.Test;
 
 public class TestPostRequestDTOValidator : AbstractValidator<TestPostRequestDTO>
 {
