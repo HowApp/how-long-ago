@@ -1,4 +1,3 @@
-
 namespace How.Server;
 
 using Common.Configurations;
@@ -14,12 +13,10 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+
         // Add services to the container.
         builder.Services.SetupServices(builder.Configuration);
-        
-        builder.Services.AddRazorPages();
-        
+
         var app = builder.Build();
 
         var serviceScopeFactory = app.Services.GetService<IServiceScopeFactory>();
@@ -31,11 +28,10 @@ public class Program
             var adminCredentials = scope.ServiceProvider.GetService<IOptions<AdminCredentials>>();
             await SeedAdmin.Seed(scope.ServiceProvider, adminCredentials!.Value);
         }
-        
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.UseWebAssemblyDebugging();
             app.UseSwagger();
             app.UseSwaggerUI();
         }
@@ -49,19 +45,15 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseCors(AppConstants.CorsPolicy);
-        
+
         app.UseRouting();
 
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapRazorPages();
         app.MapControllers();
-        
+
         app.UseStaticFiles();
-        
-        // app.UseBlazorFrameworkFiles();
-        // app.MapFallbackToFile("index.html");
 
         await app.RunAsync();
     }

@@ -30,5 +30,9 @@
     <Compile Remove="Migrations\20240121213211_Initial.Designer.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Error.cshtml" />
+  </ItemGroup>
+
 
 </Project>
