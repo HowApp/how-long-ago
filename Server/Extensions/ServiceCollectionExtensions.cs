@@ -4,6 +4,7 @@ using Common.Configurations;
 using Common.Constants;
 using Core;
 using Core.Database;
+using Core.Database.DapperConnection;
 using Core.Database.Entities.Identity;
 using Core.Services.AccountServices;
 using Core.Services.UserServices;
@@ -60,13 +61,15 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? 
+                               throw new ApplicationException("Database Connection string is null!");
 
         services.AddDbContext<BaseDbContext>(o =>
         {
             o.UseNpgsql(connectionString,
                 b =>
                 {
+                    b.UseNodaTime();
                     b.MigrationsAssembly("How.Server");
                 });
             
@@ -76,6 +79,8 @@ public static class ServiceCollectionExtensions
         services.AddDbContextFactory<BaseDbContext>(o => 
             o.UseNpgsql(connectionString), 
             ServiceLifetime.Scoped);
+
+        services.AddSingleton<DapperConnection>(o => new DapperConnection(connectionString));
         
         return services;
     }
@@ -109,6 +114,7 @@ public static class ServiceCollectionExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
+            c.ConfigureForNodaTime();
             c.EnableAnnotations();
         });
 

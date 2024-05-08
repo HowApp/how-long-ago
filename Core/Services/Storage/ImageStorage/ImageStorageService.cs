@@ -9,6 +9,7 @@ using Database.Entities.Storage;
 using Infrastructure.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 public class ImageStorageService : IImageStorageService
 {
@@ -52,29 +53,31 @@ public class ImageStorageService : IImageStorageService
             var trustedImageNameForDisplay = $"{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
             var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
             
-            var imageHash = HashHelper.ComputeMd5($"{DateTime.UtcNow}-{trustedImageNameForDisplay}");
-            var thumbnailHash = HashHelper.ComputeMd5($"{DateTime.UtcNow}-{trustedThumbnailNameForDisplay}");
+            var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
+            var thumbnailHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
             
-            var item = new StorageImage
+            var item = new Image
             {
                 ImageHeight = convertedImage.Height,
                 ImageWidth = convertedImage.Width,
                 ThumbnailHeight = reducedImage.Height,
                 ThumbnailWidth = reducedImage.Width,
-                Image = new AppFile
+                Originall = new FileStorage
                 {
-                    FileHash = imageHash,
-                    FileName = trustedImageNameForDisplay,
+                    Hash = imageHash,
+                    Name = trustedImageNameForDisplay,
+                    Path = StoragePathHelper.Images.Image(trustedImageNameForDisplay),
                     Extension = extensions,
-                    FileSize = convertedImage.ImageData.Length,
+                    Size = convertedImage.ImageData.Length,
                     Content = convertedImage.ImageData
                 },
-                Thumbnail = new AppFile
+                Thumbnail = new FileStorage
                 {
-                    FileHash = thumbnailHash,
-                    FileName = trustedThumbnailNameForDisplay,
+                    Hash = thumbnailHash,
+                    Name = trustedThumbnailNameForDisplay,
+                    Path = StoragePathHelper.Images.Image(trustedThumbnailNameForDisplay),
                     Extension = extensions,
-                    FileSize = reducedImage.ImageData.Length,
+                    Size = reducedImage.ImageData.Length,
                     Content = reducedImage.ImageData
                 }
             };

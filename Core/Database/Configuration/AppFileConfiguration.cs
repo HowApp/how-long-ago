@@ -1,14 +1,13 @@
-﻿namespace How.Core.Database.Configuration
-{
-    using How.Core.Database.Entities.Storage;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿namespace How.Core.Database.Configuration;
 
-    internal class AppFileConfiguration : IEntityTypeConfiguration<AppFile>
+using Entities.Storage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+internal class AppFileConfiguration : IEntityTypeConfiguration<FileStorage>
+{
+    public void Configure(EntityTypeBuilder<FileStorage> builder)
     {
-        public void Configure(EntityTypeBuilder<AppFile> builder)
-        {
-            builder.HasIndex(x => x.FileHash).IsUnique();
-        }
+        builder.HasIndex(x => x.Hash).IsUnique();
     }
 }

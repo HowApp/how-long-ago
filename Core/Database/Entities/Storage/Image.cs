@@ -2,7 +2,7 @@ namespace How.Core.Database.Entities.Storage;
 
 using Base;
 
-public class StorageImage : BaseIdentityKey
+public class Image : BaseIdentityKey
 {
     public int ImageHeight { get; set; }
     public int ImageWidth { get; set; }
@@ -11,8 +11,8 @@ public class StorageImage : BaseIdentityKey
     public int ThumbnailWidth { get; set; }
     
     public int ImageId { get; set; }
-    public AppFile Image { get; set; }
+    public FileStorage Originall { get; set; }
     
     public int ThumbnailId { get; set; }
-    public AppFile Thumbnail { get; set; }
+    public FileStorage Thumbnail { get; set; }
 }

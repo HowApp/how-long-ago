@@ -8,10 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Dapper" Version="2.1.35" />
       <PackageReference Include="FluentValidation" Version="11.9.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.2" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.2" />
+      <PackageReference Include="NodaTime" Version="3.1.11" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+      <PackageReference Include="Npgsql.NodaTime" Version="8.0.2" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
     </ItemGroup>
 

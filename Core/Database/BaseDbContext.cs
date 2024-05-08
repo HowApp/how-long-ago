@@ -21,8 +21,8 @@ public class BaseDbContext : IdentityDbContext<
     {
     }
 
-    public DbSet<AppFile> AppFiles { get; set; }
-    public DbSet<StorageImage> StorageImages { get; set; }
+    public DbSet<FileStorage> AppFiles { get; set; }
+    public DbSet<Image> StorageImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

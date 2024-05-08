@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Models.ServicesModel.StorageService;
+using NodaTime;
 
 public class FileStorageService : IFileStorageService
 {
@@ -25,7 +26,7 @@ public class FileStorageService : IFileStorageService
     {
         try
         {
-            var item = new AppFile();
+            var item = new FileStorage();
 
             using (var memoryStream = new MemoryStream())
             {
@@ -42,7 +43,7 @@ public class FileStorageService : IFileStorageService
                 }
 
                 item.Content = memoryStream.ToArray();
-                item.FileSize = memoryStream.Length;
+                item.Size = memoryStream.Length;
             }
 
             // Don't trust the file name sent by the client. To display
@@ -51,10 +52,11 @@ public class FileStorageService : IFileStorageService
                 file.FileName);
 
             var extensions = Path.GetExtension(trustedFileNameForDisplay).ToLowerInvariant();
-            var fileHash = HashHelper.ComputeMd5($"{DateTime.UtcNow}-{trustedFileNameForDisplay}");
+            var fileHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedFileNameForDisplay}");
 
-            item.FileHash = fileHash;
-            item.FileName = trustedFileNameForDisplay;
+            item.Hash = fileHash;
+            item.Name = trustedFileNameForDisplay;
+            item.Path = StoragePathHelper.Files.File(trustedFileNameForDisplay);
             item.Extension = extensions;
 
 
@@ -77,10 +79,10 @@ public class FileStorageService : IFileStorageService
         try
         {
             var image = await _dbContext.AppFiles
-                .Where(i => i.FileHash == fileHash)
+                .Where(i => i.Hash == fileHash)
                 .Select(i => new
                 {
-                    i.FileName,
+                    FileName = i.Name,
                     i.Extension,
                     i.Content
                 })
@@ -116,7 +118,7 @@ public class FileStorageService : IFileStorageService
         try
         {
             var image = await _dbContext.AppFiles
-                .Where(i => i.FileHash == fileHash)
+                .Where(i => i.Hash == fileHash)
                 .Select(i => new
                 {
                     i.Extension,

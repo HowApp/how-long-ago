@@ -9,10 +9,9 @@ public class EventRecord : BaseShort
     public int EventId { get; set; }
     public Event Event { get; set; }
     
-    [StringLength(512)]
+    [StringLength(2048)]
     public string Description { get; set; }
     
-    // TODO add image of record
-    // public int ImageId { get; set; }
-    // public AppFile Image { get; set; }
+    public int? ImageId { get; set; }
+    public Image Image { get; set; }
 }
