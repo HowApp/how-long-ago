@@ -4,12 +4,12 @@ using Common.Configurations;
 using Common.Constants;
 using Core;
 using Core.Database;
-using Core.Database.DapperConnection;
 using Core.Database.Entities.Identity;
-using Core.Services.AccountServices;
-using Core.Services.UserServices;
+using Core.Services.Identity;
+using Core.Services.CurrentUser;
 using Core.Services.Storage.FileStorage;
 using Core.Services.Storage.ImageStorage;
+using Core.Services.Account;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hosting.Filters;
@@ -85,14 +85,14 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<AdminCredentials>(configuration.GetSection("AdminCredentials"));
 
         return services;
     }
 
-    public static IServiceCollection AddCustomServices(this IServiceCollection services)
+    private static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
         services.AddMediatR(cfg =>
         {
@@ -100,10 +100,11 @@ public static class ServiceCollectionExtensions
             cfg.NotificationPublisher = new TaskWhenAllPublisher();
         });
         
-        services.AddTransient<IUserService, UserService>();
-        services.AddTransient<IAccountService, AccountService>();
+        services.AddTransient<ICurrentUserService, CurrentUserService>();
+        services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<IFileStorageService, FileStorageService>();
         services.AddTransient<IImageStorageService, ImageStorageService>();
+        services.AddTransient<IAccountService, AccountService>();
         
         return services;
     }
@@ -150,7 +151,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddCookies(this IServiceCollection services)
+    private static IServiceCollection AddCookies(this IServiceCollection services)
     {
         services.ConfigureApplicationCookie(o =>
         {

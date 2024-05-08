@@ -62,7 +62,7 @@ public class ImageStorageService : IImageStorageService
                 ImageWidth = convertedImage.Width,
                 ThumbnailHeight = reducedImage.Height,
                 ThumbnailWidth = reducedImage.Width,
-                Originall = new FileStorage
+                Main = new FileStorage
                 {
                     Hash = imageHash,
                     Name = trustedImageNameForDisplay,

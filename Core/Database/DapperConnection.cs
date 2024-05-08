@@ -1,4 +1,4 @@
-namespace How.Core.Database.DapperConnection;
+namespace How.Core.Database;
 
 using Npgsql;
 

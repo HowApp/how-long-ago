@@ -1,4 +1,4 @@
-namespace How.Core.DTO.Auth;
+namespace How.Core.DTO.Identity;
 
 using System.ComponentModel.DataAnnotations;
 

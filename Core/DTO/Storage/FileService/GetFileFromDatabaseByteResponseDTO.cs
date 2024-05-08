@@ -1,6 +1,6 @@
-namespace How.Core.Models.ServicesModel.StorageService;
+namespace How.Core.DTO.Storage.FileService;
 
-public class GetImageFromDatabaseByteResult
+public sealed class GetFileFromDatabaseByteResponseDTO
 {
     public string FileName { get; set; }
     public string MimeType { get; set; }

@@ -1,6 +1,6 @@
-namespace How.Core.DTO.Auth;
+namespace How.Core.DTO.Identity;
 
-public class CurrentUserResponseDTO
+public sealed class CurrentUserResponseDTO
 {
     public bool IsAuthenticate { get; set; }
     public string UserName { get; set; }

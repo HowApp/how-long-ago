@@ -1,13 +1,12 @@
-﻿namespace How.Core.Services.Storage.FileStorage
-{
-    using Common.ResultType;
-    using Microsoft.AspNetCore.Http;
-    using Models.ServicesModel.StorageService;
+﻿namespace How.Core.Services.Storage.FileStorage;
 
-    public interface IFileStorageService
-    {
-        Task<Result> PostFileToDatabase(IFormFile file);
-        Task<Result<GetImageFromDatabaseByteResult>> GetFileFromDatabaseByte(string fileHash);
-        Task<Result<GetImageFromDatabaseStreamResult>> GetFileFromDatabaseStream(string fileHash);
-    }
+using Common.ResultType;
+using DTO.Storage.FileService;
+using Microsoft.AspNetCore.Http;
+
+public interface IFileStorageService
+{
+    Task<Result> PostFileToDatabase(IFormFile file);
+    Task<Result<GetFileFromDatabaseByteResponseDTO>> GetFileFromDatabaseByte(string fileHash);
+    Task<Result<GetFileFromDatabaseStreamResponseDTO>> GetFileFromDatabaseStream(string fileHash);
 }

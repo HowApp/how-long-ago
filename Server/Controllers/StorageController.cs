@@ -1,11 +1,14 @@
 ﻿namespace How.Server.Controllers;
 
-using Core.DTO.Storage;
+using Core.DTO.Storage.FileService;
+using Core.DTO.Storage.ImageService;
 using Core.Services.Storage.FileStorage;
 using Core.Services.Storage.ImageStorage;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
+[Authorize]
 public class StorageController : BaseController
 {
     private readonly IFileStorageService _fileStorageService;
@@ -20,7 +23,7 @@ public class StorageController : BaseController
     [HttpPost]
     [SwaggerOperation("Upload file to server")]
     [Route("api/storage/file/create")]
-    public async Task<IActionResult> PostFile(CreateImageRequestDTO request)
+    public async Task<IActionResult> PostFile(CreateFileRequestDTO request)
     {
         var result = await _fileStorageService.PostFileToDatabase(request.File);
 

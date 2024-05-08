@@ -1,34 +1,34 @@
-namespace How.Core.Services.AccountServices;
+namespace How.Core.Services.Identity;
 
 using Common.Constants;
 using Common.Extensions;
 using Database.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Models.ServicesModel.AccountService;
 using Common.ResultType;
-using UserServices;
+using CurrentUser;
+using DTO.Identity;
 
-public class AccountService : IAccountService
+public class IdentityService : IIdentityService
 {
-    private readonly ILogger<AccountService> _logger;
+    private readonly ILogger<IdentityService> _logger;
     private readonly UserManager<HowUser> _userManager;
     private readonly SignInManager<HowUser> _signInManager;
-    private readonly IUserService _userService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public AccountService(
-        ILogger<AccountService> logger,
+    public IdentityService(
+        ILogger<IdentityService> logger,
         UserManager<HowUser> userManager, 
         SignInManager<HowUser> signInManager, 
-        IUserService userService)
+        ICurrentUserService currentUserService)
     {
         _logger = logger;
         _userManager = userManager;
         _signInManager = signInManager;
-        _userService = userService;
+        _currentUserService = currentUserService;
     }
 
-    public async Task<Result> Login(LoginRequestModel requestModel)
+    public async Task<Result> Login(LoginRequestDTO requestModel)
     {
         try
         {
@@ -62,7 +62,7 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<Result> Register(RegisterRequestModel requestModel)
+    public async Task<Result> Register(RegisterRequestDTO requestModel)
     {
         try
         {
@@ -117,20 +117,20 @@ public class AccountService : IAccountService
         }
     }
 
-    public async Task<Result<CurrentUserResponseModel>> GetCurrentUserInfo()
+    public async Task<Result<CurrentUserResponseDTO>> GetCurrentUserInfo()
     {
         try
         {
-            var user = _userService.User;
+            var user = _currentUserService.User;
 
             if (user.Identity is null)
             {
-                return Result.Failure<CurrentUserResponseModel>(new Error(
+                return Result.Failure<CurrentUserResponseDTO>(new Error(
                     ErrorType.Account,
                     "User not found!"));
             }
 
-            var result = new CurrentUserResponseModel
+            var result = new CurrentUserResponseDTO
             {
                 IsAuthenticate = user.Identity.IsAuthenticated,
                 UserName = user.Identity.Name ?? string.Empty,
@@ -142,7 +142,7 @@ public class AccountService : IAccountService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<CurrentUserResponseModel>(new Error(
+            return Result.Failure<CurrentUserResponseDTO>(new Error(
                 ErrorType.Account,
                 $"Error while executing {nameof(GetCurrentUserInfo)}!"));
         }

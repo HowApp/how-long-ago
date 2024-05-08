@@ -1,4 +1,4 @@
-﻿namespace How.Core.DTO.Storage;
+﻿namespace How.Core.DTO.Storage.ImageService;
 
 using Common.Attributes;
 using Common.Enums;

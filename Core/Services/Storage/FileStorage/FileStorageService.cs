@@ -5,10 +5,10 @@ using Common.Helpers;
 using Common.ResultType;
 using Database;
 using Database.Entities.Storage;
+using DTO.Storage.FileService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Models.ServicesModel.StorageService;
 using NodaTime;
 
 public class FileStorageService : IFileStorageService
@@ -74,7 +74,7 @@ public class FileStorageService : IFileStorageService
         }
     }
 
-    public async Task<Result<GetImageFromDatabaseByteResult>> GetFileFromDatabaseByte(string fileHash)
+    public async Task<Result<GetFileFromDatabaseByteResponseDTO>> GetFileFromDatabaseByte(string fileHash)
     {
         try
         {
@@ -90,12 +90,12 @@ public class FileStorageService : IFileStorageService
 
             if (image is null)
             {
-                return Result.Failure<GetImageFromDatabaseByteResult>(new Error(
+                return Result.Failure<GetFileFromDatabaseByteResponseDTO>(new Error(
                     ErrorType.Storage,
                     $"File not found!"));
             }
             
-            var result = new GetImageFromDatabaseByteResult
+            var result = new GetFileFromDatabaseByteResponseDTO
             {
                 FileName = image.FileName,
                 MimeType = CommonMIMETypesHelper.GetMIMEType(image.Extension),
@@ -107,13 +107,13 @@ public class FileStorageService : IFileStorageService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetImageFromDatabaseByteResult>(new Error(
+            return Result.Failure<GetFileFromDatabaseByteResponseDTO>(new Error(
                 ErrorType.Storage,
                 $"Error while executing {nameof(GetFileFromDatabaseByte)}"));
         }
     }
 
-    public async Task<Result<GetImageFromDatabaseStreamResult>> GetFileFromDatabaseStream(string fileHash)
+    public async Task<Result<GetFileFromDatabaseStreamResponseDTO>> GetFileFromDatabaseStream(string fileHash)
     {
         try
         {
@@ -121,6 +121,7 @@ public class FileStorageService : IFileStorageService
                 .Where(i => i.Hash == fileHash)
                 .Select(i => new
                 {
+                    FileName = i.Name,
                     i.Extension,
                     i.Content
                 })
@@ -128,14 +129,15 @@ public class FileStorageService : IFileStorageService
 
             if (image is null)
             {
-                return Result.Failure<GetImageFromDatabaseStreamResult>(new Error(
+                return Result.Failure<GetFileFromDatabaseStreamResponseDTO>(new Error(
                     ErrorType.Storage,
                     $"File not found!"));
             }
 
             var memoryStream = new MemoryStream(image.Content);
-            var result = new GetImageFromDatabaseStreamResult
+            var result = new GetFileFromDatabaseStreamResponseDTO
             {
+                FileName = image.FileName,
                 MimeType = CommonMIMETypesHelper.GetMIMEType(image.Extension),
                 Content = memoryStream
             };
@@ -145,7 +147,7 @@ public class FileStorageService : IFileStorageService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetImageFromDatabaseStreamResult>(new Error(
+            return Result.Failure<GetFileFromDatabaseStreamResponseDTO>(new Error(
                 ErrorType.Storage,
                 $"Error while executing {nameof(GetFileFromDatabaseStream)}"));
         }
