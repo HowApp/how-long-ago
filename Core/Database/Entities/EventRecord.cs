@@ -12,6 +12,6 @@ public class EventRecord : BaseShort
     [StringLength(2048)]
     public string Description { get; set; }
     
-    public int? ImageId { get; set; }
-    public Image Image { get; set; }
+    public int? StorageImageId { get; set; }
+    public StorageImage StorageImage { get; set; }
 }

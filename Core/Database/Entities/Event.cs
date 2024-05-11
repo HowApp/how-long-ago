@@ -18,6 +18,6 @@ public class Event : BaseLong
     
     public ICollection<EventRecord> Records { get; set; }
     
-    public int? ImageId { get; set; }
-    public Image Image { get; set; }
+    public int? StorageImageId { get; set; }
+    public StorageImage StorageImage { get; set; }
 }

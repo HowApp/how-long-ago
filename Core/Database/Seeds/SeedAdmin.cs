@@ -19,6 +19,8 @@ public static class SeedAdmin
         {
             user = new HowUser
             {
+                FirstName = "Admin",
+                LastName = string.Empty,
                 UserName = adminCredentials.Name,
                 Email = adminCredentials.Email,
                 EmailConfirmed = true,

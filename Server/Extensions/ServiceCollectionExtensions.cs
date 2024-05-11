@@ -17,6 +17,11 @@ using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 
 public static class ServiceCollectionExtensions
 {
@@ -36,11 +41,18 @@ public static class ServiceCollectionExtensions
             });
         });
 
-        services.AddControllersWithViews(options =>
+        services.AddControllers(options =>
+            {
+                options.Filters.Add<ModelStateValidationFilter>();
+                options.Filters.Add<ExceptionFilter>();
+            });
+        
+        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
-            options.Filters.Add<ModelStateValidationFilter>();
-            options.Filters.Add<ExceptionFilter>();
-        });
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            Converters = { new StringEnumConverter() },
+            NullValueHandling = NullValueHandling.Ignore
+        }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssemblyContaining<BaseDbContext>();
         

@@ -56,13 +56,13 @@ public class ImageStorageService : IImageStorageService
             var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
             var thumbnailHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
             
-            var item = new Image
+            var item = new StorageImage
             {
                 ImageHeight = convertedImage.Height,
                 ImageWidth = convertedImage.Width,
                 ThumbnailHeight = reducedImage.Height,
                 ThumbnailWidth = reducedImage.Width,
-                Main = new FileStorage
+                Main = new StorageFile
                 {
                     Hash = imageHash,
                     Name = trustedImageNameForDisplay,
@@ -71,7 +71,7 @@ public class ImageStorageService : IImageStorageService
                     Size = convertedImage.ImageData.Length,
                     Content = convertedImage.ImageData
                 },
-                Thumbnail = new FileStorage
+                Thumbnail = new StorageFile
                 {
                     Hash = thumbnailHash,
                     Name = trustedThumbnailNameForDisplay,

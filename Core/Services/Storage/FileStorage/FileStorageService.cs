@@ -26,7 +26,7 @@ public class FileStorageService : IFileStorageService
     {
         try
         {
-            var item = new FileStorage();
+            var item = new StorageFile();
 
             using (var memoryStream = new MemoryStream())
             {
@@ -60,7 +60,7 @@ public class FileStorageService : IFileStorageService
             item.Extension = extensions;
 
 
-            _dbContext.AppFiles.Add(item);
+            _dbContext.StorageFiles.Add(item);
             await _dbContext.SaveChangesAsync(CancellationToken.None);
 
             return Result.Success();
@@ -78,7 +78,7 @@ public class FileStorageService : IFileStorageService
     {
         try
         {
-            var image = await _dbContext.AppFiles
+            var image = await _dbContext.StorageFiles
                 .Where(i => i.Hash == fileHash)
                 .Select(i => new
                 {
@@ -117,7 +117,7 @@ public class FileStorageService : IFileStorageService
     {
         try
         {
-            var image = await _dbContext.AppFiles
+            var image = await _dbContext.StorageFiles
                 .Where(i => i.Hash == fileHash)
                 .Select(i => new
                 {

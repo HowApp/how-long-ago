@@ -2,7 +2,7 @@ namespace How.Core.Database.Entities.Storage;
 
 using Base;
 
-public class FileStorage : BaseIdentityKey
+public class StorageFile : BaseIdentityKey
 {
     public string Hash { get; set; }
     public string Name { get; set; }

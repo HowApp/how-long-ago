@@ -13,4 +13,5 @@ public class CurrentUserService : ICurrentUserService
     }
 
     public ClaimsPrincipal User => _httpContextAccessor.HttpContext.User;
+    public int UserId => Int32.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)); 
 }

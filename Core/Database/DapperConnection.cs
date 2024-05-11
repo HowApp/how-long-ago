@@ -18,7 +18,6 @@ public class DapperConnection
         var dataSource = dataSourceBuilder.Build();
         
         var connection = dataSource.OpenConnection();
-        connection.Open();
         return connection;
     }
 }

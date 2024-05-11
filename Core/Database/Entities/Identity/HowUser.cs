@@ -5,7 +5,10 @@ using Storage;
 
 public class HowUser : IdentityUser<int>
 {
-    public int? ImageId { get; set; }
-    public Image Image { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    
+    public int? StorageImageId { get; set; }
+    public StorageImage StorageImage { get; set; }
     public virtual ICollection<HowUserRole> UserRoles {get; set;}
 }

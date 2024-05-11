@@ -5,4 +5,5 @@ using System.Security.Claims;
 public interface ICurrentUserService
 {
     ClaimsPrincipal User { get; }
+    int UserId { get; }
 }

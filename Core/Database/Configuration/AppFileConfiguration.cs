@@ -4,9 +4,9 @@ using Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-internal class AppFileConfiguration : IEntityTypeConfiguration<FileStorage>
+public class AppFileConfiguration : IEntityTypeConfiguration<StorageFile>
 {
-    public void Configure(EntityTypeBuilder<FileStorage> builder)
+    public void Configure(EntityTypeBuilder<StorageFile> builder)
     {
         builder.HasIndex(x => x.Hash).IsUnique();
     }
