@@ -29,9 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CQRS\Commands\" />
       <Folder Include="Models\" />
-      <Folder Include="Models\ServicesModel\" />
     </ItemGroup>
 
 </Project>
