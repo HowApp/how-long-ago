@@ -24,10 +24,10 @@ public class DeleteImageCommandHandler : ICommandHandler<DeleteImageCommand, Res
             var removeImageSql = @"
 DELETE FROM storage_images
 WHERE id = @imageId
-RETURNING (SELECT i.main_id, i.thumbnail_id FROM storage_images i WHERE i.id = @imageId)
+RETURNING main_id, thumbnail_id;
 ";
             await using var connection = _dapper.InitConnection();
-            var oldFiles = await connection.QueryAsync<int>(
+            var oldFiles = await connection.QueryFirstOrDefaultAsync<(int,int)>(
                 removeImageSql, new
                 {
                     imageId = request.ImageId
@@ -35,11 +35,11 @@ RETURNING (SELECT i.main_id, i.thumbnail_id FROM storage_images i WHERE i.id = @
             
             var removeFileSql = @"
 DELETE FROM storage_files
-WHERE id = ANY(@imageId)
+WHERE id = ANY(@imageId);
 ";
             await connection.ExecuteAsync(removeFileSql, new
             {
-                imageId = oldFiles
+                imageId = new int[] {oldFiles.Item1, oldFiles.Item2 }
             });
             
             return Result.Success();

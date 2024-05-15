@@ -46,11 +46,11 @@ public static class FileSignatureValidator
         using (var reader = new BinaryReader(data))
         {
             var firstBytes = reader.ReadBytes(100);
-
-            var val = false;
             
             foreach (var ext in permittedExtensions)
             {
+                var val = false;
+                
                 if (!ImageSignature.TryGetValue(ext, out var signature))
                 {
                     return false;
@@ -68,9 +68,14 @@ public static class FileSignatureValidator
                 {
                     val = signature.Any(s => headerByte.Take(s.Length).SequenceEqual(s));
                 }
+
+                if (val)
+                {
+                    return true;
+                }
             }
 
-            return val;
+            return false;
         }
     }
 }

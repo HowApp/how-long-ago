@@ -48,11 +48,12 @@ public static class ServiceCollectionExtensions
             });
         
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Converters = { new StringEnumConverter() },
-            NullValueHandling = NullValueHandling.Ignore
-        }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Converters = { new StringEnumConverter() },
+                NullValueHandling = NullValueHandling.Ignore
+            }
+            .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssemblyContaining<BaseDbContext>();
         

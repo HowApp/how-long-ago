@@ -34,7 +34,8 @@ public class InsertImageCommandHandler : ICommandHandler<InsertImageCommand, Res
             if (mainId < 1 || thumbnailId < 1)
             {
                 await transaction.RollbackAsync(CancellationToken.None);
-                return Result.Failure<int>(new Error(ErrorType.Storage,$"Error while executing {nameof(InsertImageCommand)}"));
+                return Result.Failure<int>(new Error(
+                    ErrorType.Storage,$"Error while executing {nameof(InsertImageCommand)}"));
             }
             
             var command = $@"
@@ -54,9 +55,15 @@ RETURNING id;
                     thumbnail_id = thumbnailId
                 }, transaction);
 
+            if (result < 1)
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+                return Result.Failure<int>(new Error(
+                    ErrorType.Storage,$"Error while executing {nameof(InsertImageCommand)}"));
+            }
+            
             await transaction.CommitAsync(CancellationToken.None);
             return Result.Success(result);
-            
         }
         catch (Exception e)
         {
@@ -81,7 +88,7 @@ RETURNING id;
                 hash = file.Hash,
                 name = file.Name,
                 path = file.Path,
-                extensions = file.Extension,
+                extension = file.Extension,
                 size = file.Size,
                 content = file.Content
             }, transaction);

@@ -6,6 +6,5 @@ using Models.ServicesModel;
 
 public sealed class InsertImageCommand : ICommand<Result<int>>
 {
-    public int CurrentUserId { get; set; }
     public ImageInternalModel Image { get; set; }
 }
