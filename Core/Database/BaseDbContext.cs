@@ -2,6 +2,7 @@ using How.Core.Database.Entities.Storage;
 
 namespace How.Core.Database;
 
+using Entities.Event;
 using Entities.Identity;
 using Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -24,6 +25,9 @@ public class BaseDbContext : IdentityDbContext<
     public DbSet<StorageFile> StorageFiles { get; set; }
     public DbSet<StorageImage> StorageImages { get; set; }
 
+    public DbSet<Event> Events { get; set; } 
+    public DbSet<EventRecord> EventRecords { get; set; } 
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

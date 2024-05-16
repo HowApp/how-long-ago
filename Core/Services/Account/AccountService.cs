@@ -59,7 +59,7 @@ public class AccountService : IAccountService
                 Id = queryResult.Data.Id,
                 FirstName = queryResult.Data.FirstName,
                 LastName = queryResult.Data.LastName,
-                Image = new ImageModel
+                Image = new ImageModelDTO
                 {
                     MainHash = queryResult.Data.MainHash,
                     ThumbnailHash = queryResult.Data.ThumbnailHash

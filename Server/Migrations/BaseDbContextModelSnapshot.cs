@@ -4,6 +4,7 @@ using How.Core.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -21,6 +22,108 @@ namespace How.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Instant?>("ChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
+
+                    b.Property<int?>("ChangedBy")
+                        .HasColumnType("integer")
+                        .HasColumnName("changed_by");
+
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CreteById")
+                        .HasColumnType("integer")
+                        .HasColumnName("crete_by_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("integer")
+                        .HasColumnName("owner_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<int?>("StorageImageId")
+                        .HasColumnType("integer")
+                        .HasColumnName("storage_image_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_events");
+
+                    b.HasIndex("OwnerId")
+                        .HasDatabaseName("ix_events_owner_id");
+
+                    b.HasIndex("StorageImageId")
+                        .HasDatabaseName("ix_events_storage_image_id");
+
+                    b.ToTable("events", (string)null);
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.EventRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CreteById")
+                        .HasColumnType("integer")
+                        .HasColumnName("crete_by_id");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnName("description");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("event_id");
+
+                    b.Property<int?>("StorageImageId")
+                        .HasColumnType("integer")
+                        .HasColumnName("storage_image_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_event_records");
+
+                    b.HasIndex("EventId")
+                        .HasDatabaseName("ix_event_records_event_id");
+
+                    b.HasIndex("StorageImageId")
+                        .HasDatabaseName("ix_event_records_storage_image_id");
+
+                    b.ToTable("event_records", (string)null);
+                });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowRole", b =>
                 {
@@ -132,12 +235,14 @@ namespace How.Server.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
                         .HasColumnName("last_name");
 
                     b.Property<bool>("LockoutEnabled")
@@ -396,6 +501,44 @@ namespace How.Server.Migrations
                     b.ToTable("storage_images", (string)null);
                 });
 
+            modelBuilder.Entity("How.Core.Database.Entities.Event.Event", b =>
+                {
+                    b.HasOne("How.Core.Database.Entities.Identity.HowUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_events_users_owner_id");
+
+                    b.HasOne("How.Core.Database.Entities.Storage.StorageImage", "StorageImage")
+                        .WithMany()
+                        .HasForeignKey("StorageImageId")
+                        .HasConstraintName("fk_events_storage_images_storage_image_id");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("StorageImage");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.EventRecord", b =>
+                {
+                    b.HasOne("How.Core.Database.Entities.Event.Event", "Event")
+                        .WithMany("Records")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_records_events_event_id");
+
+                    b.HasOne("How.Core.Database.Entities.Storage.StorageImage", "StorageImage")
+                        .WithMany()
+                        .HasForeignKey("StorageImageId")
+                        .HasConstraintName("fk_event_records_storage_images_storage_image_id");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("StorageImage");
+                });
+
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowRoleClaim", b =>
                 {
                     b.HasOne("How.Core.Database.Entities.Identity.HowRole", null)
@@ -486,6 +629,11 @@ namespace How.Server.Migrations
                     b.Navigation("Main");
 
                     b.Navigation("Thumbnail");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.Event", b =>
+                {
+                    b.Navigation("Records");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowRole", b =>

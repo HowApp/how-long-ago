@@ -1,4 +1,4 @@
-namespace How.Core.Database.Entities;
+namespace How.Core.Database.Entities.Event;
 
 using System.ComponentModel.DataAnnotations;
 using Base;

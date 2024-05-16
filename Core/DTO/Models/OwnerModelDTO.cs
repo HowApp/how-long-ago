@@ -1,8 +1,6 @@
-namespace How.Core.DTO.Account;
+namespace How.Core.DTO.Models;
 
-using Models;
-
-public sealed class GetUserInfoResponseDTO
+public class OwnerModelDTO
 {
     public int Id { get; set; }
     public string FirstName { get; set; }

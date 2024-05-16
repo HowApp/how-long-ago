@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -105,8 +106,8 @@ namespace How.Server.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    first_name = table.Column<string>(type: "text", nullable: false),
-                    last_name = table.Column<string>(type: "text", nullable: false),
+                    first_name = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    last_name = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     storage_image_id = table.Column<int>(type: "integer", nullable: true),
                     user_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     normalized_user_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -131,6 +132,38 @@ namespace How.Server.Migrations
                         column: x => x.storage_image_id,
                         principalTable: "storage_images",
                         principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "events",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    name = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    owner_id = table.Column<int>(type: "integer", nullable: false),
+                    storage_image_id = table.Column<int>(type: "integer", nullable: true),
+                    crete_by_id = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<Instant>(type: "timestamp with time zone", nullable: false),
+                    changed_by = table.Column<int>(type: "integer", nullable: true),
+                    changed_at = table.Column<Instant>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_events", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_events_storage_images_storage_image_id",
+                        column: x => x.storage_image_id,
+                        principalTable: "storage_images",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_events_users_owner_id",
+                        column: x => x.owner_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -218,6 +251,34 @@ namespace How.Server.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "event_records",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    event_id = table.Column<int>(type: "integer", nullable: false),
+                    description = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    storage_image_id = table.Column<int>(type: "integer", nullable: true),
+                    crete_by_id = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<Instant>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_event_records", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_event_records_events_event_id",
+                        column: x => x.event_id,
+                        principalTable: "events",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_event_records_storage_images_storage_image_id",
+                        column: x => x.storage_image_id,
+                        principalTable: "storage_images",
+                        principalColumn: "id");
+                });
+
             migrationBuilder.InsertData(
                 table: "roles",
                 columns: new[] { "id", "concurrency_stamp", "name", "normalized_name" },
@@ -226,6 +287,26 @@ namespace How.Server.Migrations
                     { 1, "88d484e2-ee7a-49b8-95e6-e34qw5rqb625", "User", "USER" },
                     { 2, "8b6258e2-ee7a-49b8-95e6-e34qw5rqd484", "Admin", "ADMIN" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_event_records_event_id",
+                table: "event_records",
+                column: "event_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_event_records_storage_image_id",
+                table: "event_records",
+                column: "storage_image_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_events_owner_id",
+                table: "events",
+                column: "owner_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_events_storage_image_id",
+                table: "events",
+                column: "storage_image_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_role_claims_role_id",
@@ -290,6 +371,9 @@ namespace How.Server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "event_records");
+
+            migrationBuilder.DropTable(
                 name: "role_claims");
 
             migrationBuilder.DropTable(
@@ -303,6 +387,9 @@ namespace How.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_tokens");
+
+            migrationBuilder.DropTable(
+                name: "events");
 
             migrationBuilder.DropTable(
                 name: "roles");
