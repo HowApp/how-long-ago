@@ -2,8 +2,9 @@ namespace How.Common.DTO;
 
 public class PaginationDTO
 {
-    private int _page;
-    private int _size;
+    private int _page = 1;
+    private int _size = 20;
+    private static int _maxSize = 100;
 
     public int Page
     {
@@ -24,10 +25,12 @@ public class PaginationDTO
         {
             _size = value switch
             {
-                > 100 => 100,
+                > 100 => _maxSize,
                 < 1 => 1,
                 _ => _size
             };
         }
     }
+
+    public static int MaxSize => _maxSize;
 }

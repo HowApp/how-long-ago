@@ -32,12 +32,13 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
             var query = $@"
 SELECT 
     e.id AS {nameof(EventItemModel.Id)},
-    e.{nameof(Event.Name).ToSnake()}  AS {nameof(EventItemModel.Name)},
+    e.{nameof(Event.Name).ToSnake()} AS {nameof(EventItemModel.Name)},
+    e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(EventItemModel.CreatedAt)},
     event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.EventMainHash)},
     event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.EventThumbnailHash)},
     u.id AS {nameof(EventItemModel.OwnerId)},
-    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(EventItemModel.FirstName)},
-    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(EventItemModel.LastName)},
+    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(EventItemModel.OwnerFirstName)},
+    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(EventItemModel.OwnerLastName)},
     user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.OwnerMainHash)},
     user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.OwnerThumbnailHash)}
 FROM {nameof(BaseDbContext.Events).ToSnake()} e 
@@ -79,7 +80,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 countQuery,
                 new
                 {
-                    status = (int)EventStatus.Active,
+                    status = (int)request.Status,
                     search = request.Search
                 });
 
@@ -87,7 +88,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 query,
                 new
                 {
-                    status = (int)EventStatus.Active,
+                    status = (int)request.Status,
                     size = request.Size,
                     offset = request.Offset,
                     search = request.Search

@@ -5,11 +5,14 @@ using Common.Constants;
 using Core;
 using Core.Database;
 using Core.Database.Entities.Identity;
+using Core.Infrastructure.NpgsqlExtensions;
 using Core.Services.Identity;
 using Core.Services.CurrentUser;
 using Core.Services.Storage.FileStorage;
 using Core.Services.Storage.ImageStorage;
 using Core.Services.Account;
+using Core.Services.Event;
+using Dapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hosting.Filters;
@@ -95,6 +98,8 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<DapperConnection>(o => new DapperConnection(connectionString));
         
+        SqlMapper.AddTypeHandler(InstantHandler.Default);
+        
         return services;
     }
 
@@ -118,6 +123,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFileStorageService, FileStorageService>();
         services.AddTransient<IImageStorageService, ImageStorageService>();
         services.AddTransient<IAccountService, AccountService>();
+        services.AddTransient<IEventService, EventService>();
         
         return services;
     }

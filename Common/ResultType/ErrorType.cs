@@ -7,4 +7,5 @@ public static class ErrorType
     public static readonly string Validation = "Validation";
     public static readonly string FileValidation = "FileValidation";
     public static readonly string Storage = "Storage";
+    public static readonly string Event = "Event";
 }
