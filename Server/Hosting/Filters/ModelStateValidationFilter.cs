@@ -16,7 +16,10 @@ public class ModelStateValidationFilter : IActionFilter
 
             foreach (var (key, value) in modelState)
             {
-                error.Add(key, value.Errors.Select(e => e.ErrorMessage));
+                if (value.Errors.Any())
+                {
+                    error.Add(key, value.Errors.Select(e => e.ErrorMessage));
+                }
             }
 
             context.Result = new BadRequestObjectResult(Result.Failure(error));

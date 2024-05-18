@@ -4,6 +4,7 @@ using Common.CQRS;
 using Common.ResultType;
 using Dapper;
 using Database;
+using Database.Entities.Storage;
 using Microsoft.Extensions.Logging;
 using Models.ServicesModel;
 using Npgsql;
@@ -34,8 +35,8 @@ public class InsertImageCommandHandler : ICommandHandler<InsertImageCommand, Res
             if (mainId < 1 || thumbnailId < 1)
             {
                 await transaction.RollbackAsync(CancellationToken.None);
-                return Result.Failure<int>(new Error(
-                    ErrorType.Storage,$"Error while executing {nameof(InsertImageCommand)}"));
+                _logger.LogError($"Error while insert {nameof(StorageFile)} at {nameof(InsertImageCommand)}");
+                return Result.Success(0);
             }
             
             var command = $@"
@@ -58,8 +59,8 @@ RETURNING id;
             if (result < 1)
             {
                 await transaction.RollbackAsync(CancellationToken.None);
-                return Result.Failure<int>(new Error(
-                    ErrorType.Storage,$"Error while executing {nameof(InsertImageCommand)}"));
+                _logger.LogError($"Error while insert {nameof(StorageImage)} at {nameof(InsertImageCommand)}");
+                return Result.Success(0);
             }
             
             await transaction.CommitAsync(CancellationToken.None);

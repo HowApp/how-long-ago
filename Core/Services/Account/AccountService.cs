@@ -132,6 +132,12 @@ public class AccountService : IAccountService
                 return Result.Failure<UpdateUserImageResponseDTO>(insertImage.Error);
             }
 
+            if (insertImage.Data < 1)
+            {
+                return Result.Failure<UpdateUserImageResponseDTO>(
+                    new Error(ErrorType.Account, $"Image not created!"));
+            }
+
             imageId = insertImage.Data;
 
             var updateUserImage = await _sender.Send(new UpdateUserImageCommand

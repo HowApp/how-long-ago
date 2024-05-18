@@ -1,5 +1,6 @@
 namespace How.Server.Controllers;
 
+using Common.ResultType;
 using Core.DTO.Account;
 using Core.Services.Account;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ public class AccountController : BaseController
     
     [HttpGet]
     [SwaggerOperation("Get user info")]
-    [ProducesResponseType<GetUserInfoResponseDTO>(200)]
+    [ProducesResponseType<Result<GetUserInfoResponseDTO>>(200)]
     [Route("api/account/info")]
     public async Task<IActionResult> GetUserInfo()
     {
@@ -29,9 +30,9 @@ public class AccountController : BaseController
 
     [HttpPatch]
     [SwaggerOperation("Update user info")]
-    [ProducesResponseType<UpdateUserImageResponseDTO>(200)]
+    [ProducesResponseType<Result>(200)]
     [Route("api/account/info")]
-    public async Task<IActionResult> UpdateUserInfo([FromQuery] UpdateUserInfoRequestDTO request)
+    public async Task<IActionResult> UpdateUserInfo([FromBody] UpdateUserInfoRequestDTO request)
     {
         var result = await _accountService.UpdateUserInfo(request);
 
@@ -40,7 +41,7 @@ public class AccountController : BaseController
     
     [HttpPut]
     [SwaggerOperation("Update user image, returning hash")]
-    [ProducesResponseType<UpdateUserImageResponseDTO>(200)]
+    [ProducesResponseType<Result<UpdateUserImageResponseDTO>>(200)]
     [Route("api/account/image")]
     public async Task<IActionResult> UpdateUserImage([FromForm] UpdateUserImageRequestDTO request)
     {
