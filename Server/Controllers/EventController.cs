@@ -38,4 +38,15 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
+    
+    [HttpPatch]
+    [SwaggerOperation("Activate Event")]
+    [ProducesResponseType<Result<int>>(200)]
+    [Route("api/event/{id:int:min(1)}/activate")]
+    public async Task<IActionResult> Activate([FromRoute] int id)
+    {
+        var result = await _eventService.ActivateEvent(id);
+
+        return HttpResult(result);
+    }
 }

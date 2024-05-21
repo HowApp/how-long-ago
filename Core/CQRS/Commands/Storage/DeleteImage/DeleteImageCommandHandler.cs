@@ -1,9 +1,11 @@
 namespace How.Core.CQRS.Commands.Storage.DeleteImage;
 
 using Common.CQRS;
+using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
+using Database.Entities.Storage;
 using Microsoft.Extensions.Logging;
 
 public class DeleteImageCommandHandler : ICommandHandler<DeleteImageCommand, Result>
@@ -21,10 +23,10 @@ public class DeleteImageCommandHandler : ICommandHandler<DeleteImageCommand, Res
     {
         try
         {
-            var removeImageSql = @"
-DELETE FROM storage_images
-WHERE id = @imageId
-RETURNING main_id, thumbnail_id;
+            var removeImageSql = @$"
+DELETE FROM {nameof(BaseDbContext.StorageImages).ToSnake()}
+WHERE {nameof(StorageImage.Id).ToSnake()} = @imageId
+RETURNING {nameof(StorageImage.MainId).ToSnake()}, {nameof(StorageImage.ThumbnailId).ToSnake()};
 ";
             await using var connection = _dapper.InitConnection();
             var oldFiles = await connection.QueryFirstOrDefaultAsync<(int,int)>(
@@ -33,9 +35,9 @@ RETURNING main_id, thumbnail_id;
                     imageId = request.ImageId
                 });
             
-            var removeFileSql = @"
-DELETE FROM storage_files
-WHERE id = ANY(@imageId);
+            var removeFileSql = $@"
+DELETE FROM {nameof(BaseDbContext.StorageFiles).ToSnake()}
+WHERE {nameof(StorageFile.Id).ToSnake()} = ANY(@imageId);
 ";
             await connection.ExecuteAsync(removeFileSql, new
             {

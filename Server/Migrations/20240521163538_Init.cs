@@ -145,9 +145,9 @@ namespace How.Server.Migrations
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     owner_id = table.Column<int>(type: "integer", nullable: false),
                     storage_image_id = table.Column<int>(type: "integer", nullable: true),
-                    crete_by_id = table.Column<int>(type: "integer", nullable: false),
+                    created_by_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<Instant>(type: "timestamp with time zone", nullable: false),
-                    changed_by = table.Column<int>(type: "integer", nullable: true),
+                    changed_by_id = table.Column<int>(type: "integer", nullable: true),
                     changed_at = table.Column<Instant>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -260,7 +260,7 @@ namespace How.Server.Migrations
                     event_id = table.Column<int>(type: "integer", nullable: false),
                     description = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     storage_image_id = table.Column<int>(type: "integer", nullable: true),
-                    crete_by_id = table.Column<int>(type: "integer", nullable: false),
+                    created_by_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<Instant>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

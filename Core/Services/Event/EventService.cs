@@ -2,10 +2,12 @@ namespace How.Core.Services.Event;
 
 using Common.ResultType;
 using CQRS.Commands.Event.CreateEvent;
+using CQRS.Commands.Event.UpdateEventStatus;
 using CQRS.Queries.Event.GetEventsPagination;
 using CurrentUser;
 using DTO.Event;
 using DTO.Models;
+using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -52,6 +54,40 @@ public class EventService : IEventService
             _logger.LogError(e.Message);
             return Result.Failure<int>(
                 new Error(ErrorType.Event, $"Error at {nameof(CreateEvent)}"));
+        }
+    }
+
+    public async Task<Result> ActivateEvent(int eventId)
+    {
+        try
+        {
+            var command = new UpdateEventStatusCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId,
+                Status = EventStatus.Active
+            };
+            
+            var result = await _sender.Send(command);
+
+            if (result.Failed)
+            {
+                return Result.Failure<int>(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure<int>(
+                    new Error(ErrorType.Event, $"Event not activated!"));
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<int>(
+                new Error(ErrorType.Event, $"Error at {nameof(ActivateEvent)}"));
         }
     }
 

@@ -1,9 +1,11 @@
 namespace How.Core.CQRS.Commands.Account.UpdateUserInfo;
 
 using Common.CQRS;
+using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
+using Database.Entities.Identity;
 using Microsoft.Extensions.Logging;
 
 public class UpdateUserInfoCommandHandler : ICommandHandler<UpdateUserInfoCommand, Result<int>>
@@ -22,11 +24,11 @@ public class UpdateUserInfoCommandHandler : ICommandHandler<UpdateUserInfoComman
         try
         {
             var command = $@"
-UPDATE users
+UPDATE {nameof(BaseDbContext.Users).ToSnake()}
 SET 
-    first_name = @first_name,
-    last_name = @last_name
-WHERE id = @userId
+    {nameof(HowUser.FirstName).ToSnake()} = @first_name,
+    {nameof(HowUser.LastName).ToSnake()} = @last_name
+WHERE {nameof(HowUser.Id).ToSnake()} = @userId
 RETURNING *;
 ";
             await using var connection = _dapper.InitConnection();

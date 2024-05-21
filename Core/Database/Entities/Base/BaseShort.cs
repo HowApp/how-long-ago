@@ -4,6 +4,6 @@ using NodaTime;
 
 public class BaseShort : BaseIdentityKey
 {
-    public int CreteById { get; set; }
+    public int CreatedById { get; set; }
     public Instant CreatedAt { get; set; }
 }

@@ -1,9 +1,11 @@
 namespace How.Core.CQRS.Commands.Event.CreateEvent;
 
 using Common.CQRS;
+using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
+using Database.Entities.Event;
 using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -24,9 +26,17 @@ public class CreateEventCommandHandler : ICommandHandler<CreateEventCommand, Res
         try
         {
             var command = $@"
-INSERT INTO events (name, status, is_deleted, owner_id, crete_by_id, created_at, changed_by, changed_at) 
+INSERT INTO {nameof(BaseDbContext.Events).ToSnake()} (
+    {nameof(Event.Name).ToSnake()},
+    {nameof(Event.Status).ToSnake()},
+    {nameof(Event.IsDeleted).ToSnake()},
+    {nameof(Event.OwnerId).ToSnake()},
+    {nameof(Event.CreatedById).ToSnake()},
+    {nameof(Event.CreatedAt).ToSnake()},
+    {nameof(Event.ChangedById).ToSnake()},
+    {nameof(Event.ChangedAt).ToSnake()}) 
 VALUES (@name, @status, @is_deleted, @owner_id, @crete_by_id, @created_at, @changed_by, @changed_at)
-RETURNING id;
+RETURNING {nameof(Event.Id).ToSnake()};
 ";
             await using var connection = _dapper.InitConnection();
             var result = await connection.QuerySingleAsync<int>(

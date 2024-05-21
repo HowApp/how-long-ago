@@ -1,9 +1,12 @@
 namespace How.Core.CQRS.Commands.Account.UpdateUserImage;
 
 using Common.CQRS;
+using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
+using Database.Entities.Identity;
+using Database.Entities.Storage;
 using Microsoft.Extensions.Logging;
 
 public class UpdateUserImageCommandHandler : ICommandHandler<UpdateUserImageCommand, Result>
@@ -27,10 +30,13 @@ public class UpdateUserImageCommandHandler : ICommandHandler<UpdateUserImageComm
         try
         {
             var updateImageSql = $@"
-UPDATE users
-SET storage_image_id = @imageId
-WHERE id = @userId
-RETURNING (SELECT coalesce(u.storage_image_id, 0) FROM users u WHERE u.id = @userId);
+UPDATE {nameof(BaseDbContext.Users).ToSnake()}
+SET {nameof(HowUser.StorageImageId).ToSnake()} = @imageId
+WHERE {nameof(HowUser.Id).ToSnake()} = @userId
+RETURNING (
+    SELECT coalesce(u.{nameof(HowUser.StorageImageId).ToSnake()}, 0) 
+    FROM {nameof(BaseDbContext.Users).ToSnake()} u 
+    WHERE u.{nameof(HowUser.Id).ToSnake()} = @userId);
 ";
             
             var oldImageId = await connection.QueryFirstOrDefaultAsync<int>(
@@ -43,10 +49,10 @@ RETURNING (SELECT coalesce(u.storage_image_id, 0) FROM users u WHERE u.id = @use
 
             if (oldImageId != 0)
             {
-                var removeImageSql = @"
-DELETE FROM storage_images
-WHERE id = @imageId
-RETURNING main_id, thumbnail_id;
+                var removeImageSql = $@"
+DELETE FROM {nameof(BaseDbContext.StorageImages).ToSnake()}
+WHERE {nameof(StorageImage.Id).ToSnake()} = @imageId
+RETURNING {nameof(StorageImage.MainId).ToSnake()}, {nameof(StorageImage.ThumbnailId).ToSnake()};
 ";
                 var oldFiles = await connection.QueryFirstOrDefaultAsync<(int,int)>(
                     removeImageSql, new
@@ -55,9 +61,9 @@ RETURNING main_id, thumbnail_id;
                     },
                     transaction);
 
-                var removeFileSql = @"
-DELETE FROM storage_files
-WHERE id = ANY(@imageId);
+                var removeFileSql = $@"
+DELETE FROM {nameof(BaseDbContext.StorageFiles).ToSnake()}
+WHERE {nameof(StorageFile.Id).ToSnake()} = ANY(@imageId);
 ";
                 await connection.ExecuteAsync(removeFileSql, new
                 {

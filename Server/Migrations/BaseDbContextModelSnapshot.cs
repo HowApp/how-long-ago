@@ -36,17 +36,17 @@ namespace How.Server.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("changed_at");
 
-                    b.Property<int?>("ChangedBy")
+                    b.Property<int?>("ChangedById")
                         .HasColumnType("integer")
-                        .HasColumnName("changed_by");
+                        .HasColumnName("changed_by_id");
 
                     b.Property<Instant>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("CreteById")
+                    b.Property<int>("CreatedById")
                         .HasColumnType("integer")
-                        .HasColumnName("crete_by_id");
+                        .HasColumnName("created_by_id");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -95,9 +95,9 @@ namespace How.Server.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("CreteById")
+                    b.Property<int>("CreatedById")
                         .HasColumnType("integer")
-                        .HasColumnName("crete_by_id");
+                        .HasColumnName("created_by_id");
 
                     b.Property<string>("Description")
                         .IsRequired()

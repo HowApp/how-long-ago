@@ -4,6 +4,6 @@ using NodaTime;
 
 public class BaseLong : BaseShort
 {
-    public int? ChangedBy { get; set; }
+    public int? ChangedById { get; set; }
     public Instant? ChangedAt { get; set; }
 }

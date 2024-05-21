@@ -1,6 +1,7 @@
 namespace How.Core.CQRS.Commands.Storage.InsertImage;
 
 using Common.CQRS;
+using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
@@ -39,10 +40,16 @@ public class InsertImageCommandHandler : ICommandHandler<InsertImageCommand, Res
                 return Result.Success(0);
             }
             
-            var command = $@"
-INSERT INTO storage_images (image_height, image_width, thumbnail_height, thumbnail_width, main_id, thumbnail_id) 
+            var command = @$"
+INSERT INTO {nameof(BaseDbContext.StorageImages).ToSnake()} (
+    {nameof(StorageImage.ImageHeight).ToSnake()},
+    {nameof(StorageImage.ImageWidth).ToSnake()},
+    {nameof(StorageImage.ThumbnailHeight).ToSnake()},
+    {nameof(StorageImage.ThumbnailWidth).ToSnake()},
+    {nameof(StorageImage.MainId).ToSnake()},
+    {nameof(StorageImage.ThumbnailId).ToSnake()}) 
 VALUES (@image_height, @image_width, @thumbnail_height, @thumbnail_width, @main_id, @thumbnail_id) 
-RETURNING id;
+RETURNING {nameof(StorageImage.Id).ToSnake()};
 ";
             var result = await connection.QuerySingleAsync<int>(
                 command, 
@@ -78,9 +85,15 @@ RETURNING id;
     private async Task<int> InsertFile(FileInternalModel file, NpgsqlConnection connection, NpgsqlTransaction transaction)
     {
         var command = $@"
-INSERT INTO storage_files (hash, name, path, extension, size, content) 
+INSERT INTO {nameof(BaseDbContext.StorageFiles).ToSnake()} (
+    {nameof(StorageFile.Hash).ToSnake()},
+    {nameof(StorageFile.Name).ToSnake()},
+    {nameof(StorageFile.Path).ToSnake()},
+    {nameof(StorageFile.Extension).ToSnake()},
+    {nameof(StorageFile.Size).ToSnake()},
+    {nameof(StorageFile.Content).ToSnake()}) 
 VALUES (@hash, @name, @path, @extension, @size, @content) 
-RETURNING id;
+RETURNING {nameof(StorageFile.Id).ToSnake()};
 ";
         var result = await connection.QuerySingleAsync<int>(
             command, 
