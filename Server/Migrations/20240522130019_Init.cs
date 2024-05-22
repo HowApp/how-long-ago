@@ -252,7 +252,7 @@ namespace How.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "event_records",
+                name: "records",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -265,18 +265,56 @@ namespace How.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_event_records", x => x.id);
+                    table.PrimaryKey("pk_records", x => x.id);
                     table.ForeignKey(
-                        name: "fk_event_records_events_event_id",
+                        name: "fk_records_events_event_id",
                         column: x => x.event_id,
                         principalTable: "events",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "fk_event_records_storage_images_storage_image_id",
+                        name: "fk_records_storage_images_storage_image_id",
                         column: x => x.storage_image_id,
                         principalTable: "storage_images",
                         principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "record_images",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    record_id = table.Column<int>(type: "integer", nullable: false),
+                    position = table.Column<int>(type: "integer", nullable: false),
+                    image_height = table.Column<int>(type: "integer", nullable: false),
+                    image_width = table.Column<int>(type: "integer", nullable: false),
+                    thumbnail_height = table.Column<int>(type: "integer", nullable: false),
+                    thumbnail_width = table.Column<int>(type: "integer", nullable: false),
+                    main_id = table.Column<int>(type: "integer", nullable: false),
+                    thumbnail_id = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_record_images", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_record_images_records_record_id",
+                        column: x => x.record_id,
+                        principalTable: "records",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_record_images_storage_files_main_id",
+                        column: x => x.main_id,
+                        principalTable: "storage_files",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_record_images_storage_files_thumbnail_id",
+                        column: x => x.thumbnail_id,
+                        principalTable: "storage_files",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -289,16 +327,6 @@ namespace How.Server.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_event_records_event_id",
-                table: "event_records",
-                column: "event_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_event_records_storage_image_id",
-                table: "event_records",
-                column: "storage_image_id");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_events_owner_id",
                 table: "events",
                 column: "owner_id");
@@ -306,6 +334,33 @@ namespace How.Server.Migrations
             migrationBuilder.CreateIndex(
                 name: "ix_events_storage_image_id",
                 table: "events",
+                column: "storage_image_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_record_images_main_id",
+                table: "record_images",
+                column: "main_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_record_images_record_id",
+                table: "record_images",
+                column: "record_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_record_images_thumbnail_id",
+                table: "record_images",
+                column: "thumbnail_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_records_event_id",
+                table: "records",
+                column: "event_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_records_storage_image_id",
+                table: "records",
                 column: "storage_image_id");
 
             migrationBuilder.CreateIndex(
@@ -326,14 +381,22 @@ namespace How.Server.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_storage_files_path",
+                table: "storage_files",
+                column: "path",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_storage_images_main_id",
                 table: "storage_images",
-                column: "main_id");
+                column: "main_id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_storage_images_thumbnail_id",
                 table: "storage_images",
-                column: "thumbnail_id");
+                column: "thumbnail_id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_user_claims_user_id",
@@ -371,7 +434,7 @@ namespace How.Server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "event_records");
+                name: "record_images");
 
             migrationBuilder.DropTable(
                 name: "role_claims");
@@ -389,10 +452,13 @@ namespace How.Server.Migrations
                 name: "user_tokens");
 
             migrationBuilder.DropTable(
-                name: "events");
+                name: "records");
 
             migrationBuilder.DropTable(
                 name: "roles");
+
+            migrationBuilder.DropTable(
+                name: "events");
 
             migrationBuilder.DropTable(
                 name: "users");

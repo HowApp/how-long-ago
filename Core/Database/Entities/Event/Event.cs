@@ -6,7 +6,7 @@ using Identity;
 using Infrastructure.Enums;
 using Storage;
 
-public class Event : BaseLong
+public class Event : BaseChanged
 {
     [StringLength(1024)]
     public string Name { get; set; }
@@ -16,7 +16,7 @@ public class Event : BaseLong
     public int OwnerId { get; set; }
     public HowUser Owner { get; set; }
     
-    public ICollection<EventRecord> Records { get; set; }
+    public ICollection<Record> Records { get; set; }
     
     public int? StorageImageId { get; set; }
     public StorageImage StorageImage { get; set; }

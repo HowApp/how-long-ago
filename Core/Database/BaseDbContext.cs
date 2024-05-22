@@ -26,7 +26,8 @@ public class BaseDbContext : IdentityDbContext<
     public DbSet<StorageImage> StorageImages { get; set; }
 
     public DbSet<Event> Events { get; set; } 
-    public DbSet<EventRecord> EventRecords { get; set; } 
+    public DbSet<Record> Records { get; set; } 
+    public DbSet<RecordImage> RecordImages { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

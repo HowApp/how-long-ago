@@ -90,6 +90,40 @@ public class EventService : IEventService
                 new Error(ErrorType.Event, $"Error at {nameof(ActivateEvent)}"));
         }
     }
+    
+    public async Task<Result> DeactivateEvent(int eventId)
+    {
+        try
+        {
+            var command = new UpdateEventStatusCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId,
+                Status = EventStatus.Inactive
+            };
+            
+            var result = await _sender.Send(command);
+
+            if (result.Failed)
+            {
+                return Result.Failure<int>(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure<int>(
+                    new Error(ErrorType.Event, $"Event not deactivated!"));
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<int>(
+                new Error(ErrorType.Event, $"Error at {nameof(DeactivateEvent)}"));
+        }
+    }
 
     public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationRequestDTO request)
     {

@@ -1,11 +1,7 @@
 ﻿namespace How.Core.DTO.Storage.ImageService;
 
-using Common.Attributes;
-using Common.Enums;
-using Microsoft.AspNetCore.Http;
+using Models;
 
-public sealed class CreateImageRequestDTO
+public sealed class CreateImageRequestDTO : UploadImageRequestModelDTO
 {
-    [FileValidator(new AppFileExt[] { AppFileExt.JPEG, AppFileExt.JPG }, 10 * 1024 * 1024)]
-    public IFormFile File { get; set; }
 }

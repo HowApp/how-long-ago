@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Base;
 using Storage;
 
-public class EventRecord : BaseShort
+public class Record : BaseCreeated
 {
     public int EventId { get; set; }
     public Event Event { get; set; }
@@ -14,4 +14,6 @@ public class EventRecord : BaseShort
     
     public int? StorageImageId { get; set; }
     public StorageImage StorageImage { get; set; }
+    
+    public ICollection<RecordImage> RecordImages { get; set; }
 }

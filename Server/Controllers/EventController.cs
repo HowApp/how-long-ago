@@ -49,4 +49,15 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
+    
+    [HttpPatch]
+    [SwaggerOperation("Deactivate Event")]
+    [ProducesResponseType<Result<int>>(200)]
+    [Route("api/event/{id:int:min(1)}/deactivate")]
+    public async Task<IActionResult> Deactivate([FromRoute] int id)
+    {
+        var result = await _eventService.DeactivateEvent(id);
+
+        return HttpResult(result);
+    }
 }

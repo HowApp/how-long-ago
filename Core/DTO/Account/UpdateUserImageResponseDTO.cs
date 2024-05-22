@@ -1,7 +1,7 @@
 namespace How.Core.DTO.Account;
 
-public sealed class UpdateUserImageResponseDTO
+using Models;
+
+public sealed class UpdateUserImageResponseDTO : UploadImageResponseModelDTO
 {
-    public string MainHash { get; set; }
-    public string ThumbnailHash { get; set; }
 }

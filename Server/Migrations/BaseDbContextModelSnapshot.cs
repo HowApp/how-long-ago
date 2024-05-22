@@ -82,7 +82,7 @@ namespace How.Server.Migrations
                     b.ToTable("events", (string)null);
                 });
 
-            modelBuilder.Entity("How.Core.Database.Entities.Event.EventRecord", b =>
+            modelBuilder.Entity("How.Core.Database.Entities.Event.Record", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -114,15 +114,73 @@ namespace How.Server.Migrations
                         .HasColumnName("storage_image_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_event_records");
+                        .HasName("pk_records");
 
                     b.HasIndex("EventId")
-                        .HasDatabaseName("ix_event_records_event_id");
+                        .HasDatabaseName("ix_records_event_id");
 
                     b.HasIndex("StorageImageId")
-                        .HasDatabaseName("ix_event_records_storage_image_id");
+                        .HasDatabaseName("ix_records_storage_image_id");
 
-                    b.ToTable("event_records", (string)null);
+                    b.ToTable("records", (string)null);
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.RecordImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ImageHeight")
+                        .HasColumnType("integer")
+                        .HasColumnName("image_height");
+
+                    b.Property<int>("ImageWidth")
+                        .HasColumnType("integer")
+                        .HasColumnName("image_width");
+
+                    b.Property<int>("MainId")
+                        .HasColumnType("integer")
+                        .HasColumnName("main_id");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer")
+                        .HasColumnName("position");
+
+                    b.Property<int>("RecordId")
+                        .HasColumnType("integer")
+                        .HasColumnName("record_id");
+
+                    b.Property<int>("ThumbnailHeight")
+                        .HasColumnType("integer")
+                        .HasColumnName("thumbnail_height");
+
+                    b.Property<int>("ThumbnailId")
+                        .HasColumnType("integer")
+                        .HasColumnName("thumbnail_id");
+
+                    b.Property<int>("ThumbnailWidth")
+                        .HasColumnType("integer")
+                        .HasColumnName("thumbnail_width");
+
+                    b.HasKey("Id")
+                        .HasName("pk_record_images");
+
+                    b.HasIndex("MainId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_record_images_main_id");
+
+                    b.HasIndex("RecordId")
+                        .HasDatabaseName("ix_record_images_record_id");
+
+                    b.HasIndex("ThumbnailId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_record_images_thumbnail_id");
+
+                    b.ToTable("record_images", (string)null);
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowRole", b =>
@@ -453,6 +511,10 @@ namespace How.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_storage_files_hash");
 
+                    b.HasIndex("Path")
+                        .IsUnique()
+                        .HasDatabaseName("ix_storage_files_path");
+
                     b.ToTable("storage_files", (string)null);
                 });
 
@@ -493,9 +555,11 @@ namespace How.Server.Migrations
                         .HasName("pk_storage_images");
 
                     b.HasIndex("MainId")
+                        .IsUnique()
                         .HasDatabaseName("ix_storage_images_main_id");
 
                     b.HasIndex("ThumbnailId")
+                        .IsUnique()
                         .HasDatabaseName("ix_storage_images_thumbnail_id");
 
                     b.ToTable("storage_images", (string)null);
@@ -520,23 +584,53 @@ namespace How.Server.Migrations
                     b.Navigation("StorageImage");
                 });
 
-            modelBuilder.Entity("How.Core.Database.Entities.Event.EventRecord", b =>
+            modelBuilder.Entity("How.Core.Database.Entities.Event.Record", b =>
                 {
                     b.HasOne("How.Core.Database.Entities.Event.Event", "Event")
                         .WithMany("Records")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_event_records_events_event_id");
+                        .HasConstraintName("fk_records_events_event_id");
 
                     b.HasOne("How.Core.Database.Entities.Storage.StorageImage", "StorageImage")
                         .WithMany()
                         .HasForeignKey("StorageImageId")
-                        .HasConstraintName("fk_event_records_storage_images_storage_image_id");
+                        .HasConstraintName("fk_records_storage_images_storage_image_id");
 
                     b.Navigation("Event");
 
                     b.Navigation("StorageImage");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.RecordImage", b =>
+                {
+                    b.HasOne("How.Core.Database.Entities.Storage.StorageFile", "Main")
+                        .WithMany()
+                        .HasForeignKey("MainId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_record_images_storage_files_main_id");
+
+                    b.HasOne("How.Core.Database.Entities.Event.Record", "Record")
+                        .WithMany("RecordImages")
+                        .HasForeignKey("RecordId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_record_images_records_record_id");
+
+                    b.HasOne("How.Core.Database.Entities.Storage.StorageFile", "Thumbnail")
+                        .WithMany()
+                        .HasForeignKey("ThumbnailId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_record_images_storage_files_thumbnail_id");
+
+                    b.Navigation("Main");
+
+                    b.Navigation("Record");
+
+                    b.Navigation("Thumbnail");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowRoleClaim", b =>
@@ -634,6 +728,11 @@ namespace How.Server.Migrations
             modelBuilder.Entity("How.Core.Database.Entities.Event.Event", b =>
                 {
                     b.Navigation("Records");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.Record", b =>
+                {
+                    b.Navigation("RecordImages");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowRole", b =>

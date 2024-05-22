@@ -11,23 +11,57 @@ public class FileValidatorAttribute : ValidationAttribute
 {
     private readonly AppFileExt[] _allowedExtensions;
     private readonly long _maxSizeBytes;
+    private readonly int _maxNumbers;
      
-    public FileValidatorAttribute(AppFileExt[] allowedExtensions, long maxSizeBytes)
+    public FileValidatorAttribute(AppFileExt[] allowedExtensions, long maxSizeBytes, int maxNumbers = 1)
     {
         _allowedExtensions = allowedExtensions;
         _maxSizeBytes = maxSizeBytes;
+        _maxNumbers = maxNumbers;
     }
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        if (value is not IFormFile file)
+        if (value is null)
         {
             throw new FileValidationException(new Dictionary<string, string>()
             {
-                {"File", "The Provided object is not a file."}
+                {"File", "Empty file."}
             });
         }
 
+        if (value is IFormFile file)
+        {
+            ValidateFile(file);
+        }
+        else if (value is IFormFileCollection files)
+        {
+            if (files.Count > _maxNumbers)
+            {
+                throw new FileValidationException(new Dictionary<string, string>()
+                {
+                    {"File", $"Allowed to upload only {_maxNumbers} items."}
+                });
+            }
+            
+            foreach (var item in files)
+            {
+                ValidateFile(item);
+            }
+        }
+        else
+        {
+            throw new FileValidationException(new Dictionary<string, string>()
+            {
+                {"File", "The Provided object is not a file or file collection."}
+            });
+        }
+        
+        return ValidationResult.Success;
+    }
+
+    private void ValidateFile(IFormFile file)
+    {
         if (file.Length == 0)
         {
             throw new FileValidationException(new Dictionary<string, string>()
@@ -63,7 +97,5 @@ public class FileValidatorAttribute : ValidationAttribute
                 {"FileSignature", $"The Provided file has an invalid signature"}
             });
         }
-
-        return ValidationResult.Success;
     }
 }
