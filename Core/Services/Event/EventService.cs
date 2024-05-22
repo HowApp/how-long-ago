@@ -2,7 +2,12 @@ namespace How.Core.Services.Event;
 
 using Common.ResultType;
 using CQRS.Commands.Event.CreateEvent;
+using CQRS.Commands.Event.DeleteEvent;
+using CQRS.Commands.Event.UpdateEvent;
+using CQRS.Commands.Event.UpdateEventImage;
 using CQRS.Commands.Event.UpdateEventStatus;
+using CQRS.Commands.Storage.DeleteImage;
+using CQRS.Commands.Storage.InsertImage;
 using CQRS.Queries.Event.GetEventsPagination;
 using CurrentUser;
 using DTO.Event;
@@ -10,18 +15,25 @@ using DTO.Models;
 using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Storage.ImageStorage;
 
 public class EventService : IEventService
 {
     private readonly ILogger<EventService> _logger;
     private readonly ISender _sender;
     private readonly ICurrentUserService _userService;
+    private readonly IImageStorageService _imageStorage;
 
-    public EventService(ILogger<EventService> logger, ISender sender, ICurrentUserService userService)
+    public EventService(
+        ILogger<EventService> logger,
+        ISender sender,
+        ICurrentUserService userService,
+        IImageStorageService imageStorage)
     {
         _logger = logger;
         _sender = sender;
         _userService = userService;
+        _imageStorage = imageStorage;
     }
 
     public async Task<Result<int>> CreateEvent(CreateEventRequestDTO request)
@@ -72,12 +84,12 @@ public class EventService : IEventService
 
             if (result.Failed)
             {
-                return Result.Failure<int>(result.Error);
+                return Result.Failure(result.Error);
             }
 
             if (result.Data < 1)
             {
-                return Result.Failure<int>(
+                return Result.Failure(
                     new Error(ErrorType.Event, $"Event not activated!"));
             }
             
@@ -86,7 +98,7 @@ public class EventService : IEventService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<int>(
+            return Result.Failure(
                 new Error(ErrorType.Event, $"Error at {nameof(ActivateEvent)}"));
         }
     }
@@ -106,12 +118,12 @@ public class EventService : IEventService
 
             if (result.Failed)
             {
-                return Result.Failure<int>(result.Error);
+                return Result.Failure(result.Error);
             }
 
             if (result.Data < 1)
             {
-                return Result.Failure<int>(
+                return Result.Failure(
                     new Error(ErrorType.Event, $"Event not deactivated!"));
             }
             
@@ -120,8 +132,112 @@ public class EventService : IEventService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<int>(
+            return Result.Failure(
                 new Error(ErrorType.Event, $"Error at {nameof(DeactivateEvent)}"));
+        }
+    }
+
+    public async Task<Result> UpdateEvent(int eventId, UpdateEventRequestDTO request)
+    {
+        try
+        {
+            var command = new UpdateEventCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId,
+                Name = request.Name
+            };
+            
+            var result = await _sender.Send(command);
+
+            if (result.Failed)
+            {
+                return Result.Failure(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Event, $"Event not updated!"));
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure(
+                new Error(ErrorType.Event, $"Error at {nameof(UpdateEvent)}"));
+        }
+    }
+
+    public async Task<Result<UpdateEventImageResponseDTO>> UpdateEventImage(int eventId, UpdateEventImageRequestDTO request)
+    {
+        var imageId = 0;
+        try
+        {
+            var image = await _imageStorage.CreateImageInternal(request.File);
+
+            if (image.Failed)
+            {
+                return Result.Failure<UpdateEventImageResponseDTO>(image.Error);
+            }
+
+            var insertImage = await _sender.Send(new InsertImageCommand
+            {
+                Image = image.Data
+            });
+
+            if (insertImage.Failed)
+            {
+                return Result.Failure<UpdateEventImageResponseDTO>(insertImage.Error);
+            }
+
+            if (insertImage.Data < 1)
+            {
+                return Result.Failure<UpdateEventImageResponseDTO>(
+                    new Error(ErrorType.Event, $"Image not created!"));
+            }
+
+            imageId = insertImage.Data;
+            
+            var updateEventImage = await _sender.Send(new UpdateEventImageCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId,
+                ImageId = insertImage.Data
+            });
+
+            if (updateEventImage.Failed)
+            {
+                await _sender.Send(new DeleteImageCommand
+                {
+                    ImageId = insertImage.Data
+                });
+                return Result.Failure<UpdateEventImageResponseDTO>(updateEventImage.Error);
+            }
+
+            var result = new UpdateEventImageResponseDTO
+            {
+                MainHash = image.Data.Main.Hash,
+                ThumbnailHash = image.Data.Thumbnail.Hash
+            };
+            
+            return Result.Success(result);
+        }
+        catch (Exception e)
+        {
+            if (imageId != 0)
+            {
+                await _sender.Send(new DeleteImageCommand
+                {
+                    ImageId = imageId
+                }); 
+            }
+            
+            _logger.LogError(e.Message);
+            return Result.Failure<UpdateEventImageResponseDTO>(
+                new Error(ErrorType.Event, $"Error at {nameof(UpdateEventImage)}"));
         }
     }
 
@@ -184,6 +300,39 @@ public class EventService : IEventService
             _logger.LogError(e.Message);
             return Result.Failure<GetEventsPaginationResponseDTO>(
                 new Error(ErrorType.Event, $"Error at {nameof(GetEventsPagination)}"));
+        }
+    }
+
+    public async Task<Result> DeleteEvent(int eventId)
+    {
+        try
+        {
+            var command = new DeleteEventCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId,
+            };
+            
+            var result = await _sender.Send(command);
+
+            if (result.Failed)
+            {
+                return Result.Failure(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Event, $"Event not deleted!"));
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure(
+                new Error(ErrorType.Event, $"Error at {nameof(UpdateEvent)}"));
         }
     }
 }

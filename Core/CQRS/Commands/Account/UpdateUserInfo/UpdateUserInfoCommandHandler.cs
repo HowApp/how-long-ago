@@ -33,7 +33,8 @@ RETURNING *;
 ";
             await using var connection = _dapper.InitConnection();
             var result = await connection.ExecuteAsync(
-                command, new
+                command, 
+                new
                 {
                     first_name = request.FirstName,
                     last_name = request.LastName,

@@ -8,6 +8,7 @@ public class CreateRecordRequestDTOValidator : AbstractValidator<CreateRecordReq
     {
         RuleFor(r => r.Description)
             .NotEmpty()
+            .MaximumLength(2048)
             .WithMessage("Provide record Description!");
     }
 }

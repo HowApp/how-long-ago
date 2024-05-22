@@ -8,4 +8,5 @@ public static class ErrorType
     public static readonly string FileValidation = "FileValidation";
     public static readonly string Storage = "Storage";
     public static readonly string Event = "Event";
+    public static readonly string Record = "Record";
 }

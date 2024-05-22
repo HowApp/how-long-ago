@@ -41,7 +41,7 @@ public class EventController : BaseController
     
     [HttpPatch]
     [SwaggerOperation("Activate Event")]
-    [ProducesResponseType<Result<int>>(200)]
+    [ProducesResponseType<Result>(200)]
     [Route("api/event/{id:int:min(1)}/activate")]
     public async Task<IActionResult> Activate([FromRoute] int id)
     {
@@ -52,11 +52,48 @@ public class EventController : BaseController
     
     [HttpPatch]
     [SwaggerOperation("Deactivate Event")]
-    [ProducesResponseType<Result<int>>(200)]
+    [ProducesResponseType<Result>(200)]
     [Route("api/event/{id:int:min(1)}/deactivate")]
     public async Task<IActionResult> Deactivate([FromRoute] int id)
     {
         var result = await _eventService.DeactivateEvent(id);
+
+        return HttpResult(result);
+    }
+    
+    [HttpPatch]
+    [SwaggerOperation("Update event")]
+    [ProducesResponseType<Result>(200)]
+    [Route("api/event/{id:int:min(1)}/update")]
+    public async Task<IActionResult> UpdateEvent(
+        [FromRoute] int id,
+        [FromForm] UpdateEventRequestDTO request)
+    {
+        var result = await _eventService.UpdateEvent(id, request);
+
+        return HttpResult(result);
+    }
+    
+    [HttpPut]
+    [SwaggerOperation("Update event image, returning hash")]
+    [ProducesResponseType<Result<UpdateEventImageResponseDTO>>(200)]
+    [Route("api/event/{id:int:min(1)}/image")]
+    public async Task<IActionResult> UpdateEventImage(
+        [FromRoute] int id,
+        [FromForm] UpdateEventImageRequestDTO request)
+    {
+        var result = await _eventService.UpdateEventImage(id, request);
+
+        return HttpResult(result);
+    }
+    
+    [HttpDelete]
+    [SwaggerOperation("Delete event")]
+    [ProducesResponseType<Result>(200)]
+    [Route("api/event/{id:int:min(1)}/delete")]
+    public async Task<IActionResult> DeleteEvent([FromRoute] int id)
+    {
+        var result = await _eventService.DeleteEvent(id);
 
         return HttpResult(result);
     }

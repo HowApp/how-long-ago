@@ -35,7 +35,7 @@ INSERT INTO {nameof(BaseDbContext.Events).ToSnake()} (
     {nameof(Event.CreatedAt).ToSnake()},
     {nameof(Event.ChangedById).ToSnake()},
     {nameof(Event.ChangedAt).ToSnake()}) 
-VALUES (@name, @status, @is_deleted, @owner_id, @crete_by_id, @created_at, @changed_by, @changed_at)
+VALUES (@name, @status, @is_deleted, @owner_id, @created_by_id, @created_at, @changed_by_id, @changed_at)
 RETURNING {nameof(Event.Id).ToSnake()};
 ";
             await using var connection = _dapper.InitConnection();
@@ -47,9 +47,9 @@ RETURNING {nameof(Event.Id).ToSnake()};
                     status = (int)EventStatus.Inactive, 
                     is_deleted = false, 
                     owner_id = request.CurrentUserId, 
-                    crete_by_id = request.CurrentUserId, 
+                    created_by_id = request.CurrentUserId, 
                     created_at = SystemClock.Instance.GetCurrentInstant(), 
-                    changed_by = request.CurrentUserId,
+                    changed_by_id = request.CurrentUserId,
                     changed_at = SystemClock.Instance.GetCurrentInstant()
                 });
             
