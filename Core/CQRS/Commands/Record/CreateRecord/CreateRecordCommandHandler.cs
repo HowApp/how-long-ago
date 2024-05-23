@@ -26,19 +26,21 @@ public class CreateRecordCommandHandler : ICommandHandler<CreateRecordCommand, R
         {
             var command = $@"
 INSERT INTO {nameof(BaseDbContext.Records).ToSnake()} (
+    {nameof(Record.EventId).ToSnake()},                                   
     {nameof(Record.Description).ToSnake()},
     {nameof(Record.CreatedById).ToSnake()},
     {nameof(Record.CreatedAt).ToSnake()}
 )
-VALUES (@description, @created_by_id, @created_at)
+VALUES (@event_id, @description, @created_by_id, @created_at)
 RETURNING {nameof(Record.Id).ToSnake()}
 ";
 
             await using var connection = _dapper.InitConnection();
-            var result = await connection.ExecuteAsync(
+            var result = await connection.QuerySingleAsync<int>(
                 command,
                 new
                 {
+                    event_id = request.EventId,
                     description = request.Description,
                     created_by_id = request.CurrentUserId,
                     created_at = SystemClock.Instance.GetCurrentInstant()
