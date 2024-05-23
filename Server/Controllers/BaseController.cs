@@ -1,7 +1,6 @@
 namespace How.Server.Controllers;
 
 using System.Net;
-// using Common.ResultClass;
 using Microsoft.AspNetCore.Mvc;
 using Common.ResultType;
 

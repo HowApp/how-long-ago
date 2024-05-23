@@ -1,9 +1,12 @@
 namespace How.Core.Services.Record;
 
+using Common.Extensions;
 using Common.ResultType;
-using CQRS.Commands.Record.CreateRecord;
+using CQRS.Commands.Record.InsertRecord;
 using CQRS.Commands.Record.UpdateRecord;
+using CQRS.Queries.General.CheckExist;
 using CurrentUser;
+using Database;
 using DTO.Record;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -25,7 +28,24 @@ public class RecordService : IRecordService
     {
         try
         {
-            var command = new CreateRecordCommand
+            var eventExist = await _sender.Send(new CheckExistQuery
+            {
+                Id = eventId,
+                Table = nameof(BaseDbContext.Events).ToSnake()
+            });
+
+            if (eventExist.Failed)
+            {
+                return Result.Failure<int>(eventExist.Error);
+            }
+
+            if (!eventExist.Data)
+            {
+                return Result.Failure<int>(
+                    new Error(ErrorType.Record, $"Event not found!"));
+            }
+            
+            var command = new InsertRecordCommand
             {
                 CurrentUserId = _userService.UserId,
                 EventId = eventId,

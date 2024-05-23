@@ -8,7 +8,6 @@ using Database;
 using Database.Entities.Event;
 using Database.Entities.Identity;
 using Database.Entities.Storage;
-using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 using Models.Event;
 

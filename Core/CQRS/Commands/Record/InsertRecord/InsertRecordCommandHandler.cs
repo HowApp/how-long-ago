@@ -1,4 +1,4 @@
-namespace How.Core.CQRS.Commands.Record.CreateRecord;
+namespace How.Core.CQRS.Commands.Record.InsertRecord;
 
 using Common.CQRS;
 using Common.Extensions;
@@ -9,18 +9,18 @@ using Database.Entities.Event;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-public class CreateRecordCommandHandler : ICommandHandler<CreateRecordCommand, Result<int>>
+public class InsertRecordCommandHandler : ICommandHandler<InsertRecordCommand, Result<int>>
 {
-    private readonly ILogger<CreateRecordCommandHandler> _logger;
+    private readonly ILogger<InsertRecordCommandHandler> _logger;
     private readonly DapperConnection _dapper;
 
-    public CreateRecordCommandHandler(ILogger<CreateRecordCommandHandler> logger, DapperConnection dapper)
+    public InsertRecordCommandHandler(ILogger<InsertRecordCommandHandler> logger, DapperConnection dapper)
     {
         _logger = logger;
         _dapper = dapper;
     }
 
-    public async Task<Result<int>> Handle(CreateRecordCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(InsertRecordCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -52,7 +52,7 @@ RETURNING {nameof(Record.Id).ToSnake()}
         {
             _logger.LogError(e.Message);
             return Result.Failure<int>(
-                new Error(ErrorType.Record, $"Error while executing {nameof(CreateRecordCommand)}"));
+                new Error(ErrorType.Record, $"Error while executing {nameof(InsertRecordCommand)}"));
         }
     }
 }
