@@ -42,7 +42,7 @@ public class RecordService : IRecordService
             if (!eventExist.Data)
             {
                 return Result.Failure<int>(
-                    new Error(ErrorType.Record, $"Event not found!"));
+                    new Error(ErrorType.Record, $"Event not found!"), 404);
             }
             
             var command = new InsertRecordCommand

@@ -4,23 +4,26 @@ public class Result
 {
     public bool Succeeded { get; }
     public bool Failed => !Succeeded;
+    public int Code { get; }
     public Error? Error { get; }
     
-    public Result(Error? error)
+    public Result(Error? error, int code = 400)
     {
         Succeeded = false;
         Error = error;
+        Code = code;
     }
 
-    public Result()
+    public Result(int code = 200)
     {
         Succeeded = true;
+        Code = code;
     }
 
     public static Result Success() => new();
-    public static Result Failure(Error? error) => new(error);
-    public static Result<TData> Success<TData>(TData data) => new(data);
-    public static Result<TData> Failure<TData>(Error? error) => new(error);
+    public static Result Failure(Error? error, int code = 400) => new(error, code);
+    public static Result<TData> Success<TData>(TData data, int code = 200) => new(data, code);
+    public static Result<TData> Failure<TData>(Error? error, int code = 400) => new(error, code);
 }
 
 public class Result<TData> : Result
@@ -33,11 +36,11 @@ public class Result<TData> : Result
         set => _data = value;
     }
 
-    public Result(Error? error) : base(error)
+    public Result(Error? error, int code = 400) : base(error, code)
     {
     }
     
-    public Result(TData data) : base()
+    public Result(TData data, int code = 200) : base(code)
     {
         Data = data;
     }

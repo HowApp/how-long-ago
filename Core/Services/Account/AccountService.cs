@@ -51,7 +51,7 @@ public class AccountService : IAccountService
             if (queryResult.Data is null)
             {
                 return Result.Failure<GetUserInfoResponseDTO>(
-                    new Error(ErrorType.Account, "User not found!"));
+                    new Error(ErrorType.Account, "User not found!"), 404);
             }
 
             var result = new GetUserInfoResponseDTO

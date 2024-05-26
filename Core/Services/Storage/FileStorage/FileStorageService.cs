@@ -92,7 +92,7 @@ public class FileStorageService : IFileStorageService
             {
                 return Result.Failure<GetFileFromDatabaseByteResponseDTO>(new Error(
                     ErrorType.Storage,
-                    $"File not found!"));
+                    $"File not found!"), 404);
             }
             
             var result = new GetFileFromDatabaseByteResponseDTO
@@ -131,7 +131,7 @@ public class FileStorageService : IFileStorageService
             {
                 return Result.Failure<GetFileFromDatabaseStreamResponseDTO>(new Error(
                     ErrorType.Storage,
-                    $"File not found!"));
+                    $"File not found!"), 404);
             }
 
             var memoryStream = new MemoryStream(image.Content);

@@ -36,7 +36,7 @@ public class IdentityService : IIdentityService
 
             if (user is null)
             {
-                return Result.Failure(new Error(ErrorType.Account, "User not found!"));
+                return Result.Failure(new Error(ErrorType.Account, "User not found!"), 404);
             }
 
             var signInResult = await _signInManager.CheckPasswordSignInAsync(
@@ -127,7 +127,7 @@ public class IdentityService : IIdentityService
             {
                 return Result.Failure<CurrentUserResponseDTO>(new Error(
                     ErrorType.Account,
-                    "User not found!"));
+                    "User not found!"), 404);
             }
 
             var result = new CurrentUserResponseDTO
