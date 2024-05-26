@@ -2,12 +2,14 @@ namespace How.Core.Services.Record;
 
 using Common.Extensions;
 using Common.ResultType;
+using CQRS.Commands.Record.CreateRecordImages;
 using CQRS.Commands.Record.InsertRecord;
 using CQRS.Commands.Record.UpdateRecord;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
 using CQRS.Queries.General.CheckExistForUser;
 using CQRS.Queries.Record.CheckRecordExist;
+using CQRS.Queries.Record.GetMaxImagePosition;
 using CurrentUser;
 using Database;
 using DTO.Models;
@@ -124,7 +126,7 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImage(
+    public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
         int eventId,
         int recordId,
         CreateRecordImagesRequestDTO request)
@@ -182,6 +184,36 @@ public class RecordService : IRecordService
 
             imageIds = createImages.Data;
 
+            var maxPosition = await _sender.Send(new GetMaxImagePositionQuery
+            {
+                RecordId = recordId
+            });
+            
+            if (maxPosition.Failed)
+            {
+                return Result.Failure<CreateRecordImagesResponseDTO>(maxPosition.Error);
+            }
+            
+            var command = new CreateRecordImagesCommand
+            {
+                RecordId = recordId,
+                ImageIds = imageIds,
+                MaxPosition = maxPosition.Data == 0 ? 0 : ++maxPosition.Data
+            };
+
+            var commandResult = await _sender.Send(command);
+
+            if (commandResult.Failed)
+            {
+                return Result.Failure<CreateRecordImagesResponseDTO>(createImages.Error);
+            }
+
+            if (!commandResult.Data.Any())
+            {
+                return Result.Failure<CreateRecordImagesResponseDTO>(
+                    new Error(ErrorType.Record, $"Record Images not created!"));
+            }
+            
             var result = new CreateRecordImagesResponseDTO
             {
                 ImagePaths = imagesInternal.Select(i => new UploadImageResponseModelDTO
@@ -205,7 +237,7 @@ public class RecordService : IRecordService
             
             _logger.LogError(e.Message);
             return Result.Failure<CreateRecordImagesResponseDTO>(
-                new Error(ErrorType.Record, $"Error at {nameof(CreateRecordImage)}"));
+                new Error(ErrorType.Record, $"Error at {nameof(CreateRecordImages)}"));
         }
     }
 }

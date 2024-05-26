@@ -5,5 +5,5 @@ using Common.ResultType;
 
 public sealed class DeleteImageMultiplyCommand : ICommand<Result>
 {
-    public int[] ImageIds { get; set; }
+    public int[] ImageIds { get; set; } = [];
 }

@@ -8,5 +8,5 @@ public interface IRecordService
 {
     Task<Result<int>> CreateRecord(int eventId, CreateRecordRequestDTO request);
     Task<Result> UpdateRecord(int eventId, int recordId, UpdateRecordRequestDTO request);
-    Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImage(int eventId, int recordId, CreateRecordImagesRequestDTO request);
+    Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(int eventId, int recordId, CreateRecordImagesRequestDTO request);
 }

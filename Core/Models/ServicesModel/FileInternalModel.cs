@@ -9,5 +9,5 @@ public class FileInternalModel
     public long Size { get; set; }
     
     // TODO remove after setup cloud storage
-    public byte[] Content { get; set; }
+    public byte[] Content { get; set; } = [];
 }
