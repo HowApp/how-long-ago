@@ -1,10 +1,10 @@
-namespace How.Core.CQRS.Commands.Storage.InsertImage;
+namespace How.Core.CQRS.Commands.Storage.CreateImage;
 
 using Common.CQRS;
 using Common.ResultType;
 using Models.ServicesModel;
 
-public sealed class InsertImageCommand : ICommand<Result<int>>
+public sealed class CreateImageCommand : ICommand<Result<int>>
 {
     public ImageInternalModel Image { get; set; }
 }

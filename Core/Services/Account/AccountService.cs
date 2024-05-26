@@ -4,7 +4,7 @@ using Common.ResultType;
 using CQRS.Commands.Account.UpdateUserImage;
 using CQRS.Commands.Account.UpdateUserInfo;
 using CQRS.Commands.Storage.DeleteImage;
-using CQRS.Commands.Storage.InsertImage;
+using CQRS.Commands.Storage.CreateImage;
 using CQRS.Queries.Account.GetUserInfo;
 using CurrentUser;
 using DTO.Account;
@@ -122,7 +122,7 @@ public class AccountService : IAccountService
                 return Result.Failure<UpdateUserImageResponseDTO>(image.Error);
             }
 
-            var insertImage = await _sender.Send(new InsertImageCommand
+            var insertImage = await _sender.Send(new CreateImageCommand
             {
                 Image = image.Data
             });

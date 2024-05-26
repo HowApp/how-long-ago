@@ -51,7 +51,7 @@ public class ImageStorageService : IImageStorageService
             // the file name, HTML-encode the value.
             var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
             
-            var trustedImageNameForDisplay = $"{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
+            var trustedImageNameForDisplay = $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
             var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
             
             var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
@@ -127,7 +127,7 @@ public class ImageStorageService : IImageStorageService
             // the file name, HTML-encode the value.
             var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
             
-            var trustedImageNameForDisplay = $"{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
+            var trustedImageNameForDisplay = $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
             var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
             
             var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");

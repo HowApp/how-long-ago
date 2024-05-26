@@ -10,18 +10,18 @@ using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-public class CreateEventCommandHandler : ICommandHandler<CreateEventCommand, Result<int>>
+public class InsertEventCommandHandler : ICommandHandler<InsertEventCommand, Result<int>>
 {
-    private readonly ILogger<CreateEventCommandHandler> _logger;
+    private readonly ILogger<InsertEventCommandHandler> _logger;
     private readonly DapperConnection _dapper;
 
-    public CreateEventCommandHandler(ILogger<CreateEventCommandHandler> logger, DapperConnection dapper)
+    public InsertEventCommandHandler(ILogger<InsertEventCommandHandler> logger, DapperConnection dapper)
     {
         _logger = logger;
         _dapper = dapper;
     }
 
-    public async Task<Result<int>> Handle(CreateEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(InsertEventCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -59,7 +59,7 @@ RETURNING {nameof(Event.Id).ToSnake()};
         {
             _logger.LogError(e.Message);
             return Result.Failure<int>(
-                new Error(ErrorType.Account, $"Error while executing {nameof(CreateEventCommand)}"));
+                new Error(ErrorType.Account, $"Error while executing {nameof(InsertEventCommand)}"));
         }
     }
 }

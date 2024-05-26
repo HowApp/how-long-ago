@@ -2,6 +2,7 @@ namespace How.Server.Controllers;
 
 using Common.ResultType;
 using Core.DTO.Record;
+using Core.DTO.RecordImage;
 using Core.Services.Record;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,20 @@ public class RecordController : BaseController
         [FromForm] UpdateRecordRequestDTO request)
     {
         var result = await _recordService.UpdateRecord(eventId, recordId, request);
+
+        return HttpResult(result);
+    }
+    
+    [HttpPut]
+    [SwaggerOperation("Update record images, returning hashes")]
+    [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
+    [Route("api/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/image")]
+    public async Task<IActionResult> UpdateEventImage(
+        [FromRoute] int eventId,
+        [FromRoute] int recordId,
+        [FromForm] CreateRecordImagesRequestDTO request)
+    {
+        var result = await _recordService.CreateRecordImage(eventId, recordId, request);
 
         return HttpResult(result);
     }

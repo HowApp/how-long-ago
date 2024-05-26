@@ -10,15 +10,6 @@ public class RecordImage : BaseIdentityKey
     
     public int Position { get; set; }
     
-    public int ImageHeight { get; set; }
-    public int ImageWidth { get; set; }
-    
-    public int ThumbnailHeight { get; set; }
-    public int ThumbnailWidth { get; set; }
-    
-    public int MainId { get; set; }
-    public StorageFile Main { get; set; }
-    
-    public int ThumbnailId { get; set; }
-    public StorageFile Thumbnail { get; set; }
+    public int ImageId { get; set; }
+    public StorageImage Image { get; set; }
 }

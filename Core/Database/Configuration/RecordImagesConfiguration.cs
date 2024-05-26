@@ -8,7 +8,7 @@ public class RecordImagesConfiguration : IEntityTypeConfiguration<RecordImage>
 {
     public void Configure(EntityTypeBuilder<RecordImage> builder)
     {
-        builder.HasIndex(b => b.MainId).IsUnique();
-        builder.HasIndex(b => b.ThumbnailId).IsUnique();
+        builder.HasIndex(b => new {b.RecordId, b.ImageId}).IsUnique();
+        builder.HasIndex(b => b.ImageId).IsUnique();
     }
 }

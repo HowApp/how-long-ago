@@ -1,5 +1,6 @@
 namespace How.Core.Services.Event;
 
+using Common.Extensions;
 using Common.ResultType;
 using CQRS.Commands.Event.CreateEvent;
 using CQRS.Commands.Event.DeleteEvent;
@@ -7,9 +8,11 @@ using CQRS.Commands.Event.UpdateEvent;
 using CQRS.Commands.Event.UpdateEventImage;
 using CQRS.Commands.Event.UpdateEventStatus;
 using CQRS.Commands.Storage.DeleteImage;
-using CQRS.Commands.Storage.InsertImage;
+using CQRS.Commands.Storage.CreateImage;
 using CQRS.Queries.Event.GetEventsPagination;
+using CQRS.Queries.General.CheckExistForUser;
 using CurrentUser;
+using Database;
 using DTO.Event;
 using DTO.Models;
 using Infrastructure.Enums;
@@ -40,7 +43,7 @@ public class EventService : IEventService
     {
         try
         {
-            var command = new CreateEventCommand
+            var command = new InsertEventCommand
             {
                 CurrentUserId = _userService.UserId,
                 Name = request.Name.Trim()
@@ -176,6 +179,24 @@ public class EventService : IEventService
         var imageId = 0;
         try
         {
+            var eventExist = await _sender.Send(new CheckExistForUserQuery
+            {
+                CurrentUserId = _userService.UserId,
+                Id = eventId,
+                Table = nameof(BaseDbContext.Events).ToSnake()
+            });
+
+            if (eventExist.Failed)
+            {
+                return Result.Failure<UpdateEventImageResponseDTO>(eventExist.Error);
+            }
+
+            if (!eventExist.Data)
+            {
+                return Result.Failure<UpdateEventImageResponseDTO>(
+                    new Error(ErrorType.Record, $"Event not found!"), 404);
+            }
+            
             var image = await _imageStorage.CreateImageInternal(request.File);
 
             if (image.Failed)
@@ -183,7 +204,7 @@ public class EventService : IEventService
                 return Result.Failure<UpdateEventImageResponseDTO>(image.Error);
             }
 
-            var insertImage = await _sender.Send(new InsertImageCommand
+            var insertImage = await _sender.Send(new CreateImageCommand
             {
                 Image = image.Data
             });

@@ -1,4 +1,4 @@
-namespace How.Core.CQRS.Commands.Storage.InsertImage;
+namespace How.Core.CQRS.Commands.Storage.CreateImage;
 
 using Common.CQRS;
 using Common.Extensions;
@@ -10,19 +10,19 @@ using Microsoft.Extensions.Logging;
 using Models.ServicesModel;
 using Npgsql;
 
-public class InsertImageCommandHandler : ICommandHandler<InsertImageCommand, Result<int>>
+public class CreateImageCommandHandler : ICommandHandler<CreateImageCommand, Result<int>>
 {
-    private readonly ILogger<InsertImageCommandHandler> _logger;
+    private readonly ILogger<CreateImageCommandHandler> _logger;
     private readonly DapperConnection _dapper;
 
-    public InsertImageCommandHandler(ILogger<InsertImageCommandHandler> logger, DapperConnection dapper)
+    public CreateImageCommandHandler(ILogger<CreateImageCommandHandler> logger, DapperConnection dapper)
     {
         _logger = logger;
         _dapper = dapper;
     }
 
     public async Task<Result<int>> Handle(
-        InsertImageCommand request, 
+        CreateImageCommand request, 
         CancellationToken cancellationToken)
     {
         await using var connection = _dapper.InitConnection();
@@ -36,7 +36,7 @@ public class InsertImageCommandHandler : ICommandHandler<InsertImageCommand, Res
             if (mainId < 1 || thumbnailId < 1)
             {
                 await transaction.RollbackAsync(CancellationToken.None);
-                _logger.LogError($"Error while insert {nameof(StorageFile)} at {nameof(InsertImageCommand)}");
+                _logger.LogError($"Error while insert {nameof(StorageFile)} at {nameof(CreateImageCommand)}");
                 return Result.Success(0);
             }
             
@@ -66,7 +66,7 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
             if (result < 1)
             {
                 await transaction.RollbackAsync(CancellationToken.None);
-                _logger.LogError($"Error while insert {nameof(StorageImage)} at {nameof(InsertImageCommand)}");
+                _logger.LogError($"Error while insert {nameof(StorageImage)} at {nameof(CreateImageCommand)}");
                 return Result.Success(0);
             }
             
@@ -78,7 +78,7 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
             await transaction.RollbackAsync(CancellationToken.None);
             _logger.LogError(e.Message);
             return Result.Failure<int>(
-                new Error(ErrorType.Account, $"Error while executing {nameof(InsertImageCommand)}"));
+                new Error(ErrorType.Account, $"Error while executing {nameof(CreateImageCommand)}"));
         }
     }
 
