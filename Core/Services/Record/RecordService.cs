@@ -6,7 +6,6 @@ using CQRS.Commands.Record.InsertRecord;
 using CQRS.Commands.Record.UpdateRecord;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
-using CQRS.Queries.General.CheckExist;
 using CQRS.Queries.General.CheckExistForUser;
 using CQRS.Queries.Record.CheckRecordExist;
 using CurrentUser;

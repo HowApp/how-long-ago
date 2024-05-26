@@ -36,7 +36,8 @@ public class CreateImageMultiplyCommandHandler : ICommandHandler<CreateImageMult
             {
                 await transaction.RollbackAsync(CancellationToken.None);
                 _logger.LogError($"Error while insert {nameof(StorageFile)} at {nameof(CreateImageMultiplyCommand)}");
-                return Result.Success(Array.Empty<int>());
+                return Result.Failure<int[]>(
+                    new Error(ErrorType.Account, $"Error while insert {nameof(StorageFile)} at {nameof(CreateImageMultiplyCommand)}"));
             }
             
             var sql = new StringBuilder();
@@ -83,7 +84,8 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
             {
                 await transaction.RollbackAsync(CancellationToken.None);
                 _logger.LogError($"Error while insert {nameof(StorageImage)} at {nameof(CreateImageMultiplyCommand)}");
-                return Result.Success(Array.Empty<int>());
+                return Result.Failure<int[]>(
+                    new Error(ErrorType.Account, $"Error while insert {nameof(StorageImage)} at {nameof(CreateImageMultiplyCommand)}"));
             }
             
             await transaction.CommitAsync(CancellationToken.None);

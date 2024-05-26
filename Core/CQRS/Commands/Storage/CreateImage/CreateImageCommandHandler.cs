@@ -37,7 +37,8 @@ public class CreateImageCommandHandler : ICommandHandler<CreateImageCommand, Res
             {
                 await transaction.RollbackAsync(CancellationToken.None);
                 _logger.LogError($"Error while insert {nameof(StorageFile)} at {nameof(CreateImageCommand)}");
-                return Result.Success(0);
+                return Result.Failure<int>(
+                    new Error(ErrorType.Account, $"Error while insert {nameof(StorageFile)} at {nameof(CreateImageCommand)}"));
             }
             
             var command = @$"
@@ -67,7 +68,8 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
             {
                 await transaction.RollbackAsync(CancellationToken.None);
                 _logger.LogError($"Error while insert {nameof(StorageImage)} at {nameof(CreateImageCommand)}");
-                return Result.Success(0);
+                return Result.Failure<int>(
+                    new Error(ErrorType.Account, $"Error while insert {nameof(StorageImage)} at {nameof(CreateImageCommand)}"));
             }
             
             await transaction.CommitAsync(CancellationToken.None);
