@@ -5,10 +5,11 @@ using Common.ResultType;
 using CQRS.Commands.Record.CreateRecordImages;
 using CQRS.Commands.Record.InsertRecord;
 using CQRS.Commands.Record.UpdateRecord;
+using CQRS.Commands.Record.UpdateRecordImagePosition;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
 using CQRS.Queries.General.CheckExistForUser;
-using CQRS.Queries.Record.CheckRecordExist;
+using CQRS.Queries.Record.GetImageIds;
 using CQRS.Queries.Record.GetMaxImagePosition;
 using CurrentUser;
 using Database;
@@ -91,14 +92,13 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result> UpdateRecord(int eventId, int recordId, UpdateRecordRequestDTO request)
+    public async Task<Result> UpdateRecord(int recordId, UpdateRecordRequestDTO request)
     {
         try
         {
             var command = new UpdateRecordCommand
             {
                 CurrentUserId = _userService.UserId,
-                EventId = eventId,
                 RecordId = recordId,
                 Description = request.Description
             };
@@ -127,18 +127,17 @@ public class RecordService : IRecordService
     }
 
     public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
-        int eventId,
         int recordId,
         CreateRecordImagesRequestDTO request)
     {
         var imageIds = new int[request.Files.Count];
         try
         {
-            var recordExist = await _sender.Send(new CheckRecordExistQuery
+            var recordExist = await _sender.Send(new CheckExistForUserQuery
             {
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
-                EventId = eventId
+                Table = nameof(BaseDbContext.Records).ToSnake()
             });
                 
             if (recordExist.Failed)
@@ -238,6 +237,80 @@ public class RecordService : IRecordService
             _logger.LogError(e.Message);
             return Result.Failure<CreateRecordImagesResponseDTO>(
                 new Error(ErrorType.Record, $"Error at {nameof(CreateRecordImages)}"));
+        }
+    }
+
+    public async Task<Result> UpdateRecordImages(int recordId, UpdateRecordImagesRequestDTO request)
+    {
+        try
+        {
+            var recordExist = await _sender.Send(new CheckExistForUserQuery
+            {
+                Id = recordId,
+                CurrentUserId = _userService.UserId,
+                Table = nameof(BaseDbContext.Records).ToSnake()
+            });
+                
+            if (recordExist.Failed)
+            {
+                return Result.Failure(recordExist.Error);
+            }
+
+            if (!recordExist.Data)
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Record, $"Record not found!"), 404);
+            }
+
+            var imageExistIds = await _sender.Send(new GetImageIdsQuery
+            {
+                RecordId = recordId
+            });
+            
+            if (imageExistIds.Failed)
+            {
+                return Result.Failure(imageExistIds.Error);
+            }
+
+            if (request.ImageIds.Any(i => !imageExistIds.Data.Contains(i)))
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Record, $"Record Image not found!"), 404);
+            }
+            
+            var imageToDelete = imageExistIds.Data.Where(i => !request.ImageIds.Contains(i)).ToArray();
+
+            if (request.ImageIds.Any())
+            {
+                var updateResult = await _sender.Send(new UpdateRecordImagePositionCommand
+                {
+                    ImageIds = request.ImageIds
+                });
+                
+                if (updateResult.Failed)
+                {
+                    return Result.Failure(updateResult.Error);
+                }
+
+                if (updateResult.Data != request.ImageIds.Length )
+                {
+                    return Result.Failure(
+                        new Error(ErrorType.Record, $"Image position not updated!"));
+                }
+            }
+
+            if (imageToDelete.Any())
+            {
+                //TODO implement removing record Images
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure(
+                new Error(ErrorType.Record, $"Error at {nameof(UpdateRecordImages)}"));
         }
     }
 }

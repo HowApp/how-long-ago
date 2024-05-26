@@ -113,7 +113,8 @@ INSERT INTO {nameof(BaseDbContext.StorageFiles).ToSnake()} (
     {nameof(StorageFile.Extension).ToSnake()},
     {nameof(StorageFile.Size).ToSnake()},
     {nameof(StorageFile.Content).ToSnake()}) 
-VALUES ({replacedItem})
+VALUES 
+    ({replacedItem})
 RETURNING {nameof(StorageFile.Id).ToSnake()};
 ";
         sql.Append(command);

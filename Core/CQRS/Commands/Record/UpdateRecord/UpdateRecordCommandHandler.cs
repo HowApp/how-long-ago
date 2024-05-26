@@ -29,7 +29,6 @@ SET
     {nameof(Record.Description).ToSnake()} = @description
 WHERE 
     {nameof(Record.Id).ToSnake()} = @record_id AND
-    {nameof(Record.EventId).ToSnake()} = @event_id AND
     {nameof(Record.CreatedById).ToSnake()} = @created_by_id
 RETURNING *;
 ";
@@ -41,7 +40,6 @@ RETURNING *;
                 {
                     description = request.Description,
                     record_id = request.RecordId,
-                    event_id = request.EventId,
                     created_by_id = request.CurrentUserId
                 });
             

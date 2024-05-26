@@ -34,13 +34,12 @@ public class RecordController : BaseController
     [HttpPatch]
     [SwaggerOperation("Update record")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/update")]
+    [Route("api/event/record/{recordId:int:min(1)}/update")]
     public async Task<IActionResult> UpdateRecord(
-        [FromRoute] int eventId,
         [FromRoute] int recordId,
         [FromForm] UpdateRecordRequestDTO request)
     {
-        var result = await _recordService.UpdateRecord(eventId, recordId, request);
+        var result = await _recordService.UpdateRecord(recordId, request);
 
         return HttpResult(result);
     }
@@ -48,13 +47,25 @@ public class RecordController : BaseController
     [HttpPost]
     [SwaggerOperation("Create record images, returning hashes")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
-    [Route("api/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/image")]
-    public async Task<IActionResult> CreateEventImage(
-        [FromRoute] int eventId,
+    [Route("api/event/record/{recordId:int:min(1)}/image/create")]
+    public async Task<IActionResult> CreateRecordImage(
         [FromRoute] int recordId,
         [FromForm] CreateRecordImagesRequestDTO request)
     {
-        var result = await _recordService.CreateRecordImages(eventId, recordId, request);
+        var result = await _recordService.CreateRecordImages(recordId, request);
+
+        return HttpResult(result);
+    }
+    
+    [HttpPatch]
+    [SwaggerOperation("Update record images")]
+    [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
+    [Route("api/event/record/{recordId:int:min(1)}/image/update")]
+    public async Task<IActionResult> UpdateRecordImages(
+        [FromRoute] int recordId,
+        [FromForm] UpdateRecordImagesRequestDTO request)
+    {
+        var result = await _recordService.UpdateRecordImages(recordId, request);
 
         return HttpResult(result);
     }
