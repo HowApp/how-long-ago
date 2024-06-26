@@ -3,6 +3,7 @@ namespace How.Core.Services.Record;
 using Common.Extensions;
 using Common.ResultType;
 using CQRS.Commands.Record.CreateRecordImages;
+using CQRS.Commands.Record.DeleteRecordImages;
 using CQRS.Commands.Record.InsertRecord;
 using CQRS.Commands.Record.UpdateRecord;
 using CQRS.Commands.Record.UpdateRecordImagePosition;
@@ -197,7 +198,7 @@ public class RecordService : IRecordService
             {
                 RecordId = recordId,
                 ImageIds = imageIds,
-                MaxPosition = maxPosition.Data == 0 ? 0 : ++maxPosition.Data
+                MaxPosition = ++maxPosition.Data
             };
 
             var commandResult = await _sender.Send(command);
@@ -277,8 +278,8 @@ public class RecordService : IRecordService
                 return Result.Failure(
                     new Error(ErrorType.Record, $"Record Image not found!"), 404);
             }
-            
-            var imageToDelete = imageExistIds.Data.Where(i => !request.ImageIds.Contains(i)).ToArray();
+
+            var recordImageToDelete = imageExistIds.Data.Where(i => !request.ImageIds.Contains(i)).ToArray();
 
             if (request.ImageIds.Any())
             {
@@ -286,7 +287,7 @@ public class RecordService : IRecordService
                 {
                     ImageIds = request.ImageIds
                 });
-                
+
                 if (updateResult.Failed)
                 {
                     return Result.Failure(updateResult.Error);
@@ -299,11 +300,29 @@ public class RecordService : IRecordService
                 }
             }
 
-            if (imageToDelete.Any())
+            if (recordImageToDelete.Any())
             {
-                //TODO implement removing record Images
+                var deleteRecordImageResult = await _sender.Send(new DeleteRecordImagesCommand
+                {
+                    ImageIds = recordImageToDelete
+                });
+                
+                if (deleteRecordImageResult.Failed)
+                {
+                    return Result.Failure(deleteRecordImageResult.Error);
+                }
+
+                var deleteStorageItemsResult = await _sender.Send(new DeleteImageMultiplyCommand
+                {
+                    ImageIds = deleteRecordImageResult.Data
+                });
+                
+                if (deleteStorageItemsResult.Failed)
+                {
+                    return Result.Failure(deleteStorageItemsResult.Error);
+                }
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)

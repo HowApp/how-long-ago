@@ -37,7 +37,7 @@ public class RecordController : BaseController
     [Route("api/event/record/{recordId:int:min(1)}/update")]
     public async Task<IActionResult> UpdateRecord(
         [FromRoute] int recordId,
-        [FromForm] UpdateRecordRequestDTO request)
+        [FromBody] UpdateRecordRequestDTO request)
     {
         var result = await _recordService.UpdateRecord(recordId, request);
 
@@ -63,7 +63,7 @@ public class RecordController : BaseController
     [Route("api/event/record/{recordId:int:min(1)}/image/update")]
     public async Task<IActionResult> UpdateRecordImages(
         [FromRoute] int recordId,
-        [FromForm] UpdateRecordImagesRequestDTO request)
+        [FromBody] UpdateRecordImagesRequestDTO request)
     {
         var result = await _recordService.UpdateRecordImages(recordId, request);
 

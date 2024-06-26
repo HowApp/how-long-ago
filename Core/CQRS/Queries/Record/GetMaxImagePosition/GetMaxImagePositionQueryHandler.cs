@@ -24,7 +24,7 @@ public class GetMaxImagePositionQueryHandler : IQueryHandler<GetMaxImagePosition
         try
         {
             var query = $@"
-SELECT COALESCE(MAX(ri.{nameof(RecordImage.Position).ToSnake()}), 0)
+SELECT COALESCE(MAX(ri.{nameof(RecordImage.Position).ToSnake()}), -1)
 FROM {nameof(BaseDbContext.RecordImages).ToSnake()} ri
 WHERE ri.{nameof(RecordImage.RecordId).ToSnake()} = @record_id
 ";
