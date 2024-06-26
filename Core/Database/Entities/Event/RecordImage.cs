@@ -3,7 +3,7 @@ namespace How.Core.Database.Entities.Event;
 using Base;
 using Storage;
 
-public class RecordImage : BaseIdentityKey
+public class RecordImage : IdentityKey
 {
     public int RecordId { get; set; }
     public Record Record { get; set; }

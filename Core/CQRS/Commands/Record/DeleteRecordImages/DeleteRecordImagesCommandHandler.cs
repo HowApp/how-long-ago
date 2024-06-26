@@ -26,7 +26,7 @@ public class DeleteRecordImagesCommandHandler : ICommandHandler<DeleteRecordImag
         {
             var removeRecordImagesSql = $@"
 DELETE FROM {nameof(BaseDbContext.RecordImages).ToSnake()}
-WHERE {nameof(BaseIdentityKey.Id).ToSnake()} = ANY(@imageId)
+WHERE {nameof(IdentityKey.Id).ToSnake()} = ANY(@imageId)
 RETURNING {nameof(RecordImage.ImageId).ToSnake()};
 ";
 

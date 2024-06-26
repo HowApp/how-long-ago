@@ -28,8 +28,8 @@ public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuer
 SELECT EXISTS(
     SELECT 1 FROM {request.Table} 
     WHERE 
-    {nameof(BaseCreeated.Id).ToSnake()} = @id AND
-    {nameof(BaseCreeated.CreatedById).ToSnake()} = @created_by_id);
+    {nameof(BaseCreated.Id).ToSnake()} = @id AND
+    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id);
 ";
             await using var connection = _dapper.InitConnection();
             

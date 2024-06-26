@@ -35,7 +35,7 @@ INSERT INTO {nameof(BaseDbContext.RecordImages).ToSnake()} (
     {nameof(RecordImage.ImageId).ToSnake()}
 )
 VALUES ({replacedItem})
-RETURNING {nameof(BaseIdentityKey.Id).ToSnake()};
+RETURNING {nameof(IdentityKey.Id).ToSnake()};
 ";
             sql.Append(command);
         

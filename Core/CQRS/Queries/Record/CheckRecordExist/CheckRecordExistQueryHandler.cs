@@ -28,8 +28,8 @@ public class CheckRecordExistQueryHandler : IQueryHandler<CheckRecordExistQuery,
 SELECT EXISTS(
     SELECT 1 FROM {nameof(BaseDbContext.Records).ToSnake()} 
     WHERE 
-    {nameof(BaseCreeated.Id).ToSnake()} = @id AND
-    {nameof(BaseCreeated.CreatedById).ToSnake()} = @created_by_id AND 
+    {nameof(BaseCreated.Id).ToSnake()} = @id AND
+    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id AND 
     {nameof(Record.EventId).ToSnake()} = @eventId);
 ";
             await using var connection = _dapper.InitConnection();
