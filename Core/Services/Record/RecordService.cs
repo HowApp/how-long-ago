@@ -12,6 +12,7 @@ using CQRS.Commands.Storage.DeleteImageMultiply;
 using CQRS.Queries.General.CheckExistForUser;
 using CQRS.Queries.Record.GetImageIds;
 using CQRS.Queries.Record.GetMaxImagePosition;
+using CQRS.Queries.Record.GetRecordsPagination;
 using CurrentUser;
 using Database;
 using DTO.Models;
@@ -90,6 +91,56 @@ public class RecordService : IRecordService
             _logger.LogError(e.Message);
             return Result.Failure<int>(
                 new Error(ErrorType.Record, $"Error at {nameof(CreateRecord)}"));
+        }
+    }
+
+    public async Task<Result<GetRecordsPaginationResponseDTO>> GetRecordsPagination(int eventId, GetRecordsPaginationRequestDTO request)
+    {
+        try
+        {
+            var eventExist = await _sender.Send(new CheckExistForUserQuery
+            {
+                CurrentUserId = _userService.UserId,
+                Id = eventId,
+                Table = nameof(BaseDbContext.Events).ToSnake()
+            });
+
+            if (eventExist.Failed)
+            {
+                return Result.Failure<GetRecordsPaginationResponseDTO>(eventExist.Error);
+            }
+
+            if (!eventExist.Data)
+            {
+                return Result.Failure<GetRecordsPaginationResponseDTO>(
+                    new Error(ErrorType.Record, $"Event not found!"), 404);
+            }
+
+            var query = new GetRecordsPaginationQuery
+            {
+                Offset = (request.Page - 1) * request.Size,
+                Size = request.Size,
+                EventId = eventId
+            };
+            
+            var queryResult = await _sender.Send(query);
+            
+            if (queryResult.Failed)
+            {
+                return Result.Failure<GetRecordsPaginationResponseDTO>(queryResult.Error);
+            }
+
+            return new Result<GetRecordsPaginationResponseDTO>(new GetRecordsPaginationResponseDTO
+            {
+                Count = queryResult.Data.Count,
+                Records = queryResult.Data.Records
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<GetRecordsPaginationResponseDTO>(
+                new Error(ErrorType.Record, $"Error at {nameof(GetRecordsPagination)}"));
         }
     }
 

@@ -22,11 +22,24 @@ public class RecordController : BaseController
     [SwaggerOperation("Create Record, return ID")]
     [ProducesResponseType<Result<int>>(200)]
     [Route("api/event/{eventId:int:min(1)}/record/create")]
-    public async Task<IActionResult> CreateEvent(
+    public async Task<IActionResult> CreateRecord(
         [FromRoute] int eventId,
         [FromBody] CreateRecordRequestDTO request)
     {
         var result = await _recordService.CreateRecord(eventId, request);
+
+        return HttpResult(result);
+    }
+    
+    [HttpGet]
+    [SwaggerOperation("Get Record list with pagination")]
+    [ProducesResponseType<Result<GetRecordsPaginationResponseDTO>>(200)]
+    [Route("api/event/{eventId:int:min(1)}/record/list-pagination")]
+    public async Task<IActionResult> GetEventsPagination(
+        int eventId,
+        [FromQuery] GetRecordsPaginationRequestDTO request)
+    {
+        var result = await _recordService.GetRecordsPagination(eventId, request);
 
         return HttpResult(result);
     }
