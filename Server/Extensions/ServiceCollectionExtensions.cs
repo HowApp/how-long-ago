@@ -26,6 +26,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
+using NodaTime.Serialization.SystemTextJson;
 
 public static class ServiceCollectionExtensions
 {
@@ -46,10 +47,10 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddControllers(options =>
-            {
-                options.Filters.Add<ModelStateValidationFilter>();
-                options.Filters.Add<ExceptionFilter>();
-            });
+        {
+            options.Filters.Add<ModelStateValidationFilter>();
+            options.Filters.Add<ExceptionFilter>();
+        }).AddJsonOptions(s => s.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
         
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {
