@@ -271,7 +271,8 @@ public class EventService : IEventService
                 Offset = (request.Page - 1) * request.Size,
                 Size = request.Size,
                 Search = request.Search,
-                Status = request.Status
+                Status = request.Status,
+                Access = EventAccessType.Public
             };
 
             var queryResult = await _sender.Send(query);

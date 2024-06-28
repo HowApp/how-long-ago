@@ -4,6 +4,7 @@ namespace How.Core.Database;
 
 using Entities.Event;
 using Entities.Identity;
+using Entities.Record;
 using Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

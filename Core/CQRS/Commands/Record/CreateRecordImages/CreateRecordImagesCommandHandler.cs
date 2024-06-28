@@ -7,7 +7,7 @@ using Common.ResultType;
 using Dapper;
 using Database;
 using Database.Entities.Base;
-using Database.Entities.Event;
+using Database.Entities.Record;
 using Microsoft.Extensions.Logging;
 
 public class CreateRecordImagesCommandHandler : ICommandHandler<CreateRecordImagesCommand, Result<int[]>>

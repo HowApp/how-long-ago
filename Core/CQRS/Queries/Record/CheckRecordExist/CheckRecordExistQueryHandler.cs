@@ -6,7 +6,7 @@ using Database.Entities.Base;
 using Common.CQRS;
 using Common.Extensions;
 using Common.ResultType;
-using Database.Entities.Event;
+using Database.Entities.Record;
 using Microsoft.Extensions.Logging;
 
 public class CheckRecordExistQueryHandler : IQueryHandler<CheckRecordExistQuery, Result<bool>>

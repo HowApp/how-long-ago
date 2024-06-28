@@ -9,4 +9,5 @@ public sealed class GetEventsPaginationQuery : PaginationModel, IQuery<Result<Ge
 {
     public string Search { get; set; }
     public EventStatus Status { get; set; }
+    public EventAccessType Access { get; set; }
 }

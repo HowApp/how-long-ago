@@ -1,7 +1,8 @@
-namespace How.Core.Database.Entities.Event;
+namespace How.Core.Database.Entities.Record;
 
 using System.ComponentModel.DataAnnotations;
 using Base;
+using Event;
 
 public class Record : BaseCreated
 {

@@ -1,4 +1,4 @@
-namespace How.Core.Database.Entities.Event;
+namespace How.Core.Database.Entities.Record;
 
 using Base;
 using Storage;

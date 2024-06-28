@@ -1,6 +1,6 @@
 namespace How.Core.Database.Configuration;
 
-using Entities.Event;
+using Entities.Record;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

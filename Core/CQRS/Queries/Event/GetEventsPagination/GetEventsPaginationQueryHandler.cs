@@ -59,7 +59,9 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     AND
     e.{nameof(Event.Status).ToSnake()} = @status
     AND
-    LOWER(e.{nameof(Event.Name).ToSnake()}) LIKE '%' || @search || '%'
+    e.{nameof(Event.Access).ToSnake()} = @access
+    AND
+    LOWER(e.{nameof(Event.Name).ToSnake()}) ILIKE '%' || @search || '%'
 OFFSET @offset
 LIMIT @size;
 ";
@@ -71,7 +73,9 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     AND
     e.{nameof(Event.Status).ToSnake()} = @status
     AND
-    LOWER(e.{nameof(Event.Name).ToSnake()}) LIKE '%' || @search || '%';
+    e.{nameof(Event.Access).ToSnake()} = @access
+    AND
+    e.{nameof(Event.Name).ToSnake()} ILIKE '%' || @search || '%';
 ";
             await using var connection = _dapper.InitConnection();
 
@@ -80,6 +84,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 new
                 {
                     status = (int)request.Status,
+                    access = (int)request.Access,
                     search = request.Search
                 });
 
@@ -88,6 +93,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 new
                 {
                     status = (int)request.Status,
+                    access = (int)request.Access,
                     size = request.Size,
                     offset = request.Offset,
                     search = request.Search

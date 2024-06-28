@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Base;
 using Identity;
 using Infrastructure.Enums;
+using Record;
 using Storage;
 
 public class Event : BaseChanged
@@ -11,6 +12,7 @@ public class Event : BaseChanged
     [StringLength(1024)]
     public string Name { get; set; }
     public EventStatus Status { get; set; }
+    public EventAccessType Access { get; set; }
     public bool IsDeleted { get; set; }
     
     public int OwnerId { get; set; }
