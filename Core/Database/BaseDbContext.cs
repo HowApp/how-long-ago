@@ -5,6 +5,7 @@ namespace How.Core.Database;
 using Entities.Event;
 using Entities.Identity;
 using Entities.Record;
+using Entities.SharedUser;
 using Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,8 @@ public class BaseDbContext : IdentityDbContext<
     public DbSet<Event> Events { get; set; } 
     public DbSet<Record> Records { get; set; } 
     public DbSet<RecordImage> RecordImages { get; set; }
+    
+    public DbSet<SharedUser> SharedUsers { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

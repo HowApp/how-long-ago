@@ -4,7 +4,7 @@ using Entities.Record;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class RecordImagesConfiguration : IEntityTypeConfiguration<RecordImage>
+public class RecordImageConfiguration : IEntityTypeConfiguration<RecordImage>
 {
     public void Configure(EntityTypeBuilder<RecordImage> builder)
     {

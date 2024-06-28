@@ -9,7 +9,7 @@ using Database.Entities.Identity;
 using Database.Entities.Storage;
 using Microsoft.Extensions.Logging;
 
-public class GetUserInfoQueryHandler : IQueryHandler<GetUserInfoQuery, Result<GetUserInfoQueryResult?>>
+public class GetUserInfoQueryHandler : IQueryHandler<GetUserInfoQuery, Result<GetUserInfoQueryResult>>
 {
     private readonly ILogger<GetUserInfoQueryHandler> _logger;
     private readonly DapperConnection _dapper;
@@ -20,7 +20,7 @@ public class GetUserInfoQueryHandler : IQueryHandler<GetUserInfoQuery, Result<Ge
         _dapper = dapper;
     }
 
-    public async Task<Result<GetUserInfoQueryResult?>> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetUserInfoQueryResult>> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
     {
         try
         {
@@ -44,12 +44,19 @@ LIMIT 1
                query,
                new { userId = request.CurrentUserId });
 
+           
+           if (result is null)
+           {
+               return Result.Failure<GetUserInfoQueryResult>(
+                   new Error(ErrorType.Account, "User not found!"), 404);
+           }
+           
            return Result.Success(result);
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetUserInfoQueryResult?>(
+            return Result.Failure<GetUserInfoQueryResult>(
                 new Error(ErrorType.Account, $"Error while executing {nameof(GetUserInfoQuery)}"));
         }
     }
