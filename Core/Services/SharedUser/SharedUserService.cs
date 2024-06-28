@@ -4,9 +4,10 @@ using Common.Extensions;
 using Common.ResultType;
 using CQRS.Commands.SharedUser.CreateSharedUser;
 using CQRS.Queries.General.CheckExist;
-using CQRS.Queries.General.CheckExistForUser;
+using CQRS.Queries.SharedUser.GetSharedUsers;
 using CurrentUser;
 using Database;
+using DTO.Models;
 using DTO.SharedUser;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -77,6 +78,50 @@ public class SharedUserService : ISharedUserService
             _logger.LogError(e.Message);
             return Result.Failure<int>(
                 new Error(ErrorType.SharedUser, $"Error at {nameof(CreateSharedUser)}"));
+        }
+    }
+
+    public async Task<Result<GetSharedUsersResponseDTO>> GetSharedUsers()
+    {
+        try
+        {
+            var query = new GetSharedUsersQuery
+            {
+                CurrentUserId = _userService.UserId
+            };
+
+            var queryResult = await _sender.Send(query);
+
+            if (queryResult.Failed)
+            {
+                return Result.Failure<GetSharedUsersResponseDTO>(queryResult.Error);
+            }
+
+            var users = queryResult.Data.Select(r => new UserInfoModelLongDTO
+            {
+                Id = r.Id,
+                FirstName = r.FirstName,
+                LastName = r.LastName,
+                UserName = r.UserName,
+                Image = new ImageModelDTO
+                {
+                    MainHash = r.MainHash,
+                    ThumbnailHash = r.ThumbnailHash
+                }
+            }).ToList();
+
+            var result = new GetSharedUsersResponseDTO
+            {
+                Users = users
+            };
+
+            return new Result<GetSharedUsersResponseDTO>(result);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<GetSharedUsersResponseDTO>(
+                new Error(ErrorType.SharedUser, $"Error at {nameof(GetSharedUsers)}"));
         }
     }
 }

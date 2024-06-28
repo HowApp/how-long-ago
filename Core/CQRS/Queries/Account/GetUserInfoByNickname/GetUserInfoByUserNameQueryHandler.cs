@@ -39,7 +39,7 @@ LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON u.{nameof(HowUse
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} main_image ON main_image.id = si.{nameof(StorageImage.MainId).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} thumbnail on thumbnail.id = si.{nameof(StorageImage.ThumbnailId).ToSnake()}
 WHERE u.{nameof(HowUser.UserName).ToSnake()} ILIKE '%' || @search || '%'
-LIMIT 50
+LIMIT 50;
 ";
 
             await using var connection = _dapper.InitConnection();

@@ -6,4 +6,5 @@ using DTO.SharedUser;
 public interface ISharedUserService
 {
     Task<Result<int>> CreateSharedUser(CreateSharedUserRequestDTO request);
+    Task<Result<GetSharedUsersResponseDTO>> GetSharedUsers();
 }

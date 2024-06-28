@@ -27,9 +27,5 @@
     <ItemGroup>
       <ProjectReference Include="..\Common\How.Common.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="CQRS\Queries\SharedUser\" />
-    </ItemGroup>
 
 </Project>

@@ -27,4 +27,15 @@ public class SharedUserController : BaseController
 
         return HttpResult(result);
     }
+
+    [HttpGet]
+    [SwaggerOperation("Get shared Users")]
+    [ProducesResponseType<Result<int>>(200)]
+    [Route("api/shared-user")]
+    public async Task<IActionResult> GetSharedUsers()
+    {
+        var result = await _userService.GetSharedUsers();
+
+        return HttpResult(result);
+    }
 }
