@@ -18,12 +18,23 @@ public class AccountController : BaseController
     }
     
     [HttpGet]
-    [SwaggerOperation("Get user info")]
+    [SwaggerOperation("Get current user info")]
     [ProducesResponseType<Result<GetUserInfoResponseDTO>>(200)]
-    [Route("api/account/info")]
+    [Route("api/account/info/current")]
     public async Task<IActionResult> GetUserInfo()
     {
         var result = await _accountService.GetUserInfo();
+
+        return HttpResult(result);
+    }
+    
+    [HttpGet]
+    [SwaggerOperation("Get user info by User Name")]
+    [ProducesResponseType<Result<GetUserInfoByUserNameResponseDTO>>(200)]
+    [Route("api/account/info/by-user-name")]
+    public async Task<IActionResult> GetUserInfoByUserName([FromQuery] GetUserInfoByUserNameRequestDTO request)
+    {
+        var result = await _accountService.GetUserInfoByUserName(request);
 
         return HttpResult(result);
     }

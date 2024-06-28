@@ -1,6 +1,6 @@
 namespace How.Core.DTO.Models;
 
-public class OwnerModelDTO
+public class UserInfoModelShortDTO
 {
     public int Id { get; set; }
     public string FirstName { get; set; }

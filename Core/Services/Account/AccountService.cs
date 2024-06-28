@@ -6,6 +6,7 @@ using CQRS.Commands.Account.UpdateUserInfo;
 using CQRS.Commands.Storage.DeleteImage;
 using CQRS.Commands.Storage.CreateImage;
 using CQRS.Queries.Account.GetUserInfo;
+using CQRS.Queries.Account.GetUserInfoByNickname;
 using CurrentUser;
 using DTO.Account;
 using DTO.Models;
@@ -68,7 +69,50 @@ public class AccountService : IAccountService
             return Result.Failure<GetUserInfoResponseDTO>(
                 new Error(ErrorType.Account, $"Error at {nameof(GetUserInfo)}"));
         }
-        
+    }
+
+    public async Task<Result<GetUserInfoByUserNameResponseDTO>> GetUserInfoByUserName(GetUserInfoByUserNameRequestDTO request)
+    {
+        try
+        {
+            var query = new GetUserInfoByUserNameQuery
+            {
+                Search = request.Search
+            };
+
+            var queryResult = await _sender.Send(query);
+
+            if (queryResult.Failed)
+            {
+                return Result.Failure<GetUserInfoByUserNameResponseDTO>(queryResult.Error);
+            }
+
+            var users = queryResult.Data.Select(r => new UserInfoModelLongDTO
+            {
+                Id = r.Id,
+                FirstName = r.FirstName,
+                LastName = r.LastName,
+                UserName = r.UserName,
+                Image = new ImageModelDTO
+                {
+                    MainHash = r.MainHash,
+                    ThumbnailHash = r.ThumbnailHash
+                }
+            }).ToList();
+
+            var result = new GetUserInfoByUserNameResponseDTO
+            {
+                Users = users
+            };
+
+            return new Result<GetUserInfoByUserNameResponseDTO>(result);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<GetUserInfoByUserNameResponseDTO>(
+                new Error(ErrorType.Account, $"Error at {nameof(GetUserInfo)}"));
+        }
     }
 
     public async Task<Result> UpdateUserInfo(UpdateUserInfoRequestDTO request)

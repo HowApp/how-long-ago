@@ -109,7 +109,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
         {
             _logger.LogError(e.Message);
             return Result.Failure<GetEventsPaginationQueryResult>(
-                new Error(ErrorType.Account, $"Error while executing {nameof(GetEventsPaginationQuery)}"));
+                new Error(ErrorType.Event, $"Error while executing {nameof(GetEventsPaginationQuery)}"));
         }
     }
 }

@@ -104,7 +104,7 @@ WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
         {
             _logger.LogError(e.Message);
             return Result.Failure<GetRecordsPaginationResponseDTO>(
-                new Error(ErrorType.Account, $"Error while executing {nameof(GetRecordsPaginationQuery)}"));
+                new Error(ErrorType.Record, $"Error while executing {nameof(GetRecordsPaginationQuery)}"));
         }
     }
 }

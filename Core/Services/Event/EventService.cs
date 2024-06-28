@@ -300,7 +300,7 @@ public class EventService : IEventService
                             MainHash = eventItem.EventMainHash,
                             ThumbnailHash = eventItem.EventThumbnailHash
                         },
-                        Owner = new OwnerModelDTO
+                        UserInfo = new UserInfoModelShortDTO
                         {
                             Id = eventItem.OwnerId,
                             FirstName = eventItem.OwnerFirstName,

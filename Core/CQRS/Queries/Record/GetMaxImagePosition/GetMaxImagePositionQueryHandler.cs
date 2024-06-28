@@ -43,7 +43,7 @@ WHERE ri.{nameof(RecordImage.RecordId).ToSnake()} = @record_id
         {
             _logger.LogError(e.Message);
             return Result.Failure<int>(
-                new Error(ErrorType.Event, $"Error while executing {nameof(GetMaxImagePositionQuery)}"));
+                new Error(ErrorType.Record, $"Error while executing {nameof(GetMaxImagePositionQuery)}"));
         }
     }
 }
