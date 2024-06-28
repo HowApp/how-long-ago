@@ -68,6 +68,8 @@ public class IdentityService : IIdentityService
         {
             var user = new HowUser
             {
+                FirstName = string.Empty,
+                LastName = string.Empty,
                 UserName = requestModel.UserName,
                 Email = requestModel.Email,
                 EmailConfirmed = true

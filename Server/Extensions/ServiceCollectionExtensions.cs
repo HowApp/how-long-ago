@@ -13,6 +13,7 @@ using Core.Services.Storage.ImageStorage;
 using Core.Services.Account;
 using Core.Services.Event;
 using Core.Services.Record;
+using Core.Services.SharedUser;
 using Dapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -127,6 +128,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAccountService, AccountService>();
         services.AddTransient<IEventService, EventService>();
         services.AddTransient<IRecordService, RecordService>();
+        services.AddTransient<ISharedUserService, SharedUserService>();
         
         return services;
     }
