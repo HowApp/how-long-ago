@@ -28,6 +28,12 @@ public class SharedUserService : ISharedUserService
     {
         try
         {
+            if (request.UserId == _userService.UserId)
+            {
+                return Result.Failure<int>(
+                    new Error(ErrorType.Record, $"You can't perform this operation to yourself"), 418);
+            }
+            
             var sharedUserExist = await _sender.Send(new CheckExistQuery
             {
                 Id = request.UserId,
