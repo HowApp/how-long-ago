@@ -3,6 +3,7 @@ namespace How.Core.Services.SharedUser;
 using Common.Extensions;
 using Common.ResultType;
 using CQRS.Commands.SharedUser.CreateSharedUser;
+using CQRS.Commands.SharedUser.DeleteSharedUser;
 using CQRS.Queries.General.CheckExist;
 using CQRS.Queries.SharedUser.GetSharedUsers;
 using CurrentUser;
@@ -122,6 +123,37 @@ public class SharedUserService : ISharedUserService
             _logger.LogError(e.Message);
             return Result.Failure<GetSharedUsersResponseDTO>(
                 new Error(ErrorType.SharedUser, $"Error at {nameof(GetSharedUsers)}"));
+        }
+    }
+
+    public async Task<Result> DeleteSharedUser(DeleteSharedUserRequestDTO request)
+    {
+        try
+        {
+            var result = await _sender.Send(new DeleteSharedUserCommand
+            {
+                CurrentUserId = _userService.UserId,
+                SharedUserId = request.SharedUserId
+            });
+            
+            if (result.Failed)
+            {
+                return Result.Failure(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Event, $"Shared User not deleted!"));
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<GetSharedUsersResponseDTO>(
+                new Error(ErrorType.SharedUser, $"Error at {nameof(DeleteSharedUser)}"));
         }
     }
 }

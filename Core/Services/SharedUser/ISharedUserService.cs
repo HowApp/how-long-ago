@@ -7,4 +7,5 @@ public interface ISharedUserService
 {
     Task<Result<int>> CreateSharedUser(CreateSharedUserRequestDTO request);
     Task<Result<GetSharedUsersResponseDTO>> GetSharedUsers();
+    Task<Result> DeleteSharedUser(DeleteSharedUserRequestDTO request);
 }
