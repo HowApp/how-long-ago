@@ -28,8 +28,7 @@ UPDATE {nameof(BaseDbContext.Records).ToSnake()}
 SET
     {nameof(Record.Description).ToSnake()} = @description
 WHERE 
-    {nameof(Record.Id).ToSnake()} = @record_id AND
-    {nameof(Record.CreatedById).ToSnake()} = @created_by_id
+    {nameof(Record.Id).ToSnake()} = @record_id
 RETURNING *;
 ";
 
@@ -39,8 +38,7 @@ RETURNING *;
                 new
                 {
                     description = request.Description,
-                    record_id = request.RecordId,
-                    created_by_id = request.CurrentUserId
+                    record_id = request.RecordId
                 });
             
             return Result.Success(result);

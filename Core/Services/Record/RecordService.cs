@@ -149,9 +149,26 @@ public class RecordService : IRecordService
     {
         try
         {
+            var recordExist = await _sender.Send(new CheckExistForUserQuery
+            {
+                Id = recordId,
+                CurrentUserId = _userService.UserId,
+                Table = nameof(BaseDbContext.Records).ToSnake()
+            });
+                
+            if (recordExist.Failed)
+            {
+                return Result.Failure(recordExist.Error);
+            }
+
+            if (!recordExist.Data)
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Record, $"Record not found!"), 404);
+            }
+            
             var command = new UpdateRecordCommand
             {
-                CurrentUserId = _userService.UserId,
                 RecordId = recordId,
                 Description = request.Description
             };
