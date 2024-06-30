@@ -11,4 +11,5 @@ public interface IRecordService
     Task<Result> UpdateRecord(int recordId, UpdateRecordRequestDTO request);
     Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(int recordId, CreateRecordImagesRequestDTO request);
     Task<Result> UpdateRecordImages(int recordId, UpdateRecordImagesRequestDTO request);
+    Task<Result> DeleteRecord(int recordId);
 }

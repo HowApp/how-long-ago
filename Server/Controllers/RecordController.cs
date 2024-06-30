@@ -82,4 +82,15 @@ public class RecordController : BaseController
 
         return HttpResult(result);
     }
+    
+    [HttpDelete]
+    [SwaggerOperation("Delete Record by ID")]
+    [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
+    [Route("api/event/record/{recordId:int:min(1)}/delete")]
+    public async Task<IActionResult> DeleteRecord([FromRoute] int recordId)
+    {
+        var result = await _recordService.DeleteRecord(recordId);
+
+        return HttpResult(result);
+    }
 }

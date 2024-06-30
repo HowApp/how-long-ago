@@ -7,6 +7,7 @@ using Database.Entities.Base;
 using Common.CQRS;
 using Common.Extensions;
 using Common.ResultType;
+using Database.Entities.SharedUser;
 using Microsoft.Extensions.Logging;
 
 public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuery, Result<bool>>
@@ -24,15 +25,36 @@ public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuer
     {
         try
         {
-            var query = $@"
-SELECT EXISTS(
-    SELECT 1 FROM {request.Table} 
+            var innerQuery = request.WithShared ? 
+                $@"
+SELECT 1 FROM {request.Table} 
     WHERE 
-    {nameof(BaseCreated.Id).ToSnake()} = @id AND
-    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id);
+    {nameof(BaseCreated.Id).ToSnake()} = @id
+    AND
+    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
+" : 
+                $@"
+SELECT 1 FROM {request.Table} 
+    WHERE 
+    {nameof(BaseCreated.Id).ToSnake()} = @id
+    AND
+    ({nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
+         OR
+    EXISTS(
+        SELECT 1 
+        FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
+        WHERE 
+            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = {nameof(BaseCreated.CreatedById).ToSnake()} 
+          AND 
+            su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)
+        )
+";
+
+            var query = $@"
+SELECT EXISTS({innerQuery});
 ";
             await using var connection = _dapper.InitConnection();
-            
+
             var result = await connection.QuerySingleAsync<bool>(
                 query,
                 new
