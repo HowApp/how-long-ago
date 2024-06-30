@@ -5,6 +5,7 @@ using Common.ResultType;
 using CQRS.Commands.Event.CreateEvent;
 using CQRS.Commands.Event.DeleteEvent;
 using CQRS.Commands.Event.UpdateEvent;
+using CQRS.Commands.Event.UpdateEventAccess;
 using CQRS.Commands.Event.UpdateEventImage;
 using CQRS.Commands.Event.UpdateEventStatus;
 using CQRS.Commands.Storage.DeleteImage;
@@ -72,7 +73,7 @@ public class EventService : IEventService
         }
     }
 
-    public async Task<Result> ActivateEvent(int eventId)
+    public async Task<Result> UpdateActivateEventStatus(int eventId, bool setActive)
     {
         try
         {
@@ -80,7 +81,7 @@ public class EventService : IEventService
             {
                 CurrentUserId = _userService.UserId,
                 EventId = eventId,
-                Status = EventStatus.Active
+                Status = setActive ? EventStatus.Active : EventStatus.Inactive
             };
             
             var result = await _sender.Send(command);
@@ -92,8 +93,9 @@ public class EventService : IEventService
 
             if (result.Data < 1)
             {
+                var message = setActive ? "Event was not activated!" : "Event was not deactivated!";
                 return Result.Failure(
-                    new Error(ErrorType.Event, $"Event not activated!"));
+                    new Error(ErrorType.Event, message));
             }
             
             return Result.Success();
@@ -102,19 +104,19 @@ public class EventService : IEventService
         {
             _logger.LogError(e.Message);
             return Result.Failure(
-                new Error(ErrorType.Event, $"Error at {nameof(ActivateEvent)}"));
+                new Error(ErrorType.Event, $"Error at {nameof(UpdateActivateEventStatus)}"));
         }
     }
-    
-    public async Task<Result> DeactivateEvent(int eventId)
+
+    public async Task<Result> UpdateEventAccess(int eventId, bool setPublic)
     {
         try
         {
-            var command = new UpdateEventStatusCommand
+            var command = new UpdateEventAccessCommand
             {
                 CurrentUserId = _userService.UserId,
                 EventId = eventId,
-                Status = EventStatus.Inactive
+                Access = setPublic ? EventAccessType.Public : EventAccessType.Private
             };
             
             var result = await _sender.Send(command);
@@ -126,8 +128,9 @@ public class EventService : IEventService
 
             if (result.Data < 1)
             {
+                var message = setPublic ? "Event was not made public!" : "Event was not made private!";
                 return Result.Failure(
-                    new Error(ErrorType.Event, $"Event not deactivated!"));
+                    new Error(ErrorType.Event, message));
             }
             
             return Result.Success();
@@ -136,7 +139,7 @@ public class EventService : IEventService
         {
             _logger.LogError(e.Message);
             return Result.Failure(
-                new Error(ErrorType.Event, $"Error at {nameof(DeactivateEvent)}"));
+                new Error(ErrorType.Event, $"Error at {nameof(UpdateEventAccess)}"));
         }
     }
 
@@ -272,7 +275,7 @@ public class EventService : IEventService
                 Size = request.Size,
                 Search = request.Search,
                 Status = request.Status,
-                Access = EventAccessType.Public
+                Access = request.Access
             };
 
             var queryResult = await _sender.Send(query);
@@ -295,6 +298,7 @@ public class EventService : IEventService
                     {
                         Id = eventItem.Id,
                         Name = eventItem.Name,
+                        Access = eventItem.Access,
                         Image = new ImageModelDTO
                         {
                             MainHash = eventItem.EventMainHash,

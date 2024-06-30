@@ -40,23 +40,27 @@ public class EventController : BaseController
     }
     
     [HttpPatch]
-    [SwaggerOperation("Activate Event")]
+    [SwaggerOperation("Activate/Deactivate Event")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/{id:int:min(1)}/activate")]
-    public async Task<IActionResult> Activate([FromRoute] int id)
+    [Route("api/event/{id:int:min(1)}/activate-status")]
+    public async Task<IActionResult> Activate(
+        [FromRoute] int id,
+        [FromQuery] bool setActive)
     {
-        var result = await _eventService.ActivateEvent(id);
+        var result = await _eventService.UpdateActivateEventStatus(id, setActive);
 
         return HttpResult(result);
     }
     
     [HttpPatch]
-    [SwaggerOperation("Deactivate Event")]
+    [SwaggerOperation("Set event Access status Public/private")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/{id:int:min(1)}/deactivate")]
-    public async Task<IActionResult> Deactivate([FromRoute] int id)
+    [Route("api/event/{id:int:min(1)}/access-status")]
+    public async Task<IActionResult> Deactivate(
+        [FromRoute] int id,
+        [FromQuery] bool setPublic)
     {
-        var result = await _eventService.DeactivateEvent(id);
+        var result = await _eventService.UpdateEventAccess(id, setPublic);
 
         return HttpResult(result);
     }

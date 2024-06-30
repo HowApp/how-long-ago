@@ -21,6 +21,10 @@ public class GetEventsPaginationRequestDTOValidation : AbstractValidator<GetEven
 
         RuleFor(r => r.Status)
             .IsInEnum()
-            .WithMessage("provide correct Event Status!");
+            .WithMessage("Provide correct Event Status!");
+        
+        RuleFor(r => r.Access)
+            .IsInEnum()
+            .WithMessage("Provide correct Event Active status!");
     }
 }

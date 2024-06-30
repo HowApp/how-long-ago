@@ -33,6 +33,7 @@ SELECT
     e.id AS {nameof(EventItemModel.Id)},
     e.{nameof(Event.Name).ToSnake()} AS {nameof(EventItemModel.Name)},
     e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(EventItemModel.CreatedAt)},
+    e.{nameof(Event.Access).ToSnake()} As {nameof(EventItemModel.Access)},
     event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.EventMainHash)},
     event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.EventThumbnailHash)},
     u.id AS {nameof(EventItemModel.OwnerId)},

@@ -7,4 +7,5 @@ public sealed class GetEventsPaginationRequestDTO : PaginationDTO
 {
     public string Search { get; set; } = string.Empty;
     public EventStatus Status { get; set; }
+    public EventAccessType Access { get; set; }
 }
