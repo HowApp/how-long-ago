@@ -1,4 +1,4 @@
-namespace How.Server.Controllers;
+namespace How.Server.Controllers.Dashboard;
 
 using Common.ResultType;
 using Core.DTO.Record;
@@ -21,7 +21,7 @@ public class RecordController : BaseController
     [HttpPost]
     [SwaggerOperation("Create Record, return ID")]
     [ProducesResponseType<Result<int>>(200)]
-    [Route("api/event/{eventId:int:min(1)}/record/create")]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/record/create")]
     public async Task<IActionResult> CreateRecord(
         [FromRoute] int eventId,
         [FromBody] CreateRecordRequestDTO request)
@@ -34,7 +34,7 @@ public class RecordController : BaseController
     [HttpGet]
     [SwaggerOperation("Get Record list with pagination")]
     [ProducesResponseType<Result<GetRecordsPaginationResponseDTO>>(200)]
-    [Route("api/event/{eventId:int:min(1)}/record/list-pagination")]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/record/list-pagination")]
     public async Task<IActionResult> GetEventsPagination(
         int eventId,
         [FromQuery] GetRecordsPaginationRequestDTO request)
@@ -47,7 +47,7 @@ public class RecordController : BaseController
     [HttpPatch]
     [SwaggerOperation("Update record")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/record/{recordId:int:min(1)}/update")]
+    [Route("api/dashboard/event/record/{recordId:int:min(1)}/update")]
     public async Task<IActionResult> UpdateRecord(
         [FromRoute] int recordId,
         [FromBody] UpdateRecordRequestDTO request)
@@ -60,7 +60,7 @@ public class RecordController : BaseController
     [HttpPost]
     [SwaggerOperation("Create record images, returning hashes")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
-    [Route("api/event/record/{recordId:int:min(1)}/image/create")]
+    [Route("api/dashboard/event/record/{recordId:int:min(1)}/image/create")]
     public async Task<IActionResult> CreateRecordImage(
         [FromRoute] int recordId,
         [FromForm] CreateRecordImagesRequestDTO request)
@@ -73,7 +73,7 @@ public class RecordController : BaseController
     [HttpPatch]
     [SwaggerOperation("Update record images")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
-    [Route("api/event/record/{recordId:int:min(1)}/image/update")]
+    [Route("api/dashboard/event/record/{recordId:int:min(1)}/image/update")]
     public async Task<IActionResult> UpdateRecordImages(
         [FromRoute] int recordId,
         [FromBody] UpdateRecordImagesRequestDTO request)
@@ -86,7 +86,7 @@ public class RecordController : BaseController
     [HttpDelete]
     [SwaggerOperation("Delete Record by ID")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
-    [Route("api/event/record/{recordId:int:min(1)}/delete")]
+    [Route("api/dashboard/event/record/{recordId:int:min(1)}/delete")]
     public async Task<IActionResult> DeleteRecord([FromRoute] int recordId)
     {
         var result = await _recordService.DeleteRecord(recordId);

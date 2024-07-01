@@ -1,4 +1,4 @@
-namespace How.Server.Controllers;
+namespace How.Server.Controllers.Dashboard;
 
 using Common.ResultType;
 using Core.DTO.Event;
@@ -20,7 +20,7 @@ public class EventController : BaseController
     [HttpPost]
     [SwaggerOperation("Create Event, return ID")]
     [ProducesResponseType<Result<int>>(200)]
-    [Route("api/event/create")]
+    [Route("api/dashboard/event/create")]
     public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequestDTO request)
     {
         var result = await _eventService.CreateEvent(request);
@@ -31,7 +31,7 @@ public class EventController : BaseController
     [HttpGet]
     [SwaggerOperation("Get Events list with pagination")]
     [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
-    [Route("api/event/list-pagination")]
+    [Route("api/dashboard/event/list-pagination")]
     public async Task<IActionResult> GetEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
         var result = await _eventService.GetEventsPagination(request);
@@ -42,7 +42,7 @@ public class EventController : BaseController
     [HttpPatch]
     [SwaggerOperation("Activate/Deactivate Event")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/{id:int:min(1)}/activate-status")]
+    [Route("api/dashboard/event/{id:int:min(1)}/activate-status")]
     public async Task<IActionResult> Activate(
         [FromRoute] int id,
         [FromQuery] bool setActive)
@@ -55,7 +55,7 @@ public class EventController : BaseController
     [HttpPatch]
     [SwaggerOperation("Set event Access status Public/private")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/{id:int:min(1)}/access-status")]
+    [Route("api/dashboard/event/{id:int:min(1)}/access-status")]
     public async Task<IActionResult> Deactivate(
         [FromRoute] int id,
         [FromQuery] bool setPublic)
@@ -68,7 +68,7 @@ public class EventController : BaseController
     [HttpPatch]
     [SwaggerOperation("Update event")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/{id:int:min(1)}/update")]
+    [Route("api/dashboard/event/{id:int:min(1)}/update")]
     public async Task<IActionResult> UpdateEvent(
         [FromRoute] int id,
         [FromForm] UpdateEventRequestDTO request)
@@ -81,7 +81,7 @@ public class EventController : BaseController
     [HttpPut]
     [SwaggerOperation("Update event image, returning hash")]
     [ProducesResponseType<Result<UpdateEventImageResponseDTO>>(200)]
-    [Route("api/event/{id:int:min(1)}/image")]
+    [Route("api/dashboard/event/{id:int:min(1)}/image")]
     public async Task<IActionResult> UpdateEventImage(
         [FromRoute] int id,
         [FromForm] UpdateEventImageRequestDTO request)
@@ -94,7 +94,7 @@ public class EventController : BaseController
     [HttpDelete]
     [SwaggerOperation("Delete event")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/event/{id:int:min(1)}/delete")]
+    [Route("api/dashboard/event/{id:int:min(1)}/delete")]
     public async Task<IActionResult> DeleteEvent([FromRoute] int id)
     {
         var result = await _eventService.DeleteEvent(id);

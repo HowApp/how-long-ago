@@ -1,4 +1,4 @@
-namespace How.Server.Controllers;
+namespace How.Server.Controllers.Dashboard;
 
 using Common.ResultType;
 using Core.DTO.SharedUser;
@@ -20,7 +20,7 @@ public class SharedUserController : BaseController
     [HttpPost]
     [SwaggerOperation("Create shared User, return ID")]
     [ProducesResponseType<Result<int>>(200)]
-    [Route("api/shared-user/create")]
+    [Route("api/dashboard/shared-user/create")]
     public async Task<IActionResult> CreateSharedUser([FromBody] CreateSharedUserRequestDTO request)
     {
         var result = await _userService.CreateSharedUser(request);
@@ -31,7 +31,7 @@ public class SharedUserController : BaseController
     [HttpGet]
     [SwaggerOperation("Get shared Users")]
     [ProducesResponseType<Result<GetSharedUsersResponseDTO>>(200)]
-    [Route("api/shared-user/get")]
+    [Route("api/dashboard/shared-user/get")]
     public async Task<IActionResult> GetSharedUsers()
     {
         var result = await _userService.GetSharedUsers();
@@ -42,7 +42,7 @@ public class SharedUserController : BaseController
     [HttpDelete]
     [SwaggerOperation("Delete shared Users")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/shared-user/delete")]
+    [Route("api/dashboard/shared-user/delete")]
     public async Task<IActionResult> DeleteSharedUser([FromBody] DeleteSharedUserRequestDTO request)
     {
         var result = await _userService.DeleteSharedUser(request);
