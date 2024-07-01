@@ -277,7 +277,7 @@ public class EventService : IEventService
                 Search = request.Search,
                 Status = request.Status,
                 Access = request.Access,
-                IncludeShared = true
+                FilterType = FilterType.IncludeShared
             };
 
             var queryResult = await _sender.Send(query);

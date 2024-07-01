@@ -9,6 +9,7 @@ using Database.Entities.Event;
 using Database.Entities.Identity;
 using Database.Entities.Storage;
 using Database.Entities.SharedUser;
+using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 using Models.Event;
 
@@ -29,8 +30,20 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
     {
         try
         {
-            var innerFilter = request.IncludeShared ? 
-                $@"
+            var innerFilter = string.Empty;
+
+            switch (request.FilterType)
+            {
+                case FilterType.None:
+                    innerFilter = $@"
+    true";
+                    break;
+                case FilterType.CreatedBy:
+                    innerFilter = $@"
+    {nameof(Event.OwnerId).ToSnake()} = @created_by_id";
+                    break;
+                case FilterType.IncludeShared:
+                    innerFilter = $@"
     {nameof(Event.OwnerId).ToSnake()} = @created_by_id
     OR
     EXISTS(
@@ -39,11 +52,13 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
         WHERE 
             su.{nameof(SharedUser.UserOwnerId).ToSnake()} = {nameof(Event.OwnerId).ToSnake()}
           AND 
-            su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)
-"
-                 : $@"
-    {nameof(Event.OwnerId).ToSnake()} = @created_by_id
-";
+            su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)";
+                    break;
+                default:
+                    innerFilter = $@"
+    true";
+                    break;
+            }
             
             
             var query = $@"

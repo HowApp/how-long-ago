@@ -8,6 +8,7 @@ using Common.CQRS;
 using Common.Extensions;
 using Common.ResultType;
 using Database.Entities.SharedUser;
+using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 
 public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuery, Result<bool>>
@@ -25,8 +26,21 @@ public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuer
     {
         try
         {
-            var innerQuery = request.IncludeShared ? 
-                $@"
+            var innerQuery = string.Empty; 
+
+            switch (request.FilterType)
+            {
+                case FilterType.CreatedBy:
+                    innerQuery = $@"
+SELECT 1 FROM {request.Table} 
+    WHERE 
+    {nameof(BaseCreated.Id).ToSnake()} = @id
+    AND
+    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
+";
+                    break;
+                case FilterType.IncludeShared:
+                    innerQuery = $@"
 SELECT 1 FROM {request.Table} 
     WHERE 
     {nameof(BaseCreated.Id).ToSnake()} = @id
@@ -41,15 +55,13 @@ SELECT 1 FROM {request.Table}
           AND 
             su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)
         )
-"
-               :  $@"
-SELECT 1 FROM {request.Table} 
-    WHERE 
-    {nameof(BaseCreated.Id).ToSnake()} = @id
-    AND
-    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
 ";
-
+                    break;
+                default:
+                    return Result.Success(false);
+                    break;
+            }
+                
             var query = $@"
 SELECT EXISTS({innerQuery});
 ";
