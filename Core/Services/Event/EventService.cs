@@ -271,11 +271,13 @@ public class EventService : IEventService
         {
             var query = new GetEventsPaginationQuery
             {
+                CurrentUserId = _userService.UserId,
                 Offset = (request.Page - 1) * request.Size,
                 Size = request.Size,
                 Search = request.Search,
                 Status = request.Status,
-                Access = request.Access
+                Access = request.Access,
+                IncludeShared = true
             };
 
             var queryResult = await _sender.Send(query);

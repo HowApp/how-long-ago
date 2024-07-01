@@ -7,7 +7,9 @@ using Infrastructure.Enums;
 
 public sealed class GetEventsPaginationQuery : PaginationModel, IQuery<Result<GetEventsPaginationQueryResult>>
 {
+    public int CurrentUserId { get; set; }
     public string Search { get; set; }
     public EventStatus Status { get; set; }
     public EventAccessType Access { get; set; }
+    public bool IncludeShared { get; set; }
 }

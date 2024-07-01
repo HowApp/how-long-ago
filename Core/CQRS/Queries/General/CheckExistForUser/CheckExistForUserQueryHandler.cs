@@ -25,14 +25,7 @@ public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuer
     {
         try
         {
-            var innerQuery = request.WithShared ? 
-                $@"
-SELECT 1 FROM {request.Table} 
-    WHERE 
-    {nameof(BaseCreated.Id).ToSnake()} = @id
-    AND
-    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
-" : 
+            var innerQuery = request.IncludeShared ? 
                 $@"
 SELECT 1 FROM {request.Table} 
     WHERE 
@@ -48,6 +41,13 @@ SELECT 1 FROM {request.Table}
           AND 
             su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)
         )
+"
+               :  $@"
+SELECT 1 FROM {request.Table} 
+    WHERE 
+    {nameof(BaseCreated.Id).ToSnake()} = @id
+    AND
+    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
 ";
 
             var query = $@"

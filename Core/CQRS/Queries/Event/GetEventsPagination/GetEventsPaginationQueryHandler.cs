@@ -8,6 +8,7 @@ using Database;
 using Database.Entities.Event;
 using Database.Entities.Identity;
 using Database.Entities.Storage;
+using Database.Entities.SharedUser;
 using Microsoft.Extensions.Logging;
 using Models.Event;
 
@@ -28,6 +29,23 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
     {
         try
         {
+            var innerFilter = request.IncludeShared ? 
+                $@"
+    {nameof(Event.OwnerId).ToSnake()} = @created_by_id
+    OR
+    EXISTS(
+        SELECT 1 
+        FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
+        WHERE 
+            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = {nameof(Event.OwnerId).ToSnake()}
+          AND 
+            su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)
+"
+                 : $@"
+    {nameof(Event.OwnerId).ToSnake()} = @created_by_id
+";
+            
+            
             var query = $@"
 SELECT 
     e.id AS {nameof(EventItemModel.Id)},
@@ -63,6 +81,8 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     e.{nameof(Event.Access).ToSnake()} = @access
     AND
     LOWER(e.{nameof(Event.Name).ToSnake()}) ILIKE '%' || @search || '%'
+    AND
+    ({innerFilter})
 OFFSET @offset
 LIMIT @size;
 ";
@@ -76,7 +96,9 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     AND
     e.{nameof(Event.Access).ToSnake()} = @access
     AND
-    e.{nameof(Event.Name).ToSnake()} ILIKE '%' || @search || '%';
+    e.{nameof(Event.Name).ToSnake()} ILIKE '%' || @search || '%'
+    AND
+    ({innerFilter});
 ";
             await using var connection = _dapper.InitConnection();
 
@@ -84,6 +106,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 countQuery,
                 new
                 {
+                    created_by_id = request.CurrentUserId,
                     status = (int)request.Status,
                     access = (int)request.Access,
                     search = request.Search
@@ -93,6 +116,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 query,
                 new
                 {
+                    created_by_id = request.CurrentUserId,
                     status = (int)request.Status,
                     access = (int)request.Access,
                     size = request.Size,
