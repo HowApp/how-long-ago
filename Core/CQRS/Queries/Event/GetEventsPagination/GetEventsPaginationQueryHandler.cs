@@ -40,17 +40,17 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
                     break;
                 case FilterType.CreatedBy:
                     innerFilter = $@"
-    {nameof(Event.OwnerId).ToSnake()} = @created_by_id";
+    e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
                     break;
                 case FilterType.IncludeShared:
                     innerFilter = $@"
-    {nameof(Event.OwnerId).ToSnake()} = @created_by_id
+    e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id
     OR
     EXISTS(
         SELECT 1 
         FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
         WHERE 
-            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = {nameof(Event.OwnerId).ToSnake()}
+            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = e.{nameof(Event.OwnerId).ToSnake()}
           AND 
             su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)";
                     break;
@@ -98,6 +98,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     LOWER(e.{nameof(Event.Name).ToSnake()}) ILIKE '%' || @search || '%'
     AND
     ({innerFilter})
+ORDER BY e.{nameof(Event.CreatedAt).ToSnake()} DESC
 OFFSET @offset
 LIMIT @size;
 ";

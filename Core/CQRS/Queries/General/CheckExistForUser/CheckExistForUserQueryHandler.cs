@@ -41,9 +41,9 @@ SELECT 1 FROM {request.Table}
                     break;
                 case FilterType.IncludeShared:
                     innerQuery = $@"
-SELECT 1 FROM {request.Table} 
+SELECT 1 FROM {request.Table} t
     WHERE 
-    {nameof(BaseCreated.Id).ToSnake()} = @id
+    t.{nameof(BaseCreated.Id).ToSnake()} = @id
     AND
     ({nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
          OR
@@ -51,7 +51,7 @@ SELECT 1 FROM {request.Table}
         SELECT 1 
         FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
         WHERE 
-            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = {nameof(BaseCreated.CreatedById).ToSnake()} 
+            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = t.{nameof(BaseCreated.CreatedById).ToSnake()} 
           AND 
             su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)
         )
