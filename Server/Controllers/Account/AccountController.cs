@@ -1,4 +1,4 @@
-namespace How.Server.Controllers;
+namespace How.Server.Controllers.Account;
 
 using Common.ResultType;
 using Core.DTO.Account;

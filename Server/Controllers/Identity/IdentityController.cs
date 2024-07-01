@@ -1,4 +1,4 @@
-namespace How.Server.Controllers;
+namespace How.Server.Controllers.Identity;
 
 using Core.Services.Identity;
 using Microsoft.AspNetCore.Mvc;
