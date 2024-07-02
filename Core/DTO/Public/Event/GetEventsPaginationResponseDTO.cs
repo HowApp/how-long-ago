@@ -1,4 +1,4 @@
-namespace How.Core.DTO.Event;
+namespace How.Core.DTO.Public.Event;
 
 using Models;
 

@@ -1,5 +1,6 @@
 namespace How.Server.Controllers.Account;
 
+using Common.Constants;
 using Common.ResultType;
 using Core.DTO.Account;
 using Core.Services.Account;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 [Authorize]
+[ApiExplorerSettings(GroupName = SwaggerDocConstants.Account)]
 public class AccountController : BaseController
 {
     private readonly IAccountService _accountService;

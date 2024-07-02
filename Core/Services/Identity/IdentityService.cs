@@ -119,7 +119,7 @@ public class IdentityService : IIdentityService
         }
     }
 
-    public async Task<Result<CurrentUserResponseDTO>> GetCurrentUserInfo()
+    public Result<CurrentUserResponseDTO> GetCurrentUserInfo()
     {
         try
         {
@@ -150,4 +150,3 @@ public class IdentityService : IIdentityService
         }
     }
 }
-

@@ -14,7 +14,7 @@ using CQRS.Queries.Event.GetEventsPagination;
 using CQRS.Queries.General.CheckExistForUser;
 using CurrentUser;
 using Database;
-using DTO.Event;
+using DTO.Dashboard.Event;
 using DTO.Models;
 using Infrastructure.Enums;
 using MediatR;

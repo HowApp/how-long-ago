@@ -12,6 +12,7 @@ using Core.Services.Storage.FileStorage;
 using Core.Services.Storage.ImageStorage;
 using Core.Services.Account;
 using Core.Services.Event;
+using Core.Services.Public.PublicEvent;
 using Core.Services.Record;
 using Core.Services.SharedUser;
 using Dapper;
@@ -22,6 +23,7 @@ using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -130,6 +132,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRecordService, RecordService>();
         services.AddTransient<ISharedUserService, SharedUserService>();
         
+        // Public
+        services.AddTransient<IPublicEventService, PublicEventService>();
+        
         return services;
     }
 
@@ -137,10 +142,35 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddSwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(g =>
         {
-            c.ConfigureForNodaTime();
-            c.EnableAnnotations();
+            g.ConfigureForNodaTime();
+            g.EnableAnnotations();
+            
+            g.SwaggerDoc(SwaggerDocConstants.Account, new OpenApiInfo
+            {
+                Title = "How",
+                Description = "How Account",
+                Version = SwaggerDocConstants.Account,
+            });
+            g.SwaggerDoc(SwaggerDocConstants.Identity, new OpenApiInfo
+            {
+                Title = "How",
+                Description = "How Identity",
+                Version = SwaggerDocConstants.Identity,
+            });
+            g.SwaggerDoc(SwaggerDocConstants.Dashboard, new OpenApiInfo
+            {
+                Title = "How",
+                Description = "How Dashboard",
+                Version = SwaggerDocConstants.Dashboard,
+            });
+            g.SwaggerDoc(SwaggerDocConstants.Public, new OpenApiInfo
+            {
+                Title = "How",
+                Description = "How Public",
+                Version = SwaggerDocConstants.Public,
+            });
         });
 
         return services;

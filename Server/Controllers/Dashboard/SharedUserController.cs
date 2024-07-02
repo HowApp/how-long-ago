@@ -1,5 +1,6 @@
 namespace How.Server.Controllers.Dashboard;
 
+using Common.Constants;
 using Common.ResultType;
 using Core.DTO.SharedUser;
 using Core.Services.SharedUser;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 [Authorize]
+[ApiExplorerSettings(GroupName = SwaggerDocConstants.Dashboard)]
 public class SharedUserController : BaseController
 {
     private readonly ISharedUserService _userService;

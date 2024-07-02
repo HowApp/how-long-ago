@@ -33,7 +33,13 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(s =>
+            {
+                s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Account}/swagger.json", SwaggerDocConstants.Account);
+                s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Identity}/swagger.json", SwaggerDocConstants.Identity);
+                s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Dashboard}/swagger.json", SwaggerDocConstants.Dashboard);
+                s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Public}/swagger.json", SwaggerDocConstants.Public);
+            });
         }
         else
         {

@@ -1,10 +1,12 @@
 namespace How.Server.Controllers.Identity;
 
+using Common.Constants;
 using Core.Services.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Common.ResultType;
 using Core.DTO.Identity;
 
+[ApiExplorerSettings(GroupName = SwaggerDocConstants.Identity)]
 public class IdentityController : BaseController
 {
     private readonly IIdentityService _identityService;
@@ -52,9 +54,9 @@ public class IdentityController : BaseController
     [Route("api/identity/current-user-info")]
     [HttpGet]
     [ProducesResponseType(typeof(Result<CurrentUserResponseDTO>), 200)]
-    public async Task<IActionResult> CurrentUserInfo()
+    public IActionResult CurrentUserInfo()
     {
-        var result = await _identityService.GetCurrentUserInfo();
+        var result = _identityService.GetCurrentUserInfo();
 
         return HttpResult(result);
     }

@@ -1,7 +1,7 @@
 namespace How.Core.Services.Event;
 
 using Common.ResultType;
-using DTO.Event;
+using DTO.Dashboard.Event;
 
 public interface IEventService
 {

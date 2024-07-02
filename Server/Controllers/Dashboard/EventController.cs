@@ -1,13 +1,15 @@
 namespace How.Server.Controllers.Dashboard;
 
+using Common.Constants;
 using Common.ResultType;
-using Core.DTO.Event;
+using Core.DTO.Dashboard.Event;
 using Core.Services.Event;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 [Authorize]
+[ApiExplorerSettings(GroupName = SwaggerDocConstants.Dashboard)]
 public class EventController : BaseController
 {
     private readonly IEventService _eventService;

@@ -1,4 +1,4 @@
-namespace How.Core.DTO.Event;
+namespace How.Core.DTO.Dashboard.Event;
 
 using Common.DTO;
 using FluentValidation;

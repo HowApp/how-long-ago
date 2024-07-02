@@ -1,5 +1,6 @@
 namespace How.Server.Controllers.Dashboard;
 
+using Common.Constants;
 using Common.ResultType;
 using Core.DTO.Record;
 using Core.DTO.RecordImage;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 [Authorize]
+[ApiExplorerSettings(GroupName = SwaggerDocConstants.Dashboard)]
 public class RecordController : BaseController
 {
     private readonly IRecordService _recordService;

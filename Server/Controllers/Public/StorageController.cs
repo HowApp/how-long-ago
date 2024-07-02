@@ -1,9 +1,11 @@
 ﻿namespace How.Server.Controllers.Public;
 
+using Common.Constants;
 using Core.Services.Storage.FileStorage;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
+[ApiExplorerSettings(GroupName = SwaggerDocConstants.Public)]
 public class StorageController : BaseController
 {
     private readonly IFileStorageService _fileStorageService;
