@@ -4,6 +4,7 @@ using Common.Constants;
 using Common.ResultType;
 using Core.DTO.Record;
 using Core.DTO.RecordImage;
+using Core.Infrastructure.Enums;
 using Core.Services.Record;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,7 @@ public class RecordController : BaseController
     {
         _recordService = recordService;
     }
-    
+
     [HttpPost]
     [SwaggerOperation("Create Record, return ID")]
     [ProducesResponseType<Result<int>>(200)]
@@ -28,11 +29,11 @@ public class RecordController : BaseController
         [FromRoute] int eventId,
         [FromBody] CreateRecordRequestDTO request)
     {
-        var result = await _recordService.CreateRecord(eventId, request);
+        var result = await _recordService.CreateRecord(eventId, request, FilterType.IncludeShared);
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get Record list with pagination")]
     [ProducesResponseType<Result<GetRecordsPaginationResponseDTO>>(200)]
@@ -41,7 +42,7 @@ public class RecordController : BaseController
         int eventId,
         [FromQuery] GetRecordsPaginationRequestDTO request)
     {
-        var result = await _recordService.GetRecordsPagination(eventId, request);
+        var result = await _recordService.GetRecordsPagination(eventId, request, FilterType.IncludeShared);
 
         return HttpResult(result);
     }

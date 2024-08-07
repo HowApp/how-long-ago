@@ -337,7 +337,7 @@ public class RecordService : IRecordService
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
                 Table = nameof(BaseDbContext.Records).ToSnake(),
-                FilterType = FilterType.IncludeCreatedBy
+                FilterType = filterType
             });
                 
             if (recordExist.Failed)
@@ -430,7 +430,7 @@ public class RecordService : IRecordService
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
                 Table = nameof(BaseDbContext.Records).ToSnake(),
-                FilterType = FilterType.IncludeCreatedBy
+                FilterType = filterType
             });
                 
             if (recordExist.Failed)
