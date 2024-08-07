@@ -19,6 +19,7 @@ using DTO.Models;
 using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Models.ServicesModel;
 using Storage.ImageStorage;
 
 public class EventService : IEventService
@@ -265,19 +266,37 @@ public class EventService : IEventService
         }
     }
 
-    public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationRequestDTO request)
+    public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPaginationWithAccess(
+        GetEventsPaginationRequestDTO request,
+        FilterType filterType)
+    {
+        var requestModel = new GetEventsPaginationModel
+        {
+            CurrentUserId = _userService.UserId,
+            Offset = (request.Page - 1) * request.Size,
+            Size = request.Size,
+            Search = request.Search,
+            Status = request.Status,
+            Access = request.Access,
+            FilterType = filterType
+        };
+
+        return await GetEventsPagination(requestModel);
+    }
+    
+    private async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationModel request)
     {
         try
         {
             var query = new GetEventsPaginationQuery
             {
-                CurrentUserId = _userService.UserId,
-                Offset = (request.Page - 1) * request.Size,
+                CurrentUserId = request.CurrentUserId,
+                Offset = request.Offset,
                 Size = request.Size,
                 Search = request.Search,
                 Status = request.Status,
                 Access = request.Access,
-                FilterType = FilterType.IncludeShared
+                FilterType = request.FilterType
             };
 
             var queryResult = await _sender.Send(query);

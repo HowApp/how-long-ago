@@ -3,6 +3,7 @@ namespace How.Server.Controllers.Dashboard;
 using Common.Constants;
 using Common.ResultType;
 using Core.DTO.Dashboard.Event;
+using Core.Infrastructure.Enums;
 using Core.Services.Event;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ public class EventController : BaseController
     [Route("api/dashboard/event/list-pagination")]
     public async Task<IActionResult> GetEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
-        var result = await _eventService.GetEventsPagination(request);
+        var result = await _eventService.GetEventsPaginationWithAccess(request, FilterType.CreatedBy);
 
         return HttpResult(result);
     }
