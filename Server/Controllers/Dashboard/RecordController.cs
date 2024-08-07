@@ -37,7 +37,7 @@ public class RecordController : BaseController
     [SwaggerOperation("Get Record list with pagination")]
     [ProducesResponseType<Result<GetRecordsPaginationResponseDTO>>(200)]
     [Route("api/dashboard/event/{eventId:int:min(1)}/record/list-pagination")]
-    public async Task<IActionResult> GetEventsPagination(
+    public async Task<IActionResult> GetRecordsPagination(
         int eventId,
         [FromQuery] GetRecordsPaginationRequestDTO request)
     {

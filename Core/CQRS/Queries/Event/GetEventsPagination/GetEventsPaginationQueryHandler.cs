@@ -38,7 +38,7 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
                     innerFilter = $@"
     true";
                     break;
-                case FilterType.CreatedBy:
+                case FilterType.IncludeCreatedBy:
                     innerFilter = $@"
     e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
                     break;

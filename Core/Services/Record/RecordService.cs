@@ -19,6 +19,7 @@ using Database;
 using DTO.Models;
 using DTO.Record;
 using DTO.RecordImage;
+using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Models.ServicesModel;
@@ -43,7 +44,10 @@ public class RecordService : IRecordService
         _imageStorage = imageStorage;
     }
 
-    public async Task<Result<int>> CreateRecord(int eventId, CreateRecordRequestDTO request)
+    public async Task<Result<int>> CreateRecord(
+        int eventId,
+        CreateRecordRequestDTO request,
+        FilterType filterType)
     {
         try
         {
@@ -51,7 +55,8 @@ public class RecordService : IRecordService
             {
                 CurrentUserId = _userService.UserId,
                 Id = eventId,
-                Table = nameof(BaseDbContext.Events).ToSnake()
+                Table = nameof(BaseDbContext.Events).ToSnake(),
+                FilterType = filterType
             });
 
             if (eventExist.Failed)
@@ -95,7 +100,10 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result<GetRecordsPaginationResponseDTO>> GetRecordsPagination(int eventId, GetRecordsPaginationRequestDTO request)
+    public async Task<Result<GetRecordsPaginationResponseDTO>> GetRecordsPagination(
+        int eventId,
+        GetRecordsPaginationRequestDTO request,
+        FilterType filterType)
     {
         try
         {
@@ -103,7 +111,8 @@ public class RecordService : IRecordService
             {
                 CurrentUserId = _userService.UserId,
                 Id = eventId,
-                Table = nameof(BaseDbContext.Events).ToSnake()
+                Table = nameof(BaseDbContext.Events).ToSnake(),
+                FilterType = filterType
             });
 
             if (eventExist.Failed)
@@ -145,7 +154,10 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result> UpdateRecord(int recordId, UpdateRecordRequestDTO request)
+    public async Task<Result> UpdateRecord(
+        int recordId,
+        UpdateRecordRequestDTO request,
+        FilterType filterType)
     {
         try
         {
@@ -153,7 +165,8 @@ public class RecordService : IRecordService
             {
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake()
+                Table = nameof(BaseDbContext.Records).ToSnake(),
+                FilterType = filterType
             });
                 
             if (recordExist.Failed)
@@ -198,7 +211,8 @@ public class RecordService : IRecordService
 
     public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
         int recordId,
-        CreateRecordImagesRequestDTO request)
+        CreateRecordImagesRequestDTO request,
+        FilterType filterType)
     {
         var imageIds = new int[request.Files.Count];
         try
@@ -207,7 +221,8 @@ public class RecordService : IRecordService
             {
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake()
+                Table = nameof(BaseDbContext.Records).ToSnake(),
+                FilterType = filterType
             });
                 
             if (recordExist.Failed)
@@ -310,7 +325,10 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result> UpdateRecordImages(int recordId, UpdateRecordImagesRequestDTO request)
+    public async Task<Result> UpdateRecordImages(
+        int recordId,
+        UpdateRecordImagesRequestDTO request,
+        FilterType filterType)
     {
         try
         {
@@ -318,7 +336,8 @@ public class RecordService : IRecordService
             {
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake()
+                Table = nameof(BaseDbContext.Records).ToSnake(),
+                FilterType = FilterType.IncludeCreatedBy
             });
                 
             if (recordExist.Failed)
@@ -402,7 +421,7 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result> DeleteRecord(int recordId)
+    public async Task<Result> DeleteRecord(int recordId, FilterType filterType)
     {
         try
         {
@@ -410,7 +429,8 @@ public class RecordService : IRecordService
             {
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake()
+                Table = nameof(BaseDbContext.Records).ToSnake(),
+                FilterType = FilterType.IncludeCreatedBy
             });
                 
             if (recordExist.Failed)

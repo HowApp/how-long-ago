@@ -30,7 +30,7 @@ public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuer
 
             switch (request.FilterType)
             {
-                case FilterType.CreatedBy:
+                case FilterType.IncludeCreatedBy:
                     innerQuery = $@"
 SELECT 1 FROM {request.Table} 
     WHERE 

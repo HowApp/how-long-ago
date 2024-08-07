@@ -30,18 +30,29 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
-    [SwaggerOperation("Get Events list with pagination")]
+    [SwaggerOperation("Get own Events list with pagination")]
     [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
-    [Route("api/dashboard/event/list-pagination")]
-    public async Task<IActionResult> GetEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
+    [Route("api/dashboard/event/list-pagination/own")]
+    public async Task<IActionResult> GetOwnEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
-        var result = await _eventService.GetEventsPaginationWithAccess(request, FilterType.CreatedBy);
+        var result = await _eventService.GetEventsPagination(request);
 
         return HttpResult(result);
     }
-    
+
+    [HttpGet]
+    [SwaggerOperation("Get shared Events list with pagination")]
+    [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
+    [Route("api/dashboard/event/list-pagination/shared")]
+    public async Task<IActionResult> GetSharedEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
+    {
+        var result = await _eventService.GetEventsPagination(request, FilterType.IncludeShared);
+
+        return HttpResult(result);
+    }
+
     [HttpPatch]
     [SwaggerOperation("Activate/Deactivate Event")]
     [ProducesResponseType<Result>(200)]
@@ -54,7 +65,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPatch]
     [SwaggerOperation("Set event Access status Public/private")]
     [ProducesResponseType<Result>(200)]
@@ -67,7 +78,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPatch]
     [SwaggerOperation("Update event")]
     [ProducesResponseType<Result>(200)]
@@ -80,7 +91,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPut]
     [SwaggerOperation("Update event image, returning hash")]
     [ProducesResponseType<Result<UpdateEventImageResponseDTO>>(200)]
@@ -93,7 +104,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpDelete]
     [SwaggerOperation("Delete event")]
     [ProducesResponseType<Result>(200)]
