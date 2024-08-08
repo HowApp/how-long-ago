@@ -20,15 +20,15 @@ public class PublicEventService : IPublicEventService
         _sender = sender;
     }
 
-    public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationRequestDTO request)
+    public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationPublicRequestDTO publicRequest)
     {
         try
         {
             var query = new GetEventsPaginationQuery
             {
-                Offset = (request.Page - 1) * request.Size,
-                Size = request.Size,
-                Search = request.Search
+                Offset = (publicRequest.Page - 1) * publicRequest.Size,
+                Size = publicRequest.Size,
+                Search = publicRequest.Search
             };
 
             var queryResult = await _sender.Send(query);

@@ -1,6 +1,7 @@
 namespace How.Core.CQRS.Commands.Record.DeleteRecord;
 
 using Common.CQRS;
+using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
@@ -22,7 +23,7 @@ public class DeleteRecordCommandHandler : ICommandHandler<DeleteRecordCommand, R
         try
         {
             var command = $@"
-DELETE FROM records
+DELETE FROM {nameof(BaseDbContext.Records).ToSnake()}
 WHERE id = ANY(@recordIds)
 RETURNING *;
 ";
@@ -40,7 +41,7 @@ RETURNING *;
         {
             _logger.LogError(e.Message);
             return Result.Failure<int>(
-                new Error(ErrorType.Account, $"Error while executing {nameof(DeleteRecordCommand)}"));
+                new Error(ErrorType.Record, $"Error while executing {nameof(DeleteRecordCommand)}"));
         }
     }
 }

@@ -13,4 +13,6 @@ public interface IEventService
     Task<Result<UpdateEventImageResponseDTO>> UpdateEventImage(int eventId, UpdateEventImageRequestDTO request);
     Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationRequestDTO request, FilterType filterType = FilterType.IncludeCreatedBy);
     Task<Result> DeleteEvent(int eventId);
+    Task<Result> AddEventToSaved(int eventId);
+    Task<Result> DeleteEventFromSaved(int eventId);
 }

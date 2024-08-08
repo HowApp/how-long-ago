@@ -2,14 +2,17 @@ namespace How.Core.Services.Event;
 
 using Common.Extensions;
 using Common.ResultType;
+using CQRS.Commands.Event.AddEventToSaved;
 using CQRS.Commands.Event.CreateEvent;
 using CQRS.Commands.Event.DeleteEvent;
+using CQRS.Commands.Event.DeleteEventFromSaved;
 using CQRS.Commands.Event.UpdateEvent;
 using CQRS.Commands.Event.UpdateEventAccess;
 using CQRS.Commands.Event.UpdateEventImage;
 using CQRS.Commands.Event.UpdateEventStatus;
 using CQRS.Commands.Storage.DeleteImage;
 using CQRS.Commands.Storage.CreateImage;
+using CQRS.Queries.Event.CheckAccessToEvent;
 using CQRS.Queries.Event.GetEventsPagination;
 using CQRS.Queries.General.CheckExistForUser;
 using CurrentUser;
@@ -364,6 +367,87 @@ public class EventService : IEventService
             _logger.LogError(e.Message);
             return Result.Failure(
                 new Error(ErrorType.Event, $"Error at {nameof(UpdateEvent)}"));
+        }
+    }
+
+    public async Task<Result> AddEventToSaved(int eventId)
+    {
+        try
+        {
+            var eventAccess = await _sender.Send(new CheckAccessToEventQuery
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId,
+            });
+
+            if (eventAccess.Failed)
+            {
+                return Result.Failure<UpdateEventImageResponseDTO>(eventAccess.Error);
+            }
+
+            if (!eventAccess.Data)
+            {
+                return Result.Failure<UpdateEventImageResponseDTO>(
+                    new Error(ErrorType.Event, $"Event not found!"), 404);
+            }
+
+            var command = new AddEventToSavedCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId
+            };
+
+            var result = await _sender.Send(command);
+            
+            if (result.Failed)
+            {
+                return Result.Failure(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Event, $"Event not added to Saved!"));
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure(
+                new Error(ErrorType.Event, $"Error at {nameof(AddEventToSaved)}"));
+        }
+    }
+
+    public async Task<Result> DeleteEventFromSaved(int eventId)
+    {
+        try
+        {
+            var result = await _sender.Send(new DeleteEventFromSavedCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId
+            });
+            
+            if (result.Failed)
+            {
+                return Result.Failure(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure(
+                    new Error(ErrorType.Event, $"Event not deleted from Saved!"));
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure(
+                new Error(ErrorType.Event, $"Error at {nameof(DeleteEventFromSaved)}"));
         }
     }
 }

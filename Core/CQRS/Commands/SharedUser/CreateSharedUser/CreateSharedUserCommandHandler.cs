@@ -33,8 +33,8 @@ ON CONFLICT({nameof(SharedUser.UserOwnerId).ToSnake()}, {nameof(SharedUser.UserS
 DO NOTHING; 
 
 SELECT *
-FROM shared_users su
-WHERE su.user_owner_id = @ownerId AND su.user_shared_id = @sharedId;
+FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su
+WHERE su.{nameof(SharedUser.UserOwnerId).ToSnake()} = @ownerId AND su.{nameof(SharedUser.UserSharedId).ToSnake()} = @sharedId;
 ";
             await using var connection = _dapper.InitConnection();
             var result = await connection.QuerySingleAsync<int>(

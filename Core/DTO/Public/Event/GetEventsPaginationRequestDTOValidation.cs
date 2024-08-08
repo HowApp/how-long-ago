@@ -3,7 +3,7 @@ namespace How.Core.DTO.Public.Event;
 using Common.DTO;
 using FluentValidation;
 
-public class GetEventsPaginationRequestDTOValidation : AbstractValidator<GetEventsPaginationRequestDTO>
+public class GetEventsPaginationRequestDTOValidation : AbstractValidator<GetEventsPaginationPublicRequestDTO>
 {
     public GetEventsPaginationRequestDTOValidation()
     {

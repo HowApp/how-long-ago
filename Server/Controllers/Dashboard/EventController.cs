@@ -115,4 +115,28 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
+    
+    [HttpPost]
+    [SwaggerOperation("Add Event to saved")]
+    [ProducesResponseType<Result>(200)]
+    [Route("api/dashboard/event/{id:int:min(1)}/saved/add")]
+    public async Task<IActionResult> AddEventToSaved([FromRoute] int id)
+    {
+        var result = await _eventService.AddEventToSaved(id);
+
+        return HttpResult(result);
+    }
+    
+    [HttpDelete]
+    [SwaggerOperation("Delete event")]
+    [ProducesResponseType<Result>(200)]
+    [Route("api/dashboard/event/{id:int:min(1)}/saved/delete")]
+    public async Task<IActionResult> DeleteEventFromSaved([FromRoute] int id)
+    {
+        var result = await _eventService.DeleteEventFromSaved(id);
+
+        return HttpResult(result);
+    }
+    
+    // TODO add ability to get saved events
 }

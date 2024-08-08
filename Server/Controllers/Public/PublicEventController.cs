@@ -21,9 +21,9 @@ public class PublicEventController : BaseController
     [SwaggerOperation("Get Events list with pagination")]
     [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
     [Route("api/public/event/list-pagination")]
-    public async Task<IActionResult> GetEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
+    public async Task<IActionResult> GetEventsPagination([FromQuery] GetEventsPaginationPublicRequestDTO publicRequest)
     {
-        var result = await _eventService.GetEventsPagination(request);
+        var result = await _eventService.GetEventsPagination(publicRequest);
 
         return HttpResult(result);
     }
