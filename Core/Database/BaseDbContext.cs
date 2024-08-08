@@ -28,6 +28,7 @@ public class BaseDbContext : IdentityDbContext<
     public DbSet<StorageImage> StorageImages { get; set; }
 
     public DbSet<Event> Events { get; set; } 
+    public DbSet<SavedEvent> SavedEvents { get; set; }
     public DbSet<Record> Records { get; set; } 
     public DbSet<RecordImage> RecordImages { get; set; }
     
