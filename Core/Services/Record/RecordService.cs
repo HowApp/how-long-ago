@@ -8,8 +8,10 @@ using CQRS.Commands.Record.DeleteRecordImages;
 using CQRS.Commands.Record.InsertRecord;
 using CQRS.Commands.Record.UpdateRecord;
 using CQRS.Commands.Record.UpdateRecordImagePosition;
+using CQRS.Commands.Record.UpdateRecordLikeState;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
+using CQRS.Queries.General.CheckExist;
 using CQRS.Queries.General.CheckExistForUser;
 using CQRS.Queries.Record.GetImageIds;
 using CQRS.Queries.Record.GetMaxImagePosition;
@@ -47,7 +49,7 @@ public class RecordService : IRecordService
     public async Task<Result<int>> CreateRecord(
         int eventId,
         CreateRecordRequestDTO request,
-        FilterType filterType)
+        AccessFilterType accessFilterType)
     {
         try
         {
@@ -56,7 +58,7 @@ public class RecordService : IRecordService
                 CurrentUserId = _userService.UserId,
                 Id = eventId,
                 Table = nameof(BaseDbContext.Events).ToSnake(),
-                FilterType = filterType
+                AccessFilterType = accessFilterType
             });
 
             if (eventExist.Failed)
@@ -103,7 +105,7 @@ public class RecordService : IRecordService
     public async Task<Result<GetRecordsPaginationResponseDTO>> GetRecordsPagination(
         int eventId,
         GetRecordsPaginationRequestDTO request,
-        FilterType filterType)
+        AccessFilterType accessFilterType)
     {
         try
         {
@@ -112,7 +114,7 @@ public class RecordService : IRecordService
                 CurrentUserId = _userService.UserId,
                 Id = eventId,
                 Table = nameof(BaseDbContext.Events).ToSnake(),
-                FilterType = filterType
+                AccessFilterType = accessFilterType
             });
 
             if (eventExist.Failed)
@@ -157,7 +159,7 @@ public class RecordService : IRecordService
     public async Task<Result> UpdateRecord(
         int recordId,
         UpdateRecordRequestDTO request,
-        FilterType filterType)
+        AccessFilterType accessFilterType)
     {
         try
         {
@@ -166,7 +168,7 @@ public class RecordService : IRecordService
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
                 Table = nameof(BaseDbContext.Records).ToSnake(),
-                FilterType = filterType
+                AccessFilterType = accessFilterType
             });
                 
             if (recordExist.Failed)
@@ -209,10 +211,59 @@ public class RecordService : IRecordService
         }
     }
 
+    public async Task<Result<LikeState>> UpdateLikeState(int recordId, LikeState likeState)
+    {
+        try
+        {
+            var eventExist = await _sender.Send(new CheckExistQuery
+            {
+                Id = recordId,
+                Table = nameof(BaseDbContext.Records).ToSnake()
+            });
+
+            if (eventExist.Failed)
+            {
+                return Result.Failure<LikeState>(eventExist.Error);
+            }
+
+            if (!eventExist.Data)
+            {
+                return Result.Failure<LikeState>(new Error(ErrorType.Record, $"Record not found!"), 404);
+            }
+            
+            var command = new UpdateRecordLikeStateCommand
+            {
+                CurrentUserId = _userService.UserId,
+                RecordId = recordId,
+                LikeState = likeState
+            };
+            
+            var result = await _sender.Send(command);
+
+            if (result.Failed)
+            {
+                return Result.Failure<LikeState>(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure<LikeState>(new Error(ErrorType.Record, "Action not performed!"));
+            }
+            
+            return Result.Success(likeState);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<LikeState>(
+                new Error(ErrorType.Record, $"Error at {nameof(UpdateLikeState)}"));
+        }
+    }
+
     public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
         int recordId,
         CreateRecordImagesRequestDTO request,
-        FilterType filterType)
+        AccessFilterType accessFilterType)
     {
         var imageIds = new int[request.Files.Count];
         try
@@ -222,7 +273,7 @@ public class RecordService : IRecordService
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
                 Table = nameof(BaseDbContext.Records).ToSnake(),
-                FilterType = filterType
+                AccessFilterType = accessFilterType
             });
                 
             if (recordExist.Failed)
@@ -328,7 +379,7 @@ public class RecordService : IRecordService
     public async Task<Result> UpdateRecordImages(
         int recordId,
         UpdateRecordImagesRequestDTO request,
-        FilterType filterType)
+        AccessFilterType accessFilterType)
     {
         try
         {
@@ -337,7 +388,7 @@ public class RecordService : IRecordService
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
                 Table = nameof(BaseDbContext.Records).ToSnake(),
-                FilterType = filterType
+                AccessFilterType = accessFilterType
             });
                 
             if (recordExist.Failed)
@@ -421,7 +472,7 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result> DeleteRecord(int recordId, FilterType filterType)
+    public async Task<Result> DeleteRecord(int recordId, AccessFilterType accessFilterType)
     {
         try
         {
@@ -430,7 +481,7 @@ public class RecordService : IRecordService
                 Id = recordId,
                 CurrentUserId = _userService.UserId,
                 Table = nameof(BaseDbContext.Records).ToSnake(),
-                FilterType = filterType
+                AccessFilterType = accessFilterType
             });
                 
             if (recordExist.Failed)

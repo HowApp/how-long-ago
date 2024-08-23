@@ -29,7 +29,7 @@ public class RecordController : BaseController
         [FromRoute] int eventId,
         [FromBody] CreateRecordRequestDTO request)
     {
-        var result = await _recordService.CreateRecord(eventId, request, FilterType.IncludeShared);
+        var result = await _recordService.CreateRecord(eventId, request, AccessFilterType.IncludeShared);
 
         return HttpResult(result);
     }
@@ -42,7 +42,7 @@ public class RecordController : BaseController
         int eventId,
         [FromQuery] GetRecordsPaginationRequestDTO request)
     {
-        var result = await _recordService.GetRecordsPagination(eventId, request, FilterType.IncludeShared);
+        var result = await _recordService.GetRecordsPagination(eventId, request, AccessFilterType.IncludeShared);
 
         return HttpResult(result);
     }
@@ -56,6 +56,19 @@ public class RecordController : BaseController
         [FromBody] UpdateRecordRequestDTO request)
     {
         var result = await _recordService.UpdateRecord(recordId, request);
+
+        return HttpResult(result);
+    }
+    
+    [HttpPatch]
+    [SwaggerOperation("Update like record state")]
+    [ProducesResponseType<Result>(200)]
+    [Route("api/dashboard/event/record/{recordId:int:min(1)}/like")]
+    public async Task<IActionResult> UpdateRecordLikeState(
+        [FromRoute] int recordId,
+        [FromQuery] LikeState request)
+    {
+        var result = await _recordService.UpdateLikeState(recordId, request);
 
         return HttpResult(result);
     }

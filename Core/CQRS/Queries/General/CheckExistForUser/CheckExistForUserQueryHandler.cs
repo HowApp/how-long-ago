@@ -28,9 +28,9 @@ public class CheckExistForUserQueryHandler : IQueryHandler<CheckExistForUserQuer
         {
             var innerQuery = string.Empty; 
 
-            switch (request.FilterType)
+            switch (request.AccessFilterType)
             {
-                case FilterType.IncludeCreatedBy:
+                case AccessFilterType.IncludeCreatedBy:
                     innerQuery = $@"
 SELECT 1 FROM {request.Table} 
     WHERE 
@@ -39,7 +39,7 @@ SELECT 1 FROM {request.Table}
     {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
 ";
                     break;
-                case FilterType.IncludeShared:
+                case AccessFilterType.IncludeShared:
                     innerQuery = $@"
 SELECT 1 FROM {request.Table} t
     WHERE 

@@ -48,7 +48,7 @@ public class EventController : BaseController
     [Route("api/dashboard/event/list-pagination/shared")]
     public async Task<IActionResult> GetSharedEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
-        var result = await _eventService.GetEventsPagination(request, FilterType.IncludeShared);
+        var result = await _eventService.GetEventsPagination(request, AccessFilterType.IncludeShared);
 
         return HttpResult(result);
     }
@@ -91,6 +91,20 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
+    
+    [HttpPatch]
+    [SwaggerOperation("Update like event state")]
+    [ProducesResponseType<Result>(200)]
+    [Route("api/dashboard/event/{id:int:min(1)}/like")]
+    public async Task<IActionResult> UpdateEventLikeState(
+        [FromRoute] int id,
+        [FromQuery] LikeState request)
+    {
+        var result = await _eventService.UpdateLikeState(id, request);
+
+        return HttpResult(result);
+    }
+    
 
     [HttpPut]
     [SwaggerOperation("Update event image, returning hash")]

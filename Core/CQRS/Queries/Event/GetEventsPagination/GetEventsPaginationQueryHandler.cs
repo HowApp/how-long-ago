@@ -32,17 +32,17 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
         {
             var innerFilter = string.Empty;
 
-            switch (request.FilterType)
+            switch (request.AccessFilterType)
             {
-                case FilterType.None:
+                case AccessFilterType.None:
                     innerFilter = $@"
     true";
                     break;
-                case FilterType.IncludeCreatedBy:
+                case AccessFilterType.IncludeCreatedBy:
                     innerFilter = $@"
     e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
                     break;
-                case FilterType.IncludeShared:
+                case AccessFilterType.IncludeShared:
                     innerFilter = $@"
     e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id
     OR

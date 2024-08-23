@@ -9,11 +9,13 @@ using CQRS.Commands.Event.DeleteEventFromSaved;
 using CQRS.Commands.Event.UpdateEvent;
 using CQRS.Commands.Event.UpdateEventAccess;
 using CQRS.Commands.Event.UpdateEventImage;
+using CQRS.Commands.Event.UpdateEventLikeState;
 using CQRS.Commands.Event.UpdateEventStatus;
 using CQRS.Commands.Storage.DeleteImage;
 using CQRS.Commands.Storage.CreateImage;
 using CQRS.Queries.Event.CheckAccessToEvent;
 using CQRS.Queries.Event.GetEventsPagination;
+using CQRS.Queries.General.CheckExist;
 using CQRS.Queries.General.CheckExistForUser;
 using CurrentUser;
 using Database;
@@ -190,7 +192,7 @@ public class EventService : IEventService
                 CurrentUserId = _userService.UserId,
                 Id = eventId,
                 Table = nameof(BaseDbContext.Events).ToSnake(),
-                FilterType = FilterType.IncludeCreatedBy
+                AccessFilterType = AccessFilterType.IncludeCreatedBy
             });
 
             if (eventExist.Failed)
@@ -269,9 +271,58 @@ public class EventService : IEventService
         }
     }
 
+    public async Task<Result<LikeState>> UpdateLikeState(int eventId, LikeState likeState)
+    {
+        try
+        {
+            var eventExist = await _sender.Send(new CheckExistQuery
+            {
+                Id = eventId,
+                Table = nameof(BaseDbContext.Events).ToSnake()
+            });
+
+            if (eventExist.Failed)
+            {
+                return Result.Failure<LikeState>(eventExist.Error);
+            }
+
+            if (!eventExist.Data)
+            {
+                return Result.Failure<LikeState>(new Error(ErrorType.Event, $"Event not found!"), 404);
+            }
+            
+            var command = new UpdateEventLikeStateCommand
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId,
+                LikeState = likeState
+            };
+            
+            var result = await _sender.Send(command);
+
+            if (result.Failed)
+            {
+                return Result.Failure<LikeState>(result.Error);
+            }
+
+            if (result.Data < 1)
+            {
+                return Result.Failure<LikeState>(new Error(ErrorType.Event, "Action not performed!"));
+            }
+            
+            return Result.Success(likeState);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<LikeState>(
+                new Error(ErrorType.Event, $"Error at {nameof(UpdateLikeState)}"));
+        }
+    }
+
     public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(
         GetEventsPaginationRequestDTO request,
-        FilterType filterType)
+        AccessFilterType accessFilterType)
     {
         try
         {
@@ -283,7 +334,7 @@ public class EventService : IEventService
                 Search = request.Search,
                 Status = request.Status,
                 Access = request.Access,
-                FilterType = filterType
+                AccessFilterType = accessFilterType
             };
 
             var queryResult = await _sender.Send(query);
