@@ -8,6 +8,7 @@ using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
+
 public class Program
 {
     public static async Task Main(string[] args)
