@@ -29,7 +29,9 @@ public class BaseDbContext : IdentityDbContext<
 
     public DbSet<Event> Events { get; set; } 
     public DbSet<SavedEvent> SavedEvents { get; set; }
+    public DbSet<LikedEvent> LikedEvents { get; set; }
     public DbSet<Record> Records { get; set; } 
+    public DbSet<LikedRecord> LikedRecords { get; set; }
     public DbSet<RecordImage> RecordImages { get; set; }
     
     public DbSet<SharedUser> SharedUsers { get; set; }
