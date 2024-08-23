@@ -1,10 +1,9 @@
 namespace How.Core.Database.Entities.Event;
 
-using Base;
 using Identity;
 using Infrastructure.Enums;
 
-public class LikedEvent : IdentityKey
+public class LikedEvent
 {
     public int EventId { get; set; }
     public Event Event { get; set; }

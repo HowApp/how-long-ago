@@ -8,6 +8,7 @@ public class LikedEventConfiguration : IEntityTypeConfiguration<LikedEvent>
 {
     public void Configure(EntityTypeBuilder<LikedEvent> builder)
     {
+        builder.HasKey(k => new {k.EventId, k.LikedByUserId});
         builder.HasIndex(i => new {i.EventId, i.LikedByUserId}).IsUnique();
     }
 }

@@ -1,10 +1,9 @@
 namespace How.Core.Database.Entities.Record;
 
-using Base;
 using Identity;
 using Infrastructure.Enums;
 
-public class LikedRecord : IdentityKey
+public class LikedRecord
 {
     public int RecordId { get; set; }
     public Record Record { get; set; }
