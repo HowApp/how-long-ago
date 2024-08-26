@@ -39,7 +39,7 @@ public class RecordController : BaseController
     [ProducesResponseType<Result<GetRecordsPaginationResponseDTO>>(200)]
     [Route("api/dashboard/event/{eventId:int:min(1)}/record/list-pagination")]
     public async Task<IActionResult> GetRecordsPagination(
-        int eventId,
+        [FromRoute] int eventId,
         [FromQuery] GetRecordsPaginationRequestDTO request)
     {
         var result = await _recordService.GetRecordsPagination(eventId, request, AccessFilterType.IncludeShared);
@@ -50,12 +50,13 @@ public class RecordController : BaseController
     [HttpPatch]
     [SwaggerOperation("Update record")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/dashboard/event/record/{recordId:int:min(1)}/update")]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/update")]
     public async Task<IActionResult> UpdateRecord(
+        [FromRoute] int eventId,
         [FromRoute] int recordId,
         [FromBody] UpdateRecordRequestDTO request)
     {
-        var result = await _recordService.UpdateRecord(recordId, request);
+        var result = await _recordService.UpdateRecord(eventId, recordId, request);
 
         return HttpResult(result);
     }
@@ -63,12 +64,13 @@ public class RecordController : BaseController
     [HttpPatch]
     [SwaggerOperation("Update like record state")]
     [ProducesResponseType<Result>(200)]
-    [Route("api/dashboard/event/record/{recordId:int:min(1)}/like")]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/like")]
     public async Task<IActionResult> UpdateRecordLikeState(
+        [FromRoute] int eventId,
         [FromRoute] int recordId,
         [FromQuery] LikeState request)
     {
-        var result = await _recordService.UpdateLikeState(recordId, request);
+        var result = await _recordService.UpdateLikeState(eventId, recordId, request);
 
         return HttpResult(result);
     }
@@ -76,12 +78,13 @@ public class RecordController : BaseController
     [HttpPost]
     [SwaggerOperation("Create record images, returning hashes")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
-    [Route("api/dashboard/event/record/{recordId:int:min(1)}/image/create")]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/image/create")]
     public async Task<IActionResult> CreateRecordImage(
+        [FromRoute] int eventId,
         [FromRoute] int recordId,
         [FromForm] CreateRecordImagesRequestDTO request)
     {
-        var result = await _recordService.CreateRecordImages(recordId, request);
+        var result = await _recordService.CreateRecordImages(eventId, recordId, request);
 
         return HttpResult(result);
     }
@@ -89,12 +92,13 @@ public class RecordController : BaseController
     [HttpPatch]
     [SwaggerOperation("Update record images")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
-    [Route("api/dashboard/event/record/{recordId:int:min(1)}/image/update")]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/image/update")]
     public async Task<IActionResult> UpdateRecordImages(
+        [FromRoute] int eventId,
         [FromRoute] int recordId,
         [FromBody] UpdateRecordImagesRequestDTO request)
     {
-        var result = await _recordService.UpdateRecordImages(recordId, request);
+        var result = await _recordService.UpdateRecordImages(eventId, recordId, request);
 
         return HttpResult(result);
     }
@@ -102,10 +106,12 @@ public class RecordController : BaseController
     [HttpDelete]
     [SwaggerOperation("Delete Record by ID")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
-    [Route("api/dashboard/event/record/{recordId:int:min(1)}/delete")]
-    public async Task<IActionResult> DeleteRecord([FromRoute] int recordId)
+    [Route("api/dashboard/event/{eventId:int:min(1)}/record/{recordId:int:min(1)}/delete")]
+    public async Task<IActionResult> DeleteRecord(
+        [FromRoute] int eventId,
+        [FromRoute] int recordId)
     {
-        var result = await _recordService.DeleteRecord(recordId);
+        var result = await _recordService.DeleteRecord(eventId, recordId);
 
         return HttpResult(result);
     }

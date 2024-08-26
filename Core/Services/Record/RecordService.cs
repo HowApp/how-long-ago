@@ -1,6 +1,5 @@
 namespace How.Core.Services.Record;
 
-using Common.Extensions;
 using Common.ResultType;
 using CQRS.Commands.Record.CreateRecordImages;
 using CQRS.Commands.Record.DeleteRecord;
@@ -12,13 +11,10 @@ using CQRS.Commands.Record.UpdateRecordLikeState;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
 using CQRS.Queries.General.CheckExistAccess;
-using CQRS.Queries.General.CheckExist;
-using CQRS.Queries.General.CheckExistForUser;
 using CQRS.Queries.Record.GetImageIds;
 using CQRS.Queries.Record.GetMaxImagePosition;
 using CQRS.Queries.Record.GetRecordsPagination;
 using CurrentUser;
-using Database;
 using DTO.Models;
 using DTO.Record;
 using DTO.RecordImage;
@@ -161,18 +157,20 @@ public class RecordService : IRecordService
     }
 
     public async Task<Result> UpdateRecord(
+        int eventId,
         int recordId,
         UpdateRecordRequestDTO request,
         AccessFilterType accessFilterType)
     {
         try
         {
-            var recordExist = await _sender.Send(new CheckExistForUserQuery
+            var queryBuilder = new RecordAccessAccessBuilder();
+            queryBuilder.Init(eventId, recordId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            
+            var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
-                Id = recordId,
-                CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake(),
-                AccessFilterType = accessFilterType
+                QueryAccessBuilder = queryBuilder
             });
                 
             if (recordExist.Failed)
@@ -215,22 +213,29 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result<LikeState>> UpdateLikeState(int recordId, LikeState likeState)
+    public async Task<Result<LikeState>> UpdateLikeState(
+        int eventId,
+        int recordId,
+        LikeState likeState)
     {
         try
         {
-            var eventExist = await _sender.Send(new CheckExistQuery
+            var queryBuilder = new RecordAccessAccessBuilder();
+            queryBuilder.Init(eventId, recordId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterByStatus(EventStatus.Active);
+            
+            var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
-                Id = recordId,
-                Table = nameof(BaseDbContext.Records).ToSnake()
+                QueryAccessBuilder = queryBuilder
             });
-
-            if (eventExist.Failed)
+            
+            if (recordExist.Failed)
             {
-                return Result.Failure<LikeState>(eventExist.Error);
+                return Result.Failure<LikeState>(recordExist.Error);
             }
 
-            if (!eventExist.Data)
+            if (!recordExist.Data)
             {
                 return Result.Failure<LikeState>(new Error(ErrorType.Record, $"Record not found!"), 404);
             }
@@ -265,6 +270,7 @@ public class RecordService : IRecordService
     }
 
     public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
+        int eventId,
         int recordId,
         CreateRecordImagesRequestDTO request,
         AccessFilterType accessFilterType)
@@ -272,12 +278,13 @@ public class RecordService : IRecordService
         var imageIds = new int[request.Files.Count];
         try
         {
-            var recordExist = await _sender.Send(new CheckExistForUserQuery
+            var queryBuilder = new RecordAccessAccessBuilder();
+            queryBuilder.Init(eventId, recordId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            
+            var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
-                Id = recordId,
-                CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake(),
-                AccessFilterType = accessFilterType
+                QueryAccessBuilder = queryBuilder
             });
                 
             if (recordExist.Failed)
@@ -381,18 +388,20 @@ public class RecordService : IRecordService
     }
 
     public async Task<Result> UpdateRecordImages(
+        int eventId,
         int recordId,
         UpdateRecordImagesRequestDTO request,
         AccessFilterType accessFilterType)
     {
         try
         {
-            var recordExist = await _sender.Send(new CheckExistForUserQuery
+            var queryBuilder = new RecordAccessAccessBuilder();
+            queryBuilder.Init(eventId, recordId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            
+            var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
-                Id = recordId,
-                CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake(),
-                AccessFilterType = accessFilterType
+                QueryAccessBuilder = queryBuilder
             });
                 
             if (recordExist.Failed)
@@ -476,16 +485,20 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result> DeleteRecord(int recordId, AccessFilterType accessFilterType)
+    public async Task<Result> DeleteRecord(
+        int eventId,
+        int recordId,
+        AccessFilterType accessFilterType)
     {
         try
         {
-            var recordExist = await _sender.Send(new CheckExistForUserQuery
+            var queryBuilder = new RecordAccessAccessBuilder();
+            queryBuilder.Init(eventId, recordId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            
+            var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
-                Id = recordId,
-                CurrentUserId = _userService.UserId,
-                Table = nameof(BaseDbContext.Records).ToSnake(),
-                AccessFilterType = accessFilterType
+                QueryAccessBuilder = queryBuilder
             });
                 
             if (recordExist.Failed)

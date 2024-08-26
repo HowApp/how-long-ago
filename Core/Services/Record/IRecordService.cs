@@ -16,19 +16,26 @@ public interface IRecordService
         GetRecordsPaginationRequestDTO request,
         AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
     Task<Result> UpdateRecord(
+        int eventId,
         int recordId,
         UpdateRecordRequestDTO request,
         AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
-    Task<Result<LikeState>> UpdateLikeState(int recordId, LikeState likeState);
+    Task<Result<LikeState>> UpdateLikeState(
+        int eventId,
+        int recordId,
+        LikeState likeState);
     Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
+        int eventId,
         int recordId,
         CreateRecordImagesRequestDTO request,
         AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
     Task<Result> UpdateRecordImages(
+        int eventId,
         int recordId,
         UpdateRecordImagesRequestDTO request,
         AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
     Task<Result> DeleteRecord(
+        int eventId,
         int recordId,
         AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
 }
