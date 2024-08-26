@@ -30,6 +30,7 @@
     
     <ItemGroup>
       <Folder Include="DTO\Dashboard\" />
+      <Folder Include="Services\QueryBuilder\" />
     </ItemGroup>
 
 </Project>
