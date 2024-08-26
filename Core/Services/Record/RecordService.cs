@@ -46,14 +46,13 @@ public class RecordService : IRecordService
 
     public async Task<Result<int>> CreateRecord(
         int eventId,
-        CreateRecordRequestDTO request,
-        AccessFilterType accessFilterType)
+        CreateRecordRequestDTO request)
     {
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder();
             queryBuilder.Init(eventId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -103,14 +102,13 @@ public class RecordService : IRecordService
 
     public async Task<Result<GetRecordsPaginationResponseDTO>> GetRecordsPagination(
         int eventId,
-        GetRecordsPaginationRequestDTO request,
-        AccessFilterType accessFilterType)
+        GetRecordsPaginationRequestDTO request)
     {
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder();
             queryBuilder.Init(eventId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -159,14 +157,13 @@ public class RecordService : IRecordService
     public async Task<Result> UpdateRecord(
         int eventId,
         int recordId,
-        UpdateRecordRequestDTO request,
-        AccessFilterType accessFilterType)
+        UpdateRecordRequestDTO request)
     {
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder();
             queryBuilder.Init(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -272,15 +269,14 @@ public class RecordService : IRecordService
     public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
         int eventId,
         int recordId,
-        CreateRecordImagesRequestDTO request,
-        AccessFilterType accessFilterType)
+        CreateRecordImagesRequestDTO request)
     {
         var imageIds = new int[request.Files.Count];
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder();
             queryBuilder.Init(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -390,14 +386,13 @@ public class RecordService : IRecordService
     public async Task<Result> UpdateRecordImages(
         int eventId,
         int recordId,
-        UpdateRecordImagesRequestDTO request,
-        AccessFilterType accessFilterType)
+        UpdateRecordImagesRequestDTO request)
     {
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder();
             queryBuilder.Init(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -487,14 +482,13 @@ public class RecordService : IRecordService
 
     public async Task<Result> DeleteRecord(
         int eventId,
-        int recordId,
-        AccessFilterType accessFilterType)
+        int recordId)
     {
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder();
             queryBuilder.Init(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {

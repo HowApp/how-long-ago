@@ -29,7 +29,7 @@ public class RecordController : BaseController
         [FromRoute] int eventId,
         [FromBody] CreateRecordRequestDTO request)
     {
-        var result = await _recordService.CreateRecord(eventId, request, AccessFilterType.IncludeShared);
+        var result = await _recordService.CreateRecord(eventId, request);
 
         return HttpResult(result);
     }
@@ -42,7 +42,7 @@ public class RecordController : BaseController
         [FromRoute] int eventId,
         [FromQuery] GetRecordsPaginationRequestDTO request)
     {
-        var result = await _recordService.GetRecordsPagination(eventId, request, AccessFilterType.IncludeShared);
+        var result = await _recordService.GetRecordsPagination(eventId, request);
 
         return HttpResult(result);
     }

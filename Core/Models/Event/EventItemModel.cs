@@ -16,4 +16,7 @@ public class EventItemModel
     public string OwnerLastName { get; set; }
     public string OwnerMainHash { get; set; }
     public string OwnerThumbnailHash { get; set; }
+    public int Likes { get; set; }
+    public int Dislikes { get; set; }
+    public LikeState OwnLikeState { get; set; }
 }

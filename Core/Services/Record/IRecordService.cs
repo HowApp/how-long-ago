@@ -9,17 +9,14 @@ public interface IRecordService
 {
     Task<Result<int>> CreateRecord(
         int eventId,
-        CreateRecordRequestDTO request,
-        AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
+        CreateRecordRequestDTO request);
     Task<Result<GetRecordsPaginationResponseDTO>> GetRecordsPagination(
         int eventId,
-        GetRecordsPaginationRequestDTO request,
-        AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
+        GetRecordsPaginationRequestDTO request);
     Task<Result> UpdateRecord(
         int eventId,
         int recordId,
-        UpdateRecordRequestDTO request,
-        AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
+        UpdateRecordRequestDTO request);
     Task<Result<LikeState>> UpdateLikeState(
         int eventId,
         int recordId,
@@ -27,15 +24,12 @@ public interface IRecordService
     Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
         int eventId,
         int recordId,
-        CreateRecordImagesRequestDTO request,
-        AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
+        CreateRecordImagesRequestDTO request);
     Task<Result> UpdateRecordImages(
         int eventId,
         int recordId,
-        UpdateRecordImagesRequestDTO request,
-        AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
+        UpdateRecordImagesRequestDTO request);
     Task<Result> DeleteRecord(
         int eventId,
-        int recordId,
-        AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
+        int recordId);
 }

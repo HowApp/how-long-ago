@@ -11,4 +11,7 @@ public class EventItemModelDTO
     public ImageModelDTO Image { get; set; }
     public UserInfoModelShortDTO UserInfo { get; set; }
     public Instant CreatedAt { get; set; }
+    public int Likes { get; set; }
+    public int Dislikes { get; set; }
+    public LikeState OwnLikeState { get; set; }
 }

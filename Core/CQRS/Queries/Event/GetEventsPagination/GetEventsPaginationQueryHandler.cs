@@ -59,8 +59,7 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
     true";
                     break;
             }
-            
-            
+
             var query = $@"
 SELECT 
     e.id AS {nameof(EventItemModel.Id)},
@@ -73,7 +72,10 @@ SELECT
     u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(EventItemModel.OwnerFirstName)},
     u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(EventItemModel.OwnerLastName)},
     user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.OwnerMainHash)},
-    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.OwnerThumbnailHash)}
+    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.OwnerThumbnailHash)},
+    user_likes.likes AS {nameof(EventItemModel.Likes)},
+    user_likes.dislikes AS {nameof(EventItemModel.Dislikes)},
+    user_likes.current_user_state AS {nameof(EventItemModel.OwnLikeState)}
 FROM {nameof(BaseDbContext.Events).ToSnake()} e 
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} event_image ON 
     e.{nameof(Event.StorageImageId).ToSnake()} = event_image.id
@@ -89,6 +91,17 @@ LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} user_main ON
     user_image.{nameof(StorageImage.MainId).ToSnake()} = user_main.id
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} user_thumbnail ON 
     user_image.{nameof(StorageImage.ThumbnailId).ToSnake()} = user_thumbnail.id
+LEFT JOIN (
+        SELECT 
+            le.{nameof(LikedEvent.EventId).ToSnake()} AS liked_event_id,
+            COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 2 THEN 1 END) AS likes,
+            COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 3 THEN 1 END) AS dislikes,
+            coalesce(le_u.{nameof(LikedEvent.State).ToSnake()}, 1) AS current_user_state
+        FROM {nameof(BaseDbContext.LikedEvents).ToSnake()} le 
+        LEFT JOIN {nameof(BaseDbContext.LikedEvents).ToSnake()} le_u ON 
+            le_u.{nameof(LikedEvent.EventId).ToSnake()} = le.{nameof(LikedEvent.EventId).ToSnake()} AND 
+            le_u.{nameof(LikedEvent.LikedByUserId).ToSnake()} = @created_by_id
+        GROUP BY le.{nameof(LikedEvent.EventId).ToSnake()}, le_u.{nameof(LikedEvent.State).ToSnake()}) user_likes ON e.id = user_likes.liked_event_id
 WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     AND
     e.{nameof(Event.Status).ToSnake()} = @status

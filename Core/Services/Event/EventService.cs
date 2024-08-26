@@ -376,7 +376,11 @@ public class EventService : IEventService
                                 ThumbnailHash = eventItem.OwnerThumbnailHash
                             }
                         },
-                        CreatedAt = eventItem.CreatedAt
+                        CreatedAt = eventItem.CreatedAt,
+                        Likes = eventItem.Likes,
+                        Dislikes = eventItem.Dislikes,
+                        OwnLikeState = eventItem.OwnLikeState,
+
                     });
             }
             
