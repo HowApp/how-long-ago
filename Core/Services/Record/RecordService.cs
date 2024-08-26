@@ -11,6 +11,7 @@ using CQRS.Commands.Record.UpdateRecordImagePosition;
 using CQRS.Commands.Record.UpdateRecordLikeState;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
+using CQRS.Queries.Event.CheckEvent;
 using CQRS.Queries.General.CheckExist;
 using CQRS.Queries.General.CheckExistForUser;
 using CQRS.Queries.Record.GetImageIds;
@@ -21,6 +22,7 @@ using Database;
 using DTO.Models;
 using DTO.Record;
 using DTO.RecordImage;
+using Infrastructure.Builders;
 using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -53,12 +55,13 @@ public class RecordService : IRecordService
     {
         try
         {
-            var eventExist = await _sender.Send(new CheckExistForUserQuery
+            var queryBuilder = new EventAccessQueryBuilder();
+            queryBuilder.Init(eventId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+
+            var eventExist = await _sender.Send(new CheckEventQuery
             {
-                CurrentUserId = _userService.UserId,
-                Id = eventId,
-                Table = nameof(BaseDbContext.Events).ToSnake(),
-                AccessFilterType = accessFilterType
+                QueryBuilder = queryBuilder
             });
 
             if (eventExist.Failed)
@@ -109,12 +112,13 @@ public class RecordService : IRecordService
     {
         try
         {
-            var eventExist = await _sender.Send(new CheckExistForUserQuery
+            var queryBuilder = new EventAccessQueryBuilder();
+            queryBuilder.Init(eventId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
+
+            var eventExist = await _sender.Send(new CheckEventQuery
             {
-                CurrentUserId = _userService.UserId,
-                Id = eventId,
-                Table = nameof(BaseDbContext.Events).ToSnake(),
-                AccessFilterType = accessFilterType
+                QueryBuilder = queryBuilder
             });
 
             if (eventExist.Failed)

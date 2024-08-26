@@ -1,6 +1,5 @@
 namespace How.Core.Services.Event;
 
-using Common.Extensions;
 using Common.ResultType;
 using CQRS.Commands.Event.AddEventToSaved;
 using CQRS.Commands.Event.CreateEvent;
@@ -13,14 +12,12 @@ using CQRS.Commands.Event.UpdateEventLikeState;
 using CQRS.Commands.Event.UpdateEventStatus;
 using CQRS.Commands.Storage.DeleteImage;
 using CQRS.Commands.Storage.CreateImage;
-using CQRS.Queries.Event.CheckAccessToEvent;
+using CQRS.Queries.Event.CheckEvent;
 using CQRS.Queries.Event.GetEventsPagination;
-using CQRS.Queries.General.CheckExist;
-using CQRS.Queries.General.CheckExistForUser;
 using CurrentUser;
-using Database;
 using DTO.Dashboard.Event;
 using DTO.Models;
+using Infrastructure.Builders;
 using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -187,12 +184,13 @@ public class EventService : IEventService
         var imageId = 0;
         try
         {
-            var eventExist = await _sender.Send(new CheckExistForUserQuery
+            var queryBuilder = new EventAccessQueryBuilder();
+            queryBuilder.Init(eventId);
+            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+
+            var eventExist = await _sender.Send(new CheckEventQuery
             {
-                CurrentUserId = _userService.UserId,
-                Id = eventId,
-                Table = nameof(BaseDbContext.Events).ToSnake(),
-                AccessFilterType = AccessFilterType.IncludeCreatedBy
+                QueryBuilder = queryBuilder
             });
 
             if (eventExist.Failed)
@@ -275,10 +273,14 @@ public class EventService : IEventService
     {
         try
         {
-            var eventExist = await _sender.Send(new CheckExistQuery
+            var queryBuilder = new EventAccessQueryBuilder();
+            queryBuilder.Init(eventId);
+            queryBuilder.FilterByEventStatus(EventStatus.Active);
+            queryBuilder.FilterByEventAccessType(EventAccessType.Public);
+
+            var eventExist = await _sender.Send(new CheckEventQuery
             {
-                Id = eventId,
-                Table = nameof(BaseDbContext.Events).ToSnake()
+                QueryBuilder = queryBuilder
             });
 
             if (eventExist.Failed)
@@ -425,10 +427,13 @@ public class EventService : IEventService
     {
         try
         {
-            var eventAccess = await _sender.Send(new CheckAccessToEventQuery
+            var queryBuilder = new EventAccessQueryBuilder();
+            queryBuilder.FilterByEventAccessType(EventAccessType.Public);
+            queryBuilder.FilterByEventStatus(EventStatus.Active);
+            
+            var eventAccess = await _sender.Send(new CheckEventQuery
             {
-                CurrentUserId = _userService.UserId,
-                EventId = eventId,
+                QueryBuilder = queryBuilder
             });
 
             if (eventAccess.Failed)

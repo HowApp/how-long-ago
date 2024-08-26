@@ -25,19 +25,26 @@ public class EventAccessQueryBuilder : IEventAccessQueryBuilder
         
         Query.Append($@"
 SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
-    WHERE e.{nameof(Event).ToSnake()} = FALSE AND
+    WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE AND
     {nameof(BaseCreated.Id).ToSnake()} = @recordId
 ");
         Parameters.Add("@recordId", recordId);
     }
 
-    public void FilterCreatedBy(int userId, bool shared = false)
+    public void FilterCreatedBy(int userId, AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy)
     {
         Parameters.Add("@createdById", userId);
 
-        if (shared)
+        switch (accessFilterType)
         {
-            Query.Append($@"
+            case AccessFilterType.IncludeCreatedBy:
+                Query.Append($@"
+    AND
+    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
+");
+                break;
+            case AccessFilterType.IncludeShared:
+                Query.Append($@"
     AND
     ({nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
          OR
@@ -50,13 +57,9 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
             su.{nameof(SharedUser.UserSharedId).ToSnake()} = @createdById)
         )
 ");
-        }
-        else
-        {
-            Query.Append($@"
-    AND
-    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
-");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(accessFilterType), accessFilterType, null);
         }
     }
 
