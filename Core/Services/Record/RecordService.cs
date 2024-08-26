@@ -11,7 +11,7 @@ using CQRS.Commands.Record.UpdateRecordImagePosition;
 using CQRS.Commands.Record.UpdateRecordLikeState;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
-using CQRS.Queries.Event.CheckEvent;
+using CQRS.Queries.General.CheckExistAccess;
 using CQRS.Queries.General.CheckExist;
 using CQRS.Queries.General.CheckExistForUser;
 using CQRS.Queries.Record.GetImageIds;
@@ -55,13 +55,13 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryBuilder();
+            var queryBuilder = new EventAccessQueryAccessBuilder();
             queryBuilder.Init(eventId);
             queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
 
-            var eventExist = await _sender.Send(new CheckEventQuery
+            var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
-                QueryBuilder = queryBuilder
+                QueryAccessBuilder = queryBuilder
             });
 
             if (eventExist.Failed)
@@ -112,13 +112,13 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryBuilder();
+            var queryBuilder = new EventAccessQueryAccessBuilder();
             queryBuilder.Init(eventId);
             queryBuilder.FilterCreatedBy(_userService.UserId, accessFilterType);
 
-            var eventExist = await _sender.Send(new CheckEventQuery
+            var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
-                QueryBuilder = queryBuilder
+                QueryAccessBuilder = queryBuilder
             });
 
             if (eventExist.Failed)

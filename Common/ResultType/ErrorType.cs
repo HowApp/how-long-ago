@@ -10,4 +10,6 @@ public static class ErrorType
     public static readonly string Event = "Event";
     public static readonly string Record = "Record";
     public static readonly string SharedUser = "SharedUser";
+    
+    public static readonly string QueryBuilder = "QueryBuilder";
 }

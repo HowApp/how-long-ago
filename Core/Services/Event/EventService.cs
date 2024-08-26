@@ -12,7 +12,7 @@ using CQRS.Commands.Event.UpdateEventLikeState;
 using CQRS.Commands.Event.UpdateEventStatus;
 using CQRS.Commands.Storage.DeleteImage;
 using CQRS.Commands.Storage.CreateImage;
-using CQRS.Queries.Event.CheckEvent;
+using CQRS.Queries.General.CheckExistAccess;
 using CQRS.Queries.Event.GetEventsPagination;
 using CurrentUser;
 using DTO.Dashboard.Event;
@@ -184,13 +184,13 @@ public class EventService : IEventService
         var imageId = 0;
         try
         {
-            var queryBuilder = new EventAccessQueryBuilder();
+            var queryBuilder = new EventAccessQueryAccessBuilder();
             queryBuilder.Init(eventId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
 
-            var eventExist = await _sender.Send(new CheckEventQuery
+            var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
-                QueryBuilder = queryBuilder
+                QueryAccessBuilder = queryBuilder
             });
 
             if (eventExist.Failed)
@@ -273,14 +273,14 @@ public class EventService : IEventService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryBuilder();
+            var queryBuilder = new EventAccessQueryAccessBuilder();
             queryBuilder.Init(eventId);
-            queryBuilder.FilterByEventStatus(EventStatus.Active);
-            queryBuilder.FilterByEventAccessType(EventAccessType.Public);
+            queryBuilder.FilterByStatus(EventStatus.Active);
+            queryBuilder.FilterByAccessType(EventAccessType.Public);
 
-            var eventExist = await _sender.Send(new CheckEventQuery
+            var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
-                QueryBuilder = queryBuilder
+                QueryAccessBuilder = queryBuilder
             });
 
             if (eventExist.Failed)
@@ -427,13 +427,13 @@ public class EventService : IEventService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryBuilder();
-            queryBuilder.FilterByEventAccessType(EventAccessType.Public);
-            queryBuilder.FilterByEventStatus(EventStatus.Active);
+            var queryBuilder = new EventAccessQueryAccessBuilder();
+            queryBuilder.FilterByAccessType(EventAccessType.Public);
+            queryBuilder.FilterByStatus(EventStatus.Active);
             
-            var eventAccess = await _sender.Send(new CheckEventQuery
+            var eventAccess = await _sender.Send(new CheckExistAccessQuery
             {
-                QueryBuilder = queryBuilder
+                QueryAccessBuilder = queryBuilder
             });
 
             if (eventAccess.Failed)

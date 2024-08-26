@@ -9,50 +9,50 @@ using Database.Entities.Event;
 using Database.Entities.SharedUser;
 using Enums;
 
-public class EventAccessQueryBuilder : IEventAccessQueryBuilder
+public class EventAccessQueryAccessBuilder : IEventAccessQueryAccessBuilder
 {
-    private StringBuilder Query { get; } = new StringBuilder();
-    private DynamicParameters Parameters { get; } = new DynamicParameters();
+    private StringBuilder _query = new StringBuilder();
+    private DynamicParameters _parameters = new DynamicParameters();
 
-    public EventAccessQueryBuilder()
+    public EventAccessQueryAccessBuilder()
     {
-        Query.Append($@"SELECT 1 WHERE 1 = 0");
+        _query.Append($@"SELECT 1 WHERE 1 = 0");
     }
 
-    public void Init(int recordId)
+    public void Init(int eventId)
     {
-        Query.Clear();
+        _query.Clear();
         
-        Query.Append($@"
+        _query.Append($@"
 SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE AND
-    {nameof(BaseCreated.Id).ToSnake()} = @recordId
+    e.{nameof(BaseCreated.Id).ToSnake()} = @eventId
 ");
-        Parameters.Add("@recordId", recordId);
+        _parameters.Add("@eventId", eventId);
     }
 
     public void FilterCreatedBy(int userId, AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy)
     {
-        Parameters.Add("@createdById", userId);
+        _parameters.Add("@createdById", userId);
 
         switch (accessFilterType)
         {
             case AccessFilterType.IncludeCreatedBy:
-                Query.Append($@"
+                _query.Append($@"
     AND
-    {nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
+    e.{nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
 ");
                 break;
             case AccessFilterType.IncludeShared:
-                Query.Append($@"
+                _query.Append($@"
     AND
-    ({nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
+    e.({nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
          OR
     EXISTS(
         SELECT 1 
         FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
         WHERE 
-            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = t.{nameof(BaseCreated.CreatedById).ToSnake()} 
+            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = e.{nameof(BaseCreated.CreatedById).ToSnake()} 
           AND 
             su.{nameof(SharedUser.UserSharedId).ToSnake()} = @createdById)
         )
@@ -63,21 +63,21 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
         }
     }
 
-    public void FilterByEventStatus(EventStatus status)
+    public void FilterByStatus(EventStatus status)
     {
-        Parameters.Add("@eventStatus", status);
+        _parameters.Add("@eventStatus", status);
         
-        Query.Append($@"
+        _query.Append($@"
     AND
     e.{nameof(Event.Status).ToSnake()} = @eventStatus
 ");
     }
 
-    public void FilterByEventAccessType(EventAccessType accessType)
+    public void FilterByAccessType(EventAccessType accessType)
     {
-        Parameters.Add("@accessType", accessType);
+        _parameters.Add("@accessType", accessType);
         
-        Query.Append($@"
+        _query.Append($@"
     AND
     e.{nameof(Event.Access).ToSnake()} = @accessType
 ");
@@ -86,9 +86,9 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     public (string sqlQuery, DynamicParameters paramsQuery) BuildQuery()
     {
         var query = $@"
-SELECT EXISTS({Query});
+SELECT EXISTS({_query});
 ";
 
-        return (query, Parameters);
+        return (query, _parameters);
     }
 }
