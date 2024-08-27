@@ -14,4 +14,6 @@ public class EventItemModelDTO
     public int Likes { get; set; }
     public int Dislikes { get; set; }
     public LikeState OwnLikeState { get; set; }
+    public int SavedCount { get; set; }
+    public bool IsSavedByUser { get; set; }
 }

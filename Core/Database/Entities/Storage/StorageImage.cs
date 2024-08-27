@@ -2,7 +2,7 @@ namespace How.Core.Database.Entities.Storage;
 
 using Base;
 
-public class StorageImage : IdentityKey
+public class StorageImage : PKey
 {
     public int ImageHeight { get; set; }
     public int ImageWidth { get; set; }

@@ -3,7 +3,7 @@ namespace How.Core.Database.Entities.Record;
 using Base;
 using Storage;
 
-public class RecordImage : IdentityKey
+public class RecordImage : PKey
 {
     public int RecordId { get; set; }
     public Record Record { get; set; }

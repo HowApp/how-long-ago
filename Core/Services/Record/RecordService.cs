@@ -50,8 +50,7 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryAccessBuilder();
-            queryBuilder.Init(eventId);
+            var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
@@ -106,8 +105,7 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryAccessBuilder();
-            queryBuilder.Init(eventId);
+            var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
@@ -161,8 +159,7 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new RecordAccessAccessBuilder();
-            queryBuilder.Init(eventId, recordId);
+            var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
@@ -217,8 +214,7 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new RecordAccessAccessBuilder();
-            queryBuilder.Init(eventId, recordId);
+            var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             queryBuilder.FilterByStatus(EventStatus.Active);
             
@@ -274,8 +270,7 @@ public class RecordService : IRecordService
         var imageIds = new int[request.Files.Count];
         try
         {
-            var queryBuilder = new RecordAccessAccessBuilder();
-            queryBuilder.Init(eventId, recordId);
+            var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
@@ -390,8 +385,7 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new RecordAccessAccessBuilder();
-            queryBuilder.Init(eventId, recordId);
+            var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
@@ -486,8 +480,7 @@ public class RecordService : IRecordService
     {
         try
         {
-            var queryBuilder = new RecordAccessAccessBuilder();
-            queryBuilder.Init(eventId, recordId);
+            var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery

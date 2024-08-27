@@ -13,12 +13,17 @@ using Enums;
 
 public class RecordAccessAccessBuilder : IRecordAccessAccessBuilder
 {
-    private StringBuilder _query = new StringBuilder();
-    private DynamicParameters _parameters = new DynamicParameters();
+    private readonly StringBuilder _query = new StringBuilder();
+    private readonly DynamicParameters _parameters = new DynamicParameters();
 
-    public RecordAccessAccessBuilder()
+    public RecordAccessAccessBuilder(int eventId, int recordId)
     {
-        _query.Append($@"SELECT 1 WHERE 1 = 0");
+        _query.Append($@"SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e WHERE 1 = 0");
+        
+        if (eventId >= 0 && recordId >= 0)
+        {
+            Init(eventId, recordId);
+        }
     }
 
     public void Init(int eventId, int recordId)

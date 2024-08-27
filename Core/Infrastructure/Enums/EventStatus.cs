@@ -2,6 +2,6 @@ namespace How.Core.Infrastructure.Enums;
 
 public enum EventStatus
 {
-    Active = 1,
-    Inactive = 2
+    Inactive = 1,
+    Active = 2
 }

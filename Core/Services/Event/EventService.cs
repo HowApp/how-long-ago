@@ -184,8 +184,7 @@ public class EventService : IEventService
         var imageId = 0;
         try
         {
-            var queryBuilder = new EventAccessQueryAccessBuilder();
-            queryBuilder.Init(eventId);
+            var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
             queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
@@ -273,8 +272,7 @@ public class EventService : IEventService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryAccessBuilder();
-            queryBuilder.Init(eventId);
+            var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
             queryBuilder.FilterByStatus(EventStatus.Active);
             queryBuilder.FilterByAccessType(EventAccessType.Public);
 
@@ -380,7 +378,8 @@ public class EventService : IEventService
                         Likes = eventItem.Likes,
                         Dislikes = eventItem.Dislikes,
                         OwnLikeState = eventItem.OwnLikeState,
-
+                        SavedCount = eventItem.SavedCount,
+                        IsSavedByUser = eventItem.IsSavedByUser,
                     });
             }
             
@@ -431,7 +430,7 @@ public class EventService : IEventService
     {
         try
         {
-            var queryBuilder = new EventAccessQueryAccessBuilder();
+            var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
             queryBuilder.FilterByAccessType(EventAccessType.Public);
             queryBuilder.FilterByStatus(EventStatus.Active);
             

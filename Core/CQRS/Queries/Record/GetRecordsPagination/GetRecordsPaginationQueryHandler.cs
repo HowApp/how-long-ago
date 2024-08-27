@@ -40,6 +40,17 @@ LEFT JOIN {nameof(BaseDbContext.RecordImages).ToSnake()} ri ON r.id = ri.{nameof
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON ri.{nameof(RecordImage.ImageId).ToSnake()} = si.id
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} sf_main ON si.{nameof(StorageImage.MainId).ToSnake()} = sf_main.id
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} sf_thumbnail ON si.{nameof(StorageImage.ThumbnailId).ToSnake()} = sf_thumbnail.id
+LEFT JOIN (
+        SELECT 
+            lr.{nameof(LikedRecord.RecordId).ToSnake()} AS liked_record_id,
+            COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 2 THEN 1 END) AS likes,
+            COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 3 THEN 1 END) AS dislikes,
+            coalesce(lr_u.{nameof(LikedRecord.State).ToSnake()}, 1) AS current_user_state
+        FROM {nameof(BaseDbContext.LikedEvents).ToSnake()} lr 
+        LEFT JOIN {nameof(BaseDbContext.LikedEvents).ToSnake()} lr_u ON 
+            lr_u.{nameof(LikedRecord.RecordId).ToSnake()} = lr.{nameof(LikedRecord.RecordId).ToSnake()} AND 
+            lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @created_by_id
+        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.id = user_likes.liked_record_id
 WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId
 ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC
 OFFSET @offset

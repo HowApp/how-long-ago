@@ -3,7 +3,7 @@ namespace How.Core.Database.Entities.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class IdentityKey
+public class PKey
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

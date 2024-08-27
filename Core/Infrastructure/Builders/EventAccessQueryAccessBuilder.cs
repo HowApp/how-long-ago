@@ -11,12 +11,17 @@ using Enums;
 
 public class EventAccessQueryAccessBuilder : IEventAccessQueryAccessBuilder
 {
-    private StringBuilder _query = new StringBuilder();
-    private DynamicParameters _parameters = new DynamicParameters();
+    private readonly StringBuilder _query = new StringBuilder();
+    private readonly DynamicParameters _parameters = new DynamicParameters();
 
-    public EventAccessQueryAccessBuilder()
+    public EventAccessQueryAccessBuilder(int eventId)
     {
-        _query.Append($@"SELECT 1 WHERE 1 = 0");
+        _query.Append($@"SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e WHERE 1 = 0");
+
+        if (eventId >= 0)
+        {
+            Init(eventId);
+        }
     }
 
     public void Init(int eventId)
