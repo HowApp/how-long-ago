@@ -108,7 +108,10 @@ LEFT JOIN (
         LEFT JOIN {nameof(BaseDbContext.LikedEvents).ToSnake()} le_u ON 
             le_u.{nameof(LikedEvent.EventId).ToSnake()} = le.{nameof(LikedEvent.EventId).ToSnake()} AND 
             le_u.{nameof(LikedEvent.LikedByUserId).ToSnake()} = @created_by_id
-        GROUP BY le.{nameof(LikedEvent.EventId).ToSnake()}, le_u.{nameof(LikedEvent.State).ToSnake()}) user_likes ON e.{nameof(PKey.Id).ToSnake()} = user_likes.liked_event_id
+        GROUP BY 
+            le.{nameof(LikedEvent.EventId).ToSnake()},
+            le_u.{nameof(LikedEvent.State).ToSnake()}
+        ) user_likes ON e.{nameof(PKey.Id).ToSnake()} = user_likes.liked_event_id
 LEFT JOIN (
     SELECT 
         se_count.{nameof(SavedEvent.EventId).ToSnake()} AS saved_count_id,
