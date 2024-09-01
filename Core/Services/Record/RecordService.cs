@@ -126,6 +126,7 @@ public class RecordService : IRecordService
 
             var query = new GetRecordsPaginationQuery
             {
+                CurrentUserId = _userService.UserId,
                 Offset = (request.Page - 1) * request.Size,
                 Size = request.Size,
                 EventId = eventId

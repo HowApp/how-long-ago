@@ -1,7 +1,8 @@
 namespace How.Core.Services.Public.PublicEvent;
 
 using Common.ResultType;
-using CQRS.Queries.Public.Event.GetEventsPagination;
+using CQRS.Queries.Public.Event.GetEventsPaginationPublic;
+using CurrentUser;
 using DTO.Public.Event;
 using DTO.Models;
 using MediatR;
@@ -11,21 +12,25 @@ public class PublicEventService : IPublicEventService
 {
     private readonly ILogger<PublicEventService> _logger;
     private readonly ISender _sender;
+    private readonly ICurrentUserService _userService;
 
     public PublicEventService(
         ILogger<PublicEventService> logger,
-        ISender sender)
+        ISender sender,
+        ICurrentUserService userService)
     {
         _logger = logger;
         _sender = sender;
+        _userService = userService;
     }
 
     public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationPublicRequestDTO publicRequest)
     {
         try
         {
-            var query = new GetEventsPaginationQuery
+            var query = new GetEventsPaginationPublicQuery
             {
+                CurrentUserId = _userService.UserId,
                 Offset = (publicRequest.Page - 1) * publicRequest.Size,
                 Size = publicRequest.Size,
                 Search = publicRequest.Search
@@ -68,7 +73,12 @@ public class PublicEventService : IPublicEventService
                                 ThumbnailHash = eventItem.OwnerThumbnailHash
                             }
                         },
-                        CreatedAt = eventItem.CreatedAt
+                        CreatedAt = eventItem.CreatedAt,
+                        Likes = eventItem.Likes,
+                        Dislikes = eventItem.Dislikes,
+                        OwnLikeState = eventItem.OwnLikeState,
+                        SavedCount = eventItem.SavedCount,
+                        IsSavedByUser = eventItem.IsSavedByUser,
                     });
             }
             

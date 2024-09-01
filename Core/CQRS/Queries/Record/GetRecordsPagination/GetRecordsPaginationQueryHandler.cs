@@ -5,6 +5,7 @@ using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
+using Database.Entities.Base;
 using Database.Entities.Record;
 using Database.Entities.Storage;
 using DTO.Models;
@@ -30,27 +31,27 @@ public class GetRecordsPaginationQueryHandler : IQueryHandler<GetRecordsPaginati
         {
             var query = $@"
 SELECT 
-    r.id AS {nameof(RecordItemModelDTO.Id)},
+    r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemModelDTO.Id)},
     r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemModelDTO.Description)},
     r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemModelDTO.CreatedAt)},
     sf_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.MainHash)},
     sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)}
 FROM {nameof(BaseDbContext.Records).ToSnake()} r
-LEFT JOIN {nameof(BaseDbContext.RecordImages).ToSnake()} ri ON r.id = ri.{nameof(RecordImage.RecordId).ToSnake()}
-LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON ri.{nameof(RecordImage.ImageId).ToSnake()} = si.id
-LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} sf_main ON si.{nameof(StorageImage.MainId).ToSnake()} = sf_main.id
-LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} sf_thumbnail ON si.{nameof(StorageImage.ThumbnailId).ToSnake()} = sf_thumbnail.id
+LEFT JOIN {nameof(BaseDbContext.RecordImages).ToSnake()} ri ON r.{nameof(PKey.Id).ToSnake()} = ri.{nameof(RecordImage.RecordId).ToSnake()}
+LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON ri.{nameof(RecordImage.ImageId).ToSnake()} = si.{nameof(PKey.Id).ToSnake()}
+LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} sf_main ON si.{nameof(StorageImage.MainId).ToSnake()} = sf_main.{nameof(PKey.Id).ToSnake()}
+LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} sf_thumbnail ON si.{nameof(StorageImage.ThumbnailId).ToSnake()} = sf_thumbnail.{nameof(PKey.Id).ToSnake()}
 LEFT JOIN (
         SELECT 
             lr.{nameof(LikedRecord.RecordId).ToSnake()} AS liked_record_id,
             COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 2 THEN 1 END) AS likes,
             COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 3 THEN 1 END) AS dislikes,
             coalesce(lr_u.{nameof(LikedRecord.State).ToSnake()}, 1) AS current_user_state
-        FROM {nameof(BaseDbContext.LikedEvents).ToSnake()} lr 
-        LEFT JOIN {nameof(BaseDbContext.LikedEvents).ToSnake()} lr_u ON 
+        FROM {nameof(BaseDbContext.LikedRecords).ToSnake()} lr 
+        LEFT JOIN {nameof(BaseDbContext.LikedRecords).ToSnake()} lr_u ON 
             lr_u.{nameof(LikedRecord.RecordId).ToSnake()} = lr.{nameof(LikedRecord.RecordId).ToSnake()} AND 
             lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @created_by_id
-        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.id = user_likes.liked_record_id
+        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
 WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId
 ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC
 OFFSET @offset

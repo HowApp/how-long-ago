@@ -13,6 +13,7 @@ using Core.Services.Storage.ImageStorage;
 using Core.Services.Account;
 using Core.Services.Event;
 using Core.Services.Public.PublicEvent;
+using Core.Services.Public.PublicRecord;
 using Core.Services.Record;
 using Core.Services.SharedUser;
 using Dapper;
@@ -134,6 +135,7 @@ public static class ServiceCollectionExtensions
         
         // Public
         services.AddTransient<IPublicEventService, PublicEventService>();
+        services.AddTransient<IPublicRecordService, PublicRecordService>();
         
         return services;
     }
