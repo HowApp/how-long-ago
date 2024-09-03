@@ -121,8 +121,8 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 countQuery,
                 new
                 {
-                    status = EventStatus.Active,
-                    access = EventAccessType.Public,
+                    status = (int)EventStatus.Active,
+                    access = (int)EventAccessType.Public,
                     search = request.Search
                 });
 
@@ -131,8 +131,8 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                 new
                 {
                     created_by_id = request.CurrentUserId,
-                    status = EventStatus.Active,
-                    access = EventAccessType.Public,
+                    status = (int)EventStatus.Active,
+                    access = (int)EventAccessType.Public,
                     size = request.Size,
                     offset = request.Offset,
                     search = request.Search

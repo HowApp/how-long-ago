@@ -39,7 +39,7 @@ RETURNING *;
             var result = await connection.ExecuteAsync(
                 command, new
                 {
-                    status = request.Status,
+                    status = (int)request.Status,
                     changed_by_id = request.CurrentUserId,
                     changed_at = SystemClock.Instance.GetCurrentInstant(),
                     id = request.EventId,

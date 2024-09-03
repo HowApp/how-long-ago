@@ -85,8 +85,8 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
                 countQuery,
                 new
                 {
-                    status = EventStatus.Active,
-                    access = EventAccessType.Public,
+                    status = (int)EventStatus.Active,
+                    access = (int)EventAccessType.Public,
                     eventId = request.EventId
                 });
 
@@ -119,8 +119,8 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
                 param: new
                 {
                     created_by_id = request.CurrentUserId,
-                    status = EventStatus.Active,
-                    access = EventAccessType.Public,
+                    status = (int)EventStatus.Active,
+                    access = (int)EventAccessType.Public,
                     eventId = request.EventId,
                     size = request.Size,
                     offset = request.Offset

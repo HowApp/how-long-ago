@@ -24,7 +24,7 @@ public class PublicEventService : IPublicEventService
         _userService = userService;
     }
 
-    public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationPublicRequestDTO publicRequest)
+    public async Task<Result<GetEventsPaginationPublicResponseDTO>> GetEventsPagination(GetEventsPaginationPublicRequestDTO publicRequest)
     {
         try
         {
@@ -40,10 +40,10 @@ public class PublicEventService : IPublicEventService
 
             if (queryResult.Failed)
             {
-                return Result.Failure<GetEventsPaginationResponseDTO>(queryResult.Error);
+                return Result.Failure<GetEventsPaginationPublicResponseDTO>(queryResult.Error);
             }
 
-            var result = new GetEventsPaginationResponseDTO
+            var result = new GetEventsPaginationPublicResponseDTO
             {
                 Count = queryResult.Data.Count,
                 Events = new List<EventItemModelDTO>(queryResult.Data.Events.Count),
@@ -87,7 +87,7 @@ public class PublicEventService : IPublicEventService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetEventsPaginationResponseDTO>(
+            return Result.Failure<GetEventsPaginationPublicResponseDTO>(
                 new Error(ErrorType.Event, $"Error at {nameof(GetEventsPagination)}"));
         }
     }

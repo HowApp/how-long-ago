@@ -3,9 +3,9 @@ namespace How.Core.DTO.Public.Event;
 using Common.DTO;
 using FluentValidation;
 
-public class GetEventsPaginationRequestDTOValidation : AbstractValidator<GetEventsPaginationPublicRequestDTO>
+public class GetEventsPaginationPublicRequestDTOValidation : AbstractValidator<GetEventsPaginationPublicRequestDTO>
 {
-    public GetEventsPaginationRequestDTOValidation()
+    public GetEventsPaginationPublicRequestDTOValidation()
     {
         RuleFor(r => r.Page)
             .GreaterThan(0)
