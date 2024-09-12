@@ -13,8 +13,10 @@ public class PaginationDTO
         {
             if (value < 1 )
             {
-                _size = 1;
+                _page = 1;
             }
+            
+            _page = value;
         }
     }
 
@@ -27,7 +29,7 @@ public class PaginationDTO
             {
                 > 100 => _maxSize,
                 < 1 => 1,
-                _ => _size
+                _ => value
             };
         }
     }
