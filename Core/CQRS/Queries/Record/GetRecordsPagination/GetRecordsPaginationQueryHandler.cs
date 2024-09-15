@@ -50,7 +50,7 @@ LEFT JOIN (
         FROM {nameof(BaseDbContext.LikedRecords).ToSnake()} lr 
         LEFT JOIN {nameof(BaseDbContext.LikedRecords).ToSnake()} lr_u ON 
             lr_u.{nameof(LikedRecord.RecordId).ToSnake()} = lr.{nameof(LikedRecord.RecordId).ToSnake()} AND 
-            lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @created_by_id
+            lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @createdById
         GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
 WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId
 ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC
@@ -100,6 +100,7 @@ WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
                 },
                 param: new
                 {
+                    createdById = request.CurrentUserId,
                     eventId = request.EventId,
                     size = request.Size,
                     offset = request.Offset

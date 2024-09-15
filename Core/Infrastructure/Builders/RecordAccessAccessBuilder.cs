@@ -56,7 +56,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
             case AccessFilterType.IncludeShared:
                 _query.Append($@"
     AND
-    e.({nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
+    (e.{nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
          OR
     EXISTS(
         SELECT 1 
