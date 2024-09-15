@@ -5,5 +5,7 @@ using DTO.Public.Event;
 
 public interface IPublicEventService
 {
-    Task<Result<GetEventsPaginationPublicResponseDTO>> GetEventsPagination(GetEventsPaginationPublicRequestDTO publicRequest);
+    Task<Result<GetEventsPaginationPublicResponseDTO>> GetEventsPagination(
+        GetEventsPaginationPublicRequestDTO publicRequest);
+    Task<Result<GetEventByIdResponseDTO>> GetEventById(int eventId);
 }

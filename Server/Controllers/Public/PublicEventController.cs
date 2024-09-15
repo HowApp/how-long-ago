@@ -27,4 +27,15 @@ public class PublicEventController : BaseController
 
         return HttpResult(result);
     }
+    
+    [HttpGet]
+    [SwaggerOperation("Get Event detail by id")]
+    [ProducesResponseType<Result<GetEventsPaginationPublicResponseDTO>>(200)]
+    [Route("api/public/event/{eventId:int:min(1)}/details")]
+    public async Task<IActionResult> GetEventById([FromRoute] int eventId)
+    {
+        var result = await _eventService.GetEventById(eventId);
+
+        return HttpResult(result);
+    }
 }

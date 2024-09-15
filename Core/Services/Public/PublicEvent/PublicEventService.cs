@@ -1,10 +1,12 @@
 namespace How.Core.Services.Public.PublicEvent;
 
 using Common.ResultType;
+using CQRS.Queries.Public.Event.GetEventById;
 using CQRS.Queries.Public.Event.GetEventsPaginationPublic;
 using CurrentUser;
 using DTO.Public.Event;
 using DTO.Models;
+using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -89,6 +91,66 @@ public class PublicEventService : IPublicEventService
             _logger.LogError(e.Message);
             return Result.Failure<GetEventsPaginationPublicResponseDTO>(
                 new Error(ErrorType.Event, $"Error at {nameof(GetEventsPagination)}"));
+        }
+    }
+
+    public async Task<Result<GetEventByIdResponseDTO>> GetEventById(int eventId)
+    {
+        try
+        {
+            var query = new GetEventByIdQuery
+            {
+                CurrentUserId = _userService.UserId,
+                EventId = eventId
+            };
+            var queryResult = await _sender.Send(query);
+
+            if (queryResult.Failed)
+            {
+                return Result.Failure<GetEventByIdResponseDTO>(queryResult.Error);
+            }
+
+            if (queryResult.Data is null)
+            {
+                return Result.Failure<GetEventByIdResponseDTO>(new Error(ErrorType.Event, $"Event not found!"), 404);
+            }
+            
+            var result = new GetEventByIdResponseDTO
+            {
+                Id = queryResult.Data.Id,
+                Name = queryResult.Data.Name,
+                Access = queryResult.Data.Access,
+                Image = new ImageModelDTO
+                {
+                    MainHash = queryResult.Data.EventMainHash,
+                    ThumbnailHash = queryResult.Data.EventThumbnailHash
+                },
+                UserInfo = new UserInfoModelShortDTO
+                {
+                    Id = queryResult.Data.OwnerId,
+                    FirstName = queryResult.Data.OwnerFirstName,
+                    LastName = queryResult.Data.OwnerLastName,
+                    Image = new ImageModelDTO
+                    {
+                        MainHash = queryResult.Data.OwnerMainHash,
+                        ThumbnailHash = queryResult.Data.OwnerThumbnailHash
+                    }
+                },
+                CreatedAt = queryResult.Data.CreatedAt,
+                Likes = queryResult.Data.Likes,
+                Dislikes = queryResult.Data.Dislikes,
+                OwnLikeState = queryResult.Data.OwnLikeState,
+                SavedCount = queryResult.Data.SavedCount,
+                IsSavedByUser = queryResult.Data.IsSavedByUser
+            };
+
+            return new Result<GetEventByIdResponseDTO>(result);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return Result.Failure<GetEventByIdResponseDTO>(
+                new Error(ErrorType.Event, $"Error at {nameof(GetEventById)}"));
         }
     }
 }
