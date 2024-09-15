@@ -61,7 +61,8 @@ LEFT JOIN (
         LEFT JOIN {nameof(BaseDbContext.LikedRecords).ToSnake()} lr_u ON 
             lr_u.{nameof(LikedRecord.RecordId).ToSnake()} = lr.{nameof(LikedRecord.RecordId).ToSnake()} AND 
             lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @createdById
-        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id;
+        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
+ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC;
 ";
 
             var countQuery = $@"
