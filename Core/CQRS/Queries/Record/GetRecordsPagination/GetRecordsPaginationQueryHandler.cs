@@ -34,9 +34,19 @@ SELECT
     r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemModelDTO.Id)},
     r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemModelDTO.Description)},
     r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemModelDTO.CreatedAt)},
+    user_likes.likes AS {nameof(RecordItemModelDTO.Likes)},
+    user_likes.dislikes AS {nameof(RecordItemModelDTO.Dislikes)},
+    user_likes.current_user_state AS {nameof(RecordItemModelDTO.OwnLikeState)},
     sf_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.MainHash)},
     sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)}
-FROM {nameof(BaseDbContext.Records).ToSnake()} r
+FROM (
+    SELECT *
+    FROM {nameof(BaseDbContext.Records).ToSnake()} rec
+    WHERE rec.{nameof(Record.EventId).ToSnake()} = @eventId
+    ORDER BY rec.{nameof(Record.CreatedAt).ToSnake()} DESC
+    OFFSET @offset
+    LIMIT @size
+    ) r
 LEFT JOIN {nameof(BaseDbContext.RecordImages).ToSnake()} ri ON r.{nameof(PKey.Id).ToSnake()} = ri.{nameof(RecordImage.RecordId).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON ri.{nameof(RecordImage.ImageId).ToSnake()} = si.{nameof(PKey.Id).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} sf_main ON si.{nameof(StorageImage.MainId).ToSnake()} = sf_main.{nameof(PKey.Id).ToSnake()}
@@ -51,11 +61,7 @@ LEFT JOIN (
         LEFT JOIN {nameof(BaseDbContext.LikedRecords).ToSnake()} lr_u ON 
             lr_u.{nameof(LikedRecord.RecordId).ToSnake()} = lr.{nameof(LikedRecord.RecordId).ToSnake()} AND 
             lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @createdById
-        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
-WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId
-ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC
-OFFSET @offset
-LIMIT @size;
+        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id;
 ";
 
             var countQuery = $@"

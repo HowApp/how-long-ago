@@ -25,18 +25,21 @@ public class UpdateRecordLikeStateCommandHandler : ICommandHandler<UpdateRecordL
         {
             var command = $@"
 INSERT INTO {nameof(BaseDbContext.LikedRecords).ToSnake()} (
-                                           {nameof(LikedRecord.RecordId).ToSnake()},
-                                           {nameof(LikedRecord.LikedByUserId).ToSnake()},
-                                           {nameof(LikedRecord.State).ToSnake()}
+   {nameof(LikedRecord.RecordId).ToSnake()},
+   {nameof(LikedRecord.LikedByUserId).ToSnake()},
+   {nameof(LikedRecord.State).ToSnake()}
 )
 VALUES (@recordId, @likedByUserId, @state)
 ON CONFLICT ({nameof(LikedRecord.RecordId).ToSnake()}, {nameof(LikedRecord.LikedByUserId).ToSnake()})
 DO UPDATE SET 
-              {nameof(LikedRecord.State).ToSnake()} = @state;
+    {nameof(LikedRecord.State).ToSnake()} = @state;
 
 SELECT *
-FROM {nameof(BaseDbContext.LikedEvents).ToSnake()} le 
-WHERE le.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @likedByUserId AND le.{nameof(LikedRecord.RecordId).ToSnake()} = @eventId;
+FROM {nameof(BaseDbContext.LikedRecords).ToSnake()} lr 
+WHERE 
+    lr.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @likedByUserId 
+  AND 
+    lr.{nameof(LikedRecord.RecordId).ToSnake()} = @recordId;
 ";
 
             await using var connection = _dapper.InitConnection();
