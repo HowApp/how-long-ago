@@ -24,6 +24,20 @@ public class Result
     public static Result Failure(Error? error, int code = 400) => new(error, code);
     public static Result<TData> Success<TData>(TData data, int code = 200) => new(data, code);
     public static Result<TData> Failure<TData>(Error? error, int code = 400) => new(error, code);
+    
+    public string GetErrorMessages()
+    {
+        if (Succeeded)
+        {
+            return "Success";
+        }
+        if (Error is not null)
+        {
+            return Error.ToString();
+        }
+
+        return "unknown error";
+    }
 }
 
 public class Result<TData> : Result

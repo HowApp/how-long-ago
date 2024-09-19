@@ -12,4 +12,9 @@ public class Error : Dictionary<string, object>
         
         this.Add(ErrorType, ErrorMessage);
     }
+
+    public override string ToString()
+    {
+        return string.Join(";\n", $"{ErrorType}: {ErrorMessage}");
+    }
 }
