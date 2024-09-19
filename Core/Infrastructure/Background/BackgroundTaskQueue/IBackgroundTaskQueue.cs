@@ -1,7 +1,9 @@
 namespace How.Core.Infrastructure.Background.BackgroundTaskQueue;
 
+using Microsoft.Extensions.DependencyInjection;
+
 public interface IBackgroundTaskQueue
 {
-    void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem);
-    Task<Func<CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken);
+    void QueueBackgroundWorkItem(Func<IServiceScope, CancellationToken, Task> workItem);
+    Task<Func<IServiceScope, CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken);
 }

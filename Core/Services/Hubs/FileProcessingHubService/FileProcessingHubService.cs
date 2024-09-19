@@ -21,12 +21,26 @@ public class FileProcessingHubService : IFileProcessingHubService
         _logger = logger;
     }
 
-    public async Task NotifyUSer(string message)
+    public async Task NotifyUser(string message)
     {
         try
         {
             await _hubContext.Clients
                 .Group(_currentUserService.UserId.ToString())
+                .SendAsync("ReceiveMessage", message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+        }
+    }
+    
+    public async Task NotifyUser(int userId, string message)
+    {
+        try
+        {
+            await _hubContext.Clients
+                .Group(userId.ToString())
                 .SendAsync("ReceiveMessage", message);
         }
         catch (Exception e)

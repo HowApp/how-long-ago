@@ -1,12 +1,13 @@
 namespace How.Core.Infrastructure.Background.BackgroundTaskQueue;
 
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 
 public class BackgroundTaskQueue : IBackgroundTaskQueue
 {
-    private ConcurrentQueue<Func<CancellationToken, Task>> _queue = new();
+    private ConcurrentQueue<Func<IServiceScope, CancellationToken, Task>> _queue = new();
     private SemaphoreSlim _semaphore = new(0);
-    public void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem)
+    public void QueueBackgroundWorkItem(Func<IServiceScope, CancellationToken, Task> workItem)
     {
         if (_queue is null)
         {
@@ -17,7 +18,7 @@ public class BackgroundTaskQueue : IBackgroundTaskQueue
         _semaphore.Release();
     }
 
-    public async Task<Func<CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken)
+    public async Task<Func<IServiceScope, CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
         _queue.TryDequeue(out var workItem);

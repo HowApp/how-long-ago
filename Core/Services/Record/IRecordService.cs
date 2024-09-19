@@ -32,4 +32,9 @@ public interface IRecordService
     Task<Result> DeleteRecord(
         int eventId,
         int recordId);
+
+    Task ImageProcessing(
+        int userId,
+        int recordId,
+        List<(string name, byte[] content)> files);
 }

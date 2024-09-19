@@ -8,4 +8,5 @@ public interface IImageStorageService
 {
     Task<Result> PostImageToDatabase(IFormFile file);
     Task<Result<ImageInternalModel>> CreateImageInternal(IFormFile file);
+    Task<Result<ImageInternalModel>> CreateImageInternal(byte[] file, string fileName);
 }
