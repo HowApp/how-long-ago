@@ -30,7 +30,7 @@ public class PublicEventController : BaseController
     
     [HttpGet]
     [SwaggerOperation("Get Event detail by id")]
-    [ProducesResponseType<Result<GetEventsPaginationPublicResponseDTO>>(200)]
+    [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
     [Route("api/public/event/{eventId:int:min(1)}/details")]
     public async Task<IActionResult> GetEventById([FromRoute] int eventId)
     {
