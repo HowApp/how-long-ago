@@ -78,7 +78,8 @@ public static class ServiceCollectionExtensions
             .AddIdentity()
             .AddCustomServices()
             .AddSwagger()
-            .AddCookies();
+            .AddCookies()
+            .AddSignalR();
         
         return services;
     }

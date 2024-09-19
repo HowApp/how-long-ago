@@ -4,6 +4,7 @@ using Common.Configurations;
 using Common.Constants;
 using Core.Database;
 using Core.Database.Seeds;
+using Core.Infrastructure.Hubs;
 using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -61,6 +62,8 @@ public class Program
         app.MapControllers();
 
         app.UseStaticFiles();
+        
+        app.MapHub<FileProcessingHub>("/hubs/fileProcessing");
 
         await app.RunAsync();
     }
