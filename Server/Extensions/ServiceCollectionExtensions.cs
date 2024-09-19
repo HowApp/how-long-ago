@@ -5,6 +5,8 @@ using Common.Constants;
 using Core;
 using Core.Database;
 using Core.Database.Entities.Identity;
+using Core.Infrastructure.Background.BackgroundTaskQueue;
+using Core.Infrastructure.Background.Workers;
 using Core.Infrastructure.NpgsqlExtensions;
 using Core.Services.Identity;
 using Core.Services.CurrentUser;
@@ -136,6 +138,10 @@ public static class ServiceCollectionExtensions
         // Public
         services.AddTransient<IPublicEventService, PublicEventService>();
         services.AddTransient<IPublicRecordService, PublicRecordService>();
+        
+        // Background
+        services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        services.AddHostedService<QueueHostedService>();
         
         return services;
     }
