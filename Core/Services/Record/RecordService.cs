@@ -1,21 +1,18 @@
 namespace How.Core.Services.Record;
 
+using BackgroundImageProcessing;
 using Common.ResultType;
-using CQRS.Commands.Record.CreateRecordImages;
 using CQRS.Commands.Record.DeleteRecord;
 using CQRS.Commands.Record.DeleteRecordImages;
 using CQRS.Commands.Record.InsertRecord;
 using CQRS.Commands.Record.UpdateRecord;
 using CQRS.Commands.Record.UpdateRecordImagePosition;
 using CQRS.Commands.Record.UpdateRecordLikeState;
-using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
 using CQRS.Queries.General.CheckExistAccess;
 using CQRS.Queries.Record.GetImageIds;
-using CQRS.Queries.Record.GetMaxImagePosition;
 using CQRS.Queries.Record.GetRecordsPagination;
 using CurrentUser;
-using DTO.Models;
 using DTO.Record;
 using DTO.RecordImage;
 using Hubs.FileProcessingHubService;
@@ -25,7 +22,6 @@ using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Models.ServicesModel;
 using Storage.ImageStorage;
 
 public class RecordService : IRecordService
@@ -36,6 +32,7 @@ public class RecordService : IRecordService
     private readonly IImageStorageService _imageStorage;
     private readonly IFileProcessingHubService _fileProcessing;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly IBackgroundImageProcessing _backgroundImageProcessing;
 
     public RecordService(
         ILogger<RecordService> logger,
@@ -43,7 +40,8 @@ public class RecordService : IRecordService
         ICurrentUserService userService,
         IImageStorageService imageStorage,
         IFileProcessingHubService fileProcessing,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IBackgroundImageProcessing backgroundImageProcessing)
     {
         _logger = logger;
         _sender = sender;
@@ -51,6 +49,7 @@ public class RecordService : IRecordService
         _imageStorage = imageStorage;
         _fileProcessing = fileProcessing;
         _backgroundTaskQueue = backgroundTaskQueue;
+        _backgroundImageProcessing = backgroundImageProcessing;
     }
 
     public async Task<Result<int>> CreateRecord(
@@ -272,12 +271,11 @@ public class RecordService : IRecordService
         }
     }
 
-    public async Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
+    public async Task<Result> CreateRecordImages(
         int eventId,
         int recordId,
         CreateRecordImagesRequestDTO request)
     {
-        var imageIds = new int[request.Files.Count];
         var userId = _userService.UserId;
         try
         {
@@ -291,12 +289,12 @@ public class RecordService : IRecordService
                 
             if (recordExist.Failed)
             {
-                return Result.Failure<CreateRecordImagesResponseDTO>(recordExist.Error);
+                return Result.Failure(recordExist.Error);
             }
 
             if (!recordExist.Data)
             {
-                return Result.Failure<CreateRecordImagesResponseDTO>(
+                return Result.Failure(
                     new Error(ErrorType.Record, $"Record not found!"), 404);
             }
             
@@ -314,206 +312,20 @@ public class RecordService : IRecordService
                 _logger.LogInformation("Start processing records.");
                 
                 // Resolve services inside the scope
-                var recordService = scope.ServiceProvider.GetRequiredService<IRecordService>();
+                var recordService = scope.ServiceProvider.GetRequiredService<IBackgroundImageProcessing>();
 
-                await recordService.ImageProcessing(userId, recordId, files);
+                await recordService.RecordImageProcessing(userId, recordId, files);
                 
                 _logger.LogInformation("Complete processing records.");
             });
-            
-            // var imagesInternal = new List<ImageInternalModel>();
-            //
-            // foreach (var item in request.Files)
-            // {
-            //     var image = await _imageStorage.CreateImageInternal(item);
-            //
-            //     if (image.Failed)
-            //     {
-            //         return Result.Failure<CreateRecordImagesResponseDTO>(image.Error);
-            //     }
-            //     
-            //     imagesInternal.Add(image.Data);
-            // }
-            //
-            // var createImages = await _sender.Send(new CreateImageMultiplyCommand
-            // {
-            //     Images = imagesInternal
-            // });
-            //
-            // if (createImages.Failed)
-            // {
-            //     return Result.Failure<CreateRecordImagesResponseDTO>(createImages.Error);
-            // }
-            //
-            // if (!createImages.Data.Any())
-            // {
-            //     return Result.Failure<CreateRecordImagesResponseDTO>(
-            //         new Error(ErrorType.Record, $"Images not created!"));
-            // }
-            //
-            // imageIds = createImages.Data;
-            //
-            // var maxPosition = await _sender.Send(new GetMaxImagePositionQuery
-            // {
-            //     RecordId = recordId
-            // });
-            //
-            // if (maxPosition.Failed)
-            // {
-            //     return Result.Failure<CreateRecordImagesResponseDTO>(maxPosition.Error);
-            // }
-            //
-            // var command = new CreateRecordImagesCommand
-            // {
-            //     RecordId = recordId,
-            //     ImageIds = imageIds,
-            //     MaxPosition = ++maxPosition.Data
-            // };
-            //
-            // var commandResult = await _sender.Send(command);
-            //
-            // if (commandResult.Failed)
-            // {
-            //     return Result.Failure<CreateRecordImagesResponseDTO>(createImages.Error);
-            // }
-            //
-            // if (!commandResult.Data.Any())
-            // {
-            //     return Result.Failure<CreateRecordImagesResponseDTO>(
-            //         new Error(ErrorType.Record, $"Record Images not created!"));
-            // }
-            //
-            // var result = new CreateRecordImagesResponseDTO
-            // {
-            //     ImagePaths = imagesInternal.Select(i => new UploadImageResponseModelDTO
-            //     {
-            //         MainHash = i.Main.Hash,
-            //         ThumbnailHash = i.Thumbnail.Hash
-            //     }).ToList()
-            // };
 
-            // return new Result<CreateRecordImagesResponseDTO>(result);
-
-            return Result.Success<CreateRecordImagesResponseDTO>(new CreateRecordImagesResponseDTO());
+            return Result.Success();
         }
         catch (Exception e)
         {
-            if (imageIds.Any())
-            {
-                await _sender.Send(new DeleteImageMultiplyCommand
-                {
-                    ImageIds = imageIds
-                });
-            }
-            
             _logger.LogError(e.Message);
-            return Result.Failure<CreateRecordImagesResponseDTO>(
+            return Result.Failure(
                 new Error(ErrorType.Record, $"Error at {nameof(CreateRecordImages)}"));
-        }
-    }
-    
-    public async Task ImageProcessing(
-        int userId,
-        int recordId,
-        List<(string name, byte[] content)> files)
-    {
-        var imageIds = new int[files.Count];
-        try
-        {
-            var imagesInternal = new List<ImageInternalModel>();
-            
-            foreach (var item in files)
-            {
-                var image = await _imageStorage.CreateImageInternal(item.content, item.name);
-
-                if (image.Failed)
-                {
-                    _logger.LogError(image.GetErrorMessages());
-                    await _fileProcessing.NotifyUser(userId, image.GetErrorMessages());
-                    return;
-                }
-                
-                imagesInternal.Add(image.Data);
-            }
-            
-            var createImages = await _sender.Send(new CreateImageMultiplyCommand
-            {
-                Images = imagesInternal
-            });
-
-            if (createImages.Failed)
-            {
-                _logger.LogError(createImages.GetErrorMessages());
-                await _fileProcessing.NotifyUser(userId, createImages.GetErrorMessages());
-                return;
-            }
-
-            if (!createImages.Data.Any())
-            {
-                _logger.LogError("Images not created!");
-                await _fileProcessing.NotifyUser(userId, "Images not created!");
-                return;
-            }
-
-            imageIds = createImages.Data;
-
-            var maxPosition = await _sender.Send(new GetMaxImagePositionQuery
-            {
-                RecordId = recordId
-            });
-            
-            if (maxPosition.Failed)
-            {
-                _logger.LogError(maxPosition.GetErrorMessages());
-                await _fileProcessing.NotifyUser(userId, maxPosition.GetErrorMessages());
-                return;
-            }
-            
-            var command = new CreateRecordImagesCommand
-            {
-                RecordId = recordId,
-                ImageIds = imageIds,
-                MaxPosition = ++maxPosition.Data
-            };
-
-            var commandResult = await _sender.Send(command);
-
-            if (commandResult.Failed)
-            {
-                _logger.LogError(createImages.GetErrorMessages());
-                return;
-            }
-
-            if (!commandResult.Data.Any())
-            {
-                _logger.LogError("Record Images not created!");
-                await _fileProcessing.NotifyUser(userId, "Record Images not created!");
-                return;
-            }
-            
-            var result = new CreateRecordImagesResponseDTO
-            {
-                ImagePaths = imagesInternal.Select(i => new UploadImageResponseModelDTO
-                {
-                    MainHash = i.Main.Hash,
-                    ThumbnailHash = i.Thumbnail.Hash
-                }).ToList()
-            };
-            
-            await _fileProcessing.NotifyUser(userId, "Images processing finish");
-        }
-        catch (Exception e)
-        {
-            if (imageIds.Any())
-            {
-                await _sender.Send(new DeleteImageMultiplyCommand
-                {
-                    ImageIds = imageIds
-                });
-            }
-            
-            _logger.LogError(e.Message);
-            await _fileProcessing.NotifyUser(userId, "Images processing failed!");
         }
     }
 

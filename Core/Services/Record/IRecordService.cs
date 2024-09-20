@@ -21,7 +21,7 @@ public interface IRecordService
         int eventId,
         int recordId,
         LikeState likeState);
-    Task<Result<CreateRecordImagesResponseDTO>> CreateRecordImages(
+    Task<Result> CreateRecordImages(
         int eventId,
         int recordId,
         CreateRecordImagesRequestDTO request);
@@ -32,9 +32,4 @@ public interface IRecordService
     Task<Result> DeleteRecord(
         int eventId,
         int recordId);
-
-    Task ImageProcessing(
-        int userId,
-        int recordId,
-        List<(string name, byte[] content)> files);
 }

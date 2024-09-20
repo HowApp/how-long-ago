@@ -13,6 +13,7 @@ using Core.Services.CurrentUser;
 using Core.Services.Storage.FileStorage;
 using Core.Services.Storage.ImageStorage;
 using Core.Services.Account;
+using Core.Services.BackgroundImageProcessing;
 using Core.Services.Event;
 using Core.Services.Hubs.FileProcessingHubService;
 using Core.Services.Public.PublicEvent;
@@ -144,6 +145,7 @@ public static class ServiceCollectionExtensions
         // Background
         services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddHostedService<QueueHostedService>();
+        services.AddTransient<IBackgroundImageProcessing, BackgroundImageProcessing>();
         
         // Hub
         services.AddTransient<IFileProcessingHubService, FileProcessingHubService>();
