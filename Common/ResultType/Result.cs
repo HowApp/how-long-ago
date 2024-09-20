@@ -1,5 +1,7 @@
 namespace How.Common.ResultType;
 
+using System.Text.Json;
+
 public class Result
 {
     public bool Succeeded { get; }
@@ -38,6 +40,11 @@ public class Result
 
         return "unknown error";
     }
+
+    public string Serialize()
+    {
+        return JsonSerializer.Serialize(this);
+    }
 }
 
 public class Result<TData> : Result
@@ -57,5 +64,10 @@ public class Result<TData> : Result
     public Result(TData data, int code = 200) : base(code)
     {
         Data = data;
+    }
+
+    public string Serialize()
+    {
+        return JsonSerializer.Serialize(this);
     }
 }
