@@ -11,6 +11,8 @@ public class QueueHostedService : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<QueueHostedService> _logger;
 
+    private const int MaxDegreeParallelism = 5;
+
     public QueueHostedService(
         IBackgroundTaskQueue backgroundTaskQueue,
         ILogger<QueueHostedService> logger,
@@ -25,25 +27,36 @@ public class QueueHostedService : BackgroundService
     {
         _logger.LogInformation("QueueHostedService is starting.");
 
+        var tasks = new List<Task>();
+        
         while (!cancellationToken.IsCancellationRequested)
         {
-            var workItem = await _backgroundTaskQueue.DequeueAsync(cancellationToken);
-
-            if (workItem is not null)
+            while (tasks.Count < MaxDegreeParallelism)
             {
-                using (var scope = _scopeFactory.CreateScope())
+                var workItem = await _backgroundTaskQueue.DequeueAsync(cancellationToken);
+
+                if (workItem is not null)
                 {
-                    try
+                    var task = Task.Run(async () =>
                     {
-                        await workItem(scope, cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e, "Error occurred executing background work item.");
-                    }
+                        using (var scope = _scopeFactory.CreateScope())
+                        {
+                            try
+                            {
+                                await workItem(scope, cancellationToken);
+                            }
+                            catch (Exception e)
+                            {
+                                _logger.LogError(e, "Error occurred executing background work item.");
+                            }
+                        }
+                    }, cancellationToken);
+                    
+                    tasks.Add(task);
                 }
             }
             
+            tasks.Remove(await Task.WhenAny(tasks));
         }
         
         _logger.LogInformation("QueueHostedService is stopping.");

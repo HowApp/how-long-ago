@@ -1,5 +1,6 @@
 namespace How.Core.Services.BackgroundImageProcessing;
 
+using Common.ResultType;
 using CQRS.Commands.Record.CreateRecordImages;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
@@ -113,7 +114,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
                 return;
             }
             
-            var result = new CreateRecordImagesResponseDTO
+            var resultImageData = new CreateRecordImagesResponseDTO
             {
                 ImagePaths = imagesInternal.Select(i => new UploadImageResponseModelDTO
                 {
@@ -121,8 +122,9 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
                     ThumbnailHash = i.Thumbnail.Hash
                 }).ToList()
             };
-            
-            await _fileProcessing.NotifyUser(userId, "Images processing finish");
+
+            var result = Result.Success(resultImageData);
+            await _fileProcessing.NotifyUser(userId, result.Serialize());
         }
         catch (Exception e)
         {
