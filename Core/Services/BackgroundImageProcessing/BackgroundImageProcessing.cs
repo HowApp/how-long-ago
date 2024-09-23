@@ -4,7 +4,9 @@ using Common.ResultType;
 using CQRS.Commands.Record.CreateRecordImages;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
+using CQRS.Commands.TemporaryStorage.DeleteTemporaryFile;
 using CQRS.Queries.Record.GetMaxImagePosition;
+using CQRS.Queries.TemporaryStorage.GetTemporaryFile;
 using DTO.Models;
 using DTO.RecordImage;
 using Hubs.FileProcessingHubService;
@@ -32,26 +34,44 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
         _logger = logger;
     }
 
-    public async Task RecordImageProcessing(int userId, int recordId, List<(string name, byte[] content)> files)
+    public async Task RecordImageProcessing(int userId, int recordId, int[] fileIds)
     {
-        var imageIds = new int[files.Count];
+        var imageIds = new int[fileIds.Length];
         try
         {
             var imagesInternal = new List<ImageInternalModel>();
             
-            foreach (var item in files)
+            foreach (var item in fileIds)
             {
-                var image = await _imageStorage.CreateImageInternal(item.content, item.name);
-
-                if (image.Failed)
+                var temporaryImage = await _sender.Send(new GetTemporaryFileQuery
                 {
-                    _logger.LogError(image.GetErrorMessages());
-                    await _fileProcessing.NotifyUser(userId, image.GetErrorMessages());
-                    return;
+                    FileId = item
+                });
+
+                if (temporaryImage.Failed)
+                {
+                    _logger.LogError(temporaryImage.GetErrorMessages());
                 }
+
+                if (temporaryImage.Data is not null)
+                {
+                    var image = await _imageStorage.CreateImageInternal(temporaryImage.Data.Content, temporaryImage.Data.FileName);
+
+                    if (image.Failed)
+                    {
+                        _logger.LogError(image.GetErrorMessages());
+                        
+                        await DeleteTemporaryFiles(fileIds);
+                        
+                        await _fileProcessing.NotifyUser(userId, image.GetErrorMessages());
+                        return;
+                    }
                 
-                imagesInternal.Add(image.Data);
+                    imagesInternal.Add(image.Data);
+                }
             }
+
+            await DeleteTemporaryFiles(fileIds);
             
             var createImages = await _sender.Send(new CreateImageMultiplyCommand
             {
@@ -81,7 +101,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             
             if (maxPosition.Failed)
             {
-                RollBackImageProcessing(imageIds);
+                await RollBackImageProcessing(imageIds);
                 
                 _logger.LogError(maxPosition.GetErrorMessages());
                 await _fileProcessing.NotifyUser(userId, maxPosition.GetErrorMessages());
@@ -99,7 +119,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
 
             if (commandResult.Failed)
             {
-                RollBackImageProcessing(imageIds);
+                await RollBackImageProcessing(imageIds);
                 
                 _logger.LogError(createImages.GetErrorMessages());
                 return;
@@ -128,21 +148,43 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
         }
         catch (Exception e)
         {
-            RollBackImageProcessing(imageIds);
+            await RollBackImageProcessing(imageIds);
+            await DeleteTemporaryFiles(fileIds);
             
             _logger.LogError(e.Message);
             await _fileProcessing.NotifyUser(userId, "Images processing failed!");
         }
     }
 
-    private void RollBackImageProcessing(int[] imageIds)
+    private async Task RollBackImageProcessing(int[] imageIds)
     {
         if (imageIds.Any())
         {
-            _sender.Send(new DeleteImageMultiplyCommand
+            var result = await _sender.Send(new DeleteImageMultiplyCommand
             {
                 ImageIds = imageIds
             });
+
+            if (result.Failed)
+            {
+                _logger.LogError(result.GetErrorMessages());
+            }
+        }
+    }
+    
+    private async Task DeleteTemporaryFiles(int[] fileIds)
+    {
+        if (fileIds.Any())
+        {
+            var result = await _sender.Send(new DeleteTemporaryFileCommand
+            {
+                FileId = fileIds
+            });
+            
+            if (result.Failed)
+            {
+                _logger.LogError(result.GetErrorMessages());
+            }
         }
     }
 }

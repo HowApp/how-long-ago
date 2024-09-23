@@ -9,6 +9,7 @@ using CQRS.Commands.Record.UpdateRecord;
 using CQRS.Commands.Record.UpdateRecordImagePosition;
 using CQRS.Commands.Record.UpdateRecordLikeState;
 using CQRS.Commands.Storage.DeleteImageMultiply;
+using CQRS.Commands.TemporaryStorage.InsertTemporaryFile;
 using CQRS.Queries.General.CheckExistAccess;
 using CQRS.Queries.Record.GetImageIds;
 using CQRS.Queries.Record.GetRecordsPagination;
@@ -22,6 +23,7 @@ using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Models.ServicesModel;
 using Storage.ImageStorage;
 
 public class RecordService : IRecordService
@@ -298,13 +300,28 @@ public class RecordService : IRecordService
                     new Error(ErrorType.Record, $"Record not found!"), 404);
             }
             
-            List<(string nameof, byte[] content)> files = new List<(string nameof, byte[] content)>(request.Files.Count);
+            List<int> temporaryFileIds = new List<int>(request.Files.Count);
 
             foreach (var t in request.Files)
             {
                 using var memoryStream = new MemoryStream();
                 await t.CopyToAsync(memoryStream);
-                files.Add((t.FileName, memoryStream.ToArray()));
+
+                var imageId = await _sender.Send(new InsertTemporaryFileCommand
+                {
+                    File = new TemporaryFileModel
+                    {
+                        FileName = t.FileName,
+                        Content = memoryStream.ToArray()
+                    }
+                });
+
+                if (imageId.Failed)
+                {
+                    return Result.Failure(imageId.Error);
+                }
+                
+                temporaryFileIds.Add(imageId.Data);
             }
             
             _backgroundTaskQueue.QueueBackgroundWorkItem(async (scope, token) =>
@@ -314,7 +331,7 @@ public class RecordService : IRecordService
                 // Resolve services inside the scope
                 var recordService = scope.ServiceProvider.GetRequiredService<IBackgroundImageProcessing>();
 
-                await recordService.RecordImageProcessing(userId, recordId, files);
+                await recordService.RecordImageProcessing(userId, recordId, temporaryFileIds.ToArray());
                 
                 _logger.LogInformation("Complete processing records.");
             });

@@ -12,4 +12,5 @@ public static class ErrorType
     public static readonly string SharedUser = "SharedUser";
     
     public static readonly string QueryBuilder = "QueryBuilder";
+    public static readonly string TemporaryuFile = "TemporaryuFile";
 }

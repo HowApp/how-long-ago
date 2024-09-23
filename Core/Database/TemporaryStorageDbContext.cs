@@ -10,7 +10,7 @@ public class TemporaryStorageDbContext : DbContext
     {
     }
 
-    public DbSet<TemporaryFile> TemporaryFiles { get; set; }
+    public DbSet<File> Files { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -93,6 +93,7 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @EventId
     e.{nameof(Event.Status).ToSnake()} = @status
     AND
     e.{nameof(Event.Access).ToSnake()} = @access
+LIMIT 1;
 ";
             
             await using var connection = _dapper.InitConnection();
