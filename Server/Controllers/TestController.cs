@@ -26,7 +26,7 @@ public class TestController : BaseController
     [Route("api/test/event/create")]
     public async Task<IActionResult> TestSignalR()
     {
-        _fileProcessing.NotifyUser("Your file has been processed.");
+        _fileProcessing.NotifyCurrentUser("Your file has been processed.");
         return HttpResult(Result.Success());
     }
     

@@ -9,7 +9,6 @@ using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-
 public class Program
 {
     public static async Task Main(string[] args)
@@ -26,6 +25,10 @@ public class Program
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<BaseDbContext>();
             await dbContext!.Database.MigrateAsync();
+            
+            var temporaryDbContext = scope.ServiceProvider.GetRequiredService<TemporaryStorageDbContext>();
+            await temporaryDbContext!.Database.EnsureDeletedAsync();
+            await temporaryDbContext!.Database.EnsureCreatedAsync();
             
             var adminCredentials = scope.ServiceProvider.GetService<IOptions<AdminCredentials>>();
             await SeedAdmin.Seed(scope.ServiceProvider, adminCredentials!.Value);

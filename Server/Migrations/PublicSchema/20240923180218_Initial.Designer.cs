@@ -10,17 +10,18 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace How.Server.Migrations
+namespace How.Server.Migrations.PublicSchema
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20240808162609_AddSavedEvent")]
-    partial class AddSavedEvent
+    [Migration("20240923180218_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -85,7 +86,34 @@ namespace How.Server.Migrations
                     b.HasIndex("StorageImageId")
                         .HasDatabaseName("ix_events_storage_image_id");
 
-                    b.ToTable("events", (string)null);
+                    b.ToTable("events", "public");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.LikedEvent", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("event_id");
+
+                    b.Property<int>("LikedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("liked_by_user_id");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
+                        .HasColumnName("state");
+
+                    b.HasKey("EventId", "LikedByUserId")
+                        .HasName("pk_liked_events");
+
+                    b.HasIndex("LikedByUserId")
+                        .HasDatabaseName("ix_liked_events_liked_by_user_id");
+
+                    b.HasIndex("EventId", "LikedByUserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_liked_events_event_id_liked_by_user_id");
+
+                    b.ToTable("liked_events", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Event.SavedEvent", b =>
@@ -108,7 +136,7 @@ namespace How.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_saved_events_event_id_user_id");
 
-                    b.ToTable("saved_events", (string)null);
+                    b.ToTable("saved_events", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowRole", b =>
@@ -143,7 +171,7 @@ namespace How.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("role_name_index");
 
-                    b.ToTable("roles", (string)null);
+                    b.ToTable("roles", "public");
 
                     b.HasData(
                         new
@@ -189,7 +217,7 @@ namespace How.Server.Migrations
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_role_claims_role_id");
 
-                    b.ToTable("role_claims", (string)null);
+                    b.ToTable("role_claims", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowUser", b =>
@@ -289,7 +317,7 @@ namespace How.Server.Migrations
                     b.HasIndex("StorageImageId")
                         .HasDatabaseName("ix_users_storage_image_id");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowUserClaim", b =>
@@ -319,7 +347,7 @@ namespace How.Server.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_user_claims_user_id");
 
-                    b.ToTable("user_claims", (string)null);
+                    b.ToTable("user_claims", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowUserLogin", b =>
@@ -346,7 +374,7 @@ namespace How.Server.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_user_logins_user_id");
 
-                    b.ToTable("user_logins", (string)null);
+                    b.ToTable("user_logins", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowUserRole", b =>
@@ -365,7 +393,7 @@ namespace How.Server.Migrations
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_user_roles_role_id");
 
-                    b.ToTable("user_roles", (string)null);
+                    b.ToTable("user_roles", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Identity.HowUserToken", b =>
@@ -389,7 +417,34 @@ namespace How.Server.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name")
                         .HasName("pk_user_tokens");
 
-                    b.ToTable("user_tokens", (string)null);
+                    b.ToTable("user_tokens", "public");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Record.LikedRecord", b =>
+                {
+                    b.Property<int>("RecordId")
+                        .HasColumnType("integer")
+                        .HasColumnName("record_id");
+
+                    b.Property<int>("LikedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("liked_by_user_id");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
+                        .HasColumnName("state");
+
+                    b.HasKey("RecordId", "LikedByUserId")
+                        .HasName("pk_liked_records");
+
+                    b.HasIndex("LikedByUserId")
+                        .HasDatabaseName("ix_liked_records_liked_by_user_id");
+
+                    b.HasIndex("RecordId", "LikedByUserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_liked_records_record_id_liked_by_user_id");
+
+                    b.ToTable("liked_records", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Record.Record", b =>
@@ -424,7 +479,7 @@ namespace How.Server.Migrations
                     b.HasIndex("EventId")
                         .HasDatabaseName("ix_records_event_id");
 
-                    b.ToTable("records", (string)null);
+                    b.ToTable("records", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Record.RecordImage", b =>
@@ -459,7 +514,7 @@ namespace How.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_record_images_record_id_image_id");
 
-                    b.ToTable("record_images", (string)null);
+                    b.ToTable("record_images", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.SharedUser.SharedUser", b =>
@@ -489,7 +544,7 @@ namespace How.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_shared_users_user_owner_id_user_shared_id");
 
-                    b.ToTable("shared_users", (string)null);
+                    b.ToTable("shared_users", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Storage.StorageFile", b =>
@@ -538,7 +593,7 @@ namespace How.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_storage_files_path");
 
-                    b.ToTable("storage_files", (string)null);
+                    b.ToTable("storage_files", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Storage.StorageImage", b =>
@@ -585,7 +640,7 @@ namespace How.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_storage_images_thumbnail_id");
 
-                    b.ToTable("storage_images", (string)null);
+                    b.ToTable("storage_images", "public");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Event.Event", b =>
@@ -605,6 +660,27 @@ namespace How.Server.Migrations
                     b.Navigation("Owner");
 
                     b.Navigation("StorageImage");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Event.LikedEvent", b =>
+                {
+                    b.HasOne("How.Core.Database.Entities.Event.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_liked_events_events_event_id");
+
+                    b.HasOne("How.Core.Database.Entities.Identity.HowUser", "LikedByUser")
+                        .WithMany()
+                        .HasForeignKey("LikedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_liked_events_users_liked_by_user_id");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("LikedByUser");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Event.SavedEvent", b =>
@@ -697,6 +773,27 @@ namespace How.Server.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_user_tokens_users_user_id");
+                });
+
+            modelBuilder.Entity("How.Core.Database.Entities.Record.LikedRecord", b =>
+                {
+                    b.HasOne("How.Core.Database.Entities.Identity.HowUser", "LikedByUser")
+                        .WithMany()
+                        .HasForeignKey("LikedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_liked_records_users_liked_by_user_id");
+
+                    b.HasOne("How.Core.Database.Entities.Record.Record", "Record")
+                        .WithMany()
+                        .HasForeignKey("RecordId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_liked_records_records_record_id");
+
+                    b.Navigation("LikedByUser");
+
+                    b.Navigation("Record");
                 });
 
             modelBuilder.Entity("How.Core.Database.Entities.Record.Record", b =>

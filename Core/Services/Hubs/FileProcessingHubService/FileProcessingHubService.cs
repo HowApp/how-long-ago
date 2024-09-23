@@ -21,7 +21,7 @@ public class FileProcessingHubService : IFileProcessingHubService
         _logger = logger;
     }
 
-    public async Task NotifyUser(string message)
+    public async Task NotifyCurrentUser(string message)
     {
         try
         {

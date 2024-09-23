@@ -40,6 +40,8 @@ public class BaseDbContext : IdentityDbContext<
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.HasDefaultSchema("public");
+
         modelBuilder.SetIdentityName();
         modelBuilder.SetIdentityRule();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseDbContext).Assembly);

@@ -28,6 +28,7 @@ using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -90,6 +91,9 @@ public static class ServiceCollectionExtensions
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? 
                                throw new ApplicationException("Database Connection string is null!");
+        
+        var connectionTemporaryString = configuration.GetConnectionString("TemporaryStorageConnection") ?? 
+                               throw new ApplicationException("Database Temporary Connection string is null!");
 
         services.AddDbContext<BaseDbContext>(o =>
         {
@@ -98,6 +102,21 @@ public static class ServiceCollectionExtensions
                 {
                     b.UseNodaTime();
                     b.MigrationsAssembly("How.Server");
+
+                    b.MigrationsHistoryTable(tableName: HistoryRepository.DefaultTableName, schema: "public");
+                });
+            
+            o.UseSnakeCaseNamingConvention();
+        });
+
+        services.AddDbContext<TemporaryStorageDbContext>(o =>
+        {
+            o.UseNpgsql(connectionTemporaryString,
+                b =>
+                {
+                    b.MigrationsAssembly("How.Server");
+                    
+                    b.MigrationsHistoryTable(tableName: HistoryRepository.DefaultTableName, schema: "temporary");
                 });
             
             o.UseSnakeCaseNamingConvention();
@@ -107,7 +126,12 @@ public static class ServiceCollectionExtensions
             o.UseNpgsql(connectionString), 
             ServiceLifetime.Scoped);
 
-        services.AddSingleton<DapperConnection>(o => new DapperConnection(connectionString));
+        services.AddDbContextFactory<TemporaryStorageDbContext>(o => 
+                o.UseNpgsql(connectionTemporaryString), 
+            ServiceLifetime.Scoped);
+
+        services.AddSingleton<DapperConnection>(o => 
+            new DapperConnection(connectionString, connectionTemporaryString));
         
         SqlMapper.AddTypeHandler(InstantHandler.Default);
         
