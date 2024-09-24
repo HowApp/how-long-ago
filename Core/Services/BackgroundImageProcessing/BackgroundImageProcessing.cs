@@ -1,12 +1,15 @@
 namespace How.Core.Services.BackgroundImageProcessing;
 
 using Common.ResultType;
+using CQRS.Commands.Event.UpdateEventImage;
 using CQRS.Commands.Record.CreateRecordImages;
+using CQRS.Commands.Storage.CreateImage;
 using CQRS.Commands.Storage.CreateImageMultiply;
 using CQRS.Commands.Storage.DeleteImageMultiply;
 using CQRS.Commands.TemporaryStorage.DeleteTemporaryFile;
 using CQRS.Queries.Record.GetMaxImagePosition;
 using CQRS.Queries.TemporaryStorage.GetTemporaryFile;
+using DTO.Dashboard.Event;
 using DTO.Models;
 using DTO.RecordImage;
 using Hubs.FileProcessingHubService;
@@ -21,6 +24,9 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
     private readonly ISender _sender;
     private readonly IImageStorageService _imageStorage;
     private readonly IFileProcessingHubService _fileProcessing;
+    
+    private int[] _temporaryFilesIds = [];
+    private int[] _processedImageIds = [];
 
     public BackgroundImageProcessing(
         ISender sender,
@@ -36,7 +42,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
 
     public async Task RecordImageProcessing(int userId, int recordId, int[] fileIds)
     {
-        var imageIds = new int[fileIds.Length];
+        _temporaryFilesIds = fileIds;
         try
         {
             var imagesInternal = new List<ImageInternalModel>();
@@ -55,13 +61,15 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
 
                 if (temporaryImage.Data is not null)
                 {
-                    var image = await _imageStorage.CreateImageInternal(temporaryImage.Data.Content, temporaryImage.Data.FileName);
+                    var image = await _imageStorage.CreateImageInternal(
+                        temporaryImage.Data.Content,
+                        temporaryImage.Data.FileName);
 
                     if (image.Failed)
                     {
                         _logger.LogError(image.GetErrorMessages());
                         
-                        await DeleteTemporaryFiles(fileIds);
+                        await DeleteTemporaryFiles();
                         
                         await _fileProcessing.NotifyUser(userId, image.GetErrorMessages());
                         return;
@@ -71,7 +79,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
                 }
             }
 
-            await DeleteTemporaryFiles(fileIds);
+            await DeleteTemporaryFiles();
             
             var createImages = await _sender.Send(new CreateImageMultiplyCommand
             {
@@ -92,7 +100,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
                 return;
             }
 
-            imageIds = createImages.Data;
+            _processedImageIds = createImages.Data;
 
             var maxPosition = await _sender.Send(new GetMaxImagePositionQuery
             {
@@ -101,7 +109,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             
             if (maxPosition.Failed)
             {
-                await RollBackImageProcessing(imageIds);
+                await RollBackImageProcessing();
                 
                 _logger.LogError(maxPosition.GetErrorMessages());
                 await _fileProcessing.NotifyUser(userId, maxPosition.GetErrorMessages());
@@ -111,7 +119,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             var command = new CreateRecordImagesCommand
             {
                 RecordId = recordId,
-                ImageIds = imageIds,
+                ImageIds = _processedImageIds,
                 MaxPosition = ++maxPosition.Data
             };
 
@@ -119,15 +127,15 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
 
             if (commandResult.Failed)
             {
-                await RollBackImageProcessing(imageIds);
+                await RollBackImageProcessing();
                 
-                _logger.LogError(createImages.GetErrorMessages());
+                _logger.LogError(commandResult.GetErrorMessages());
                 return;
             }
 
             if (!commandResult.Data.Any())
             {
-                RollBackImageProcessing(imageIds);
+                RollBackImageProcessing();
                 
                 _logger.LogError("Record Images not created!");
                 await _fileProcessing.NotifyUser(userId, "Record Images not created!");
@@ -148,21 +156,107 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
         }
         catch (Exception e)
         {
-            await RollBackImageProcessing(imageIds);
-            await DeleteTemporaryFiles(fileIds);
+            await RollBackImageProcessing();
+            await DeleteTemporaryFiles();
             
             _logger.LogError(e.Message);
             await _fileProcessing.NotifyUser(userId, "Images processing failed!");
         }
     }
 
-    private async Task RollBackImageProcessing(int[] imageIds)
+    public async Task EventImageProcessing(int userId, int eventId, int fileId)
     {
-        if (imageIds.Any())
+        var imageIds = 0;
+        _temporaryFilesIds = new int[]{fileId};
+        try
+        {
+            var temporaryImage = await _sender.Send(new GetTemporaryFileQuery
+            {
+                FileId = fileId
+            });
+
+            if (temporaryImage.Failed)
+            {
+                _logger.LogError(temporaryImage.GetErrorMessages());
+            }
+
+            if (temporaryImage.Data is null)
+            {
+                await DeleteTemporaryFiles();
+                await _fileProcessing.NotifyUser(userId, "Temporary Image is null!");
+            }
+            
+            var image = await _imageStorage.CreateImageInternal(
+                temporaryImage.Data.Content,
+                temporaryImage.Data.FileName);
+
+            if (image.Failed)
+            {
+                _logger.LogError(image.GetErrorMessages());
+                        
+                await DeleteTemporaryFiles();
+                        
+                await _fileProcessing.NotifyUser(userId, image.GetErrorMessages());
+                return;
+            }
+
+            await DeleteTemporaryFiles();
+
+            var createImages = await _sender.Send(new CreateImageCommand
+            {
+                Image = image.Data
+            });
+
+            if (createImages.Failed)
+            {
+                _logger.LogError(createImages.GetErrorMessages());
+                await _fileProcessing.NotifyUser(userId, createImages.GetErrorMessages());
+                return;
+            }
+
+            _processedImageIds = new int[]{createImages.Data};
+            
+            var updateEventImage = await _sender.Send(new UpdateEventImageCommand
+            {
+                CurrentUserId = userId,
+                EventId = eventId,
+                ImageId = createImages.Data
+            });
+
+            if (updateEventImage.Failed)
+            {
+                await RollBackImageProcessing();
+                
+                _logger.LogError(updateEventImage.GetErrorMessages());
+                return;
+            }
+
+            var resultImageData = new UpdateEventImageResponseDTO
+            {
+                MainHash = image.Data.Main.Hash,
+                ThumbnailHash = image.Data.Thumbnail.Hash
+            };
+            
+            var result = Result.Success(resultImageData);
+            await _fileProcessing.NotifyUser(userId, result.Serialize());
+        }
+        catch (Exception e)
+        {
+            await RollBackImageProcessing();
+            await DeleteTemporaryFiles();
+            
+            _logger.LogError(e.Message);
+            await _fileProcessing.NotifyUser(userId, "Images processing failed!");
+        }
+    }
+
+    private async Task RollBackImageProcessing()
+    {
+        if (_processedImageIds.Any())
         {
             var result = await _sender.Send(new DeleteImageMultiplyCommand
             {
-                ImageIds = imageIds
+                ImageIds = _processedImageIds
             });
 
             if (result.Failed)
@@ -172,13 +266,13 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
         }
     }
     
-    private async Task DeleteTemporaryFiles(int[] fileIds)
+    private async Task DeleteTemporaryFiles()
     {
-        if (fileIds.Any())
+        if (_temporaryFilesIds.Any())
         {
             var result = await _sender.Send(new DeleteTemporaryFileCommand
             {
-                FileId = fileIds
+                FileId = _temporaryFilesIds
             });
             
             if (result.Failed)

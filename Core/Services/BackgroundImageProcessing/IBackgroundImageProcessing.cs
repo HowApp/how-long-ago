@@ -6,4 +6,9 @@ public interface IBackgroundImageProcessing
         int userId,
         int recordId,
         int[] fileIds);
+    
+    Task EventImageProcessing(
+        int userId,
+        int eventId,
+        int fileId);
 }

@@ -16,7 +16,6 @@ using CQRS.Queries.Record.GetRecordsPagination;
 using CurrentUser;
 using DTO.Record;
 using DTO.RecordImage;
-using Hubs.FileProcessingHubService;
 using Infrastructure.Background.BackgroundTaskQueue;
 using Infrastructure.Builders;
 using Infrastructure.Enums;
@@ -24,34 +23,24 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Models.ServicesModel;
-using Storage.ImageStorage;
 
 public class RecordService : IRecordService
 {
     private readonly ILogger<RecordService> _logger;
     private readonly ISender _sender;
     private readonly ICurrentUserService _userService;
-    private readonly IImageStorageService _imageStorage;
-    private readonly IFileProcessingHubService _fileProcessing;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-    private readonly IBackgroundImageProcessing _backgroundImageProcessing;
 
     public RecordService(
         ILogger<RecordService> logger,
         ISender sender,
         ICurrentUserService userService,
-        IImageStorageService imageStorage,
-        IFileProcessingHubService fileProcessing,
-        IBackgroundTaskQueue backgroundTaskQueue,
-        IBackgroundImageProcessing backgroundImageProcessing)
+        IBackgroundTaskQueue backgroundTaskQueue)
     {
         _logger = logger;
         _sender = sender;
         _userService = userService;
-        _imageStorage = imageStorage;
-        _fileProcessing = fileProcessing;
         _backgroundTaskQueue = backgroundTaskQueue;
-        _backgroundImageProcessing = backgroundImageProcessing;
     }
 
     public async Task<Result<int>> CreateRecord(

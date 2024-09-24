@@ -10,7 +10,7 @@ public interface IEventService
     Task<Result> UpdateActivateEventStatus(int eventId, bool setActive);
     Task<Result> UpdateEventAccess(int eventId, bool setPublic);
     Task<Result> UpdateEvent(int eventId, UpdateEventRequestDTO request);
-    Task<Result<UpdateEventImageResponseDTO>> UpdateEventImage(int eventId, UpdateEventImageRequestDTO request);
+    Task<Result> UpdateEventImage(int eventId, UpdateEventImageRequestDTO request);
     Task<Result<LikeState>> UpdateLikeState(int eventId, LikeState likeState);
     Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(GetEventsPaginationRequestDTO request, AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy);
     Task<Result> DeleteEvent(int eventId);

@@ -1,5 +1,6 @@
 namespace How.Core.Services.Event;
 
+using BackgroundImageProcessing;
 using Common.ResultType;
 using CQRS.Commands.Event.AddEventToSaved;
 using CQRS.Commands.Event.CreateEvent;
@@ -7,39 +8,39 @@ using CQRS.Commands.Event.DeleteEvent;
 using CQRS.Commands.Event.DeleteEventFromSaved;
 using CQRS.Commands.Event.UpdateEvent;
 using CQRS.Commands.Event.UpdateEventAccess;
-using CQRS.Commands.Event.UpdateEventImage;
 using CQRS.Commands.Event.UpdateEventLikeState;
 using CQRS.Commands.Event.UpdateEventStatus;
-using CQRS.Commands.Storage.DeleteImage;
-using CQRS.Commands.Storage.CreateImage;
+using CQRS.Commands.TemporaryStorage.InsertTemporaryFile;
 using CQRS.Queries.General.CheckExistAccess;
 using CQRS.Queries.Event.GetEventsPagination;
 using CurrentUser;
 using DTO.Dashboard.Event;
 using DTO.Models;
+using Infrastructure.Background.BackgroundTaskQueue;
 using Infrastructure.Builders;
 using Infrastructure.Enums;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Storage.ImageStorage;
+using Models.ServicesModel;
 
 public class EventService : IEventService
 {
     private readonly ILogger<EventService> _logger;
     private readonly ISender _sender;
     private readonly ICurrentUserService _userService;
-    private readonly IImageStorageService _imageStorage;
+    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
     public EventService(
         ILogger<EventService> logger,
         ISender sender,
         ICurrentUserService userService,
-        IImageStorageService imageStorage)
+        IBackgroundTaskQueue backgroundTaskQueue)
     {
         _logger = logger;
         _sender = sender;
         _userService = userService;
-        _imageStorage = imageStorage;
+        _backgroundTaskQueue = backgroundTaskQueue;
     }
 
     public async Task<Result<int>> CreateEvent(CreateEventRequestDTO request)
@@ -179,13 +180,13 @@ public class EventService : IEventService
         }
     }
 
-    public async Task<Result<UpdateEventImageResponseDTO>> UpdateEventImage(int eventId, UpdateEventImageRequestDTO request)
+    public async Task<Result> UpdateEventImage(int eventId, UpdateEventImageRequestDTO request)
     {
-        var imageId = 0;
+        var userId = _userService.UserId;
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(userId, AccessFilterType.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -194,74 +195,48 @@ public class EventService : IEventService
 
             if (eventExist.Failed)
             {
-                return Result.Failure<UpdateEventImageResponseDTO>(eventExist.Error);
+                return Result.Failure(eventExist.Error);
             }
 
             if (!eventExist.Data)
             {
-                return Result.Failure<UpdateEventImageResponseDTO>(
+                return Result.Failure(
                     new Error(ErrorType.Record, $"Event not found!"), 404);
             }
             
-            var image = await _imageStorage.CreateImageInternal(request.File);
+            using var memoryStream = new MemoryStream();
+            await request.File.CopyToAsync(memoryStream);
 
-            if (image.Failed)
+            var temporaryImageId = await _sender.Send(new InsertTemporaryFileCommand
             {
-                return Result.Failure<UpdateEventImageResponseDTO>(image.Error);
-            }
-
-            var insertImage = await _sender.Send(new CreateImageCommand
-            {
-                Image = image.Data
-            });
-
-            if (insertImage.Failed)
-            {
-                return Result.Failure<UpdateEventImageResponseDTO>(insertImage.Error);
-            }
-
-            if (insertImage.Data < 1)
-            {
-                return Result.Failure<UpdateEventImageResponseDTO>(
-                    new Error(ErrorType.Event, $"Image not created!"));
-            }
-
-            imageId = insertImage.Data;
-            
-            var updateEventImage = await _sender.Send(new UpdateEventImageCommand
-            {
-                CurrentUserId = _userService.UserId,
-                EventId = eventId,
-                ImageId = insertImage.Data
-            });
-
-            if (updateEventImage.Failed)
-            {
-                await _sender.Send(new DeleteImageCommand
+                File = new TemporaryFileModel
                 {
-                    ImageId = insertImage.Data
-                });
-                return Result.Failure<UpdateEventImageResponseDTO>(updateEventImage.Error);
+                    FileName = request.File.FileName,
+                    Content = memoryStream.ToArray()
+                }
+            });
+
+            if (temporaryImageId.Failed)
+            {
+                return Result.Failure(temporaryImageId.Error);
             }
 
-            var result = new UpdateEventImageResponseDTO
+            _backgroundTaskQueue.QueueBackgroundWorkItem(async (scope, token) =>
             {
-                MainHash = image.Data.Main.Hash,
-                ThumbnailHash = image.Data.Thumbnail.Hash
-            };
+                _logger.LogInformation("Start processing records.");
+
+                // Resolve services inside the scope
+                var recordService = scope.ServiceProvider.GetRequiredService<IBackgroundImageProcessing>();
+
+                await recordService.EventImageProcessing(userId, eventId, temporaryImageId.Data);
+                
+                _logger.LogInformation("Complete processing records.");
+            });
             
-            return Result.Success(result);
+            return Result.Success();
         }
         catch (Exception e)
         {
-            if (imageId != 0)
-            {
-                await _sender.Send(new DeleteImageCommand
-                {
-                    ImageId = imageId
-                }); 
-            }
-            
             _logger.LogError(e.Message);
             return Result.Failure<UpdateEventImageResponseDTO>(
                 new Error(ErrorType.Event, $"Error at {nameof(UpdateEventImage)}"));
