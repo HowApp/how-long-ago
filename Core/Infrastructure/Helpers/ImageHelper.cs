@@ -13,10 +13,10 @@ public static class ImageHelper
     
     private static WebpEncoder Encoder() => new WebpEncoder
     {
+        SkipMetadata = false,
         FileFormat = WebpFileFormatType.Lossy,
-        Quality = 85,
+        Quality = 50,
         Method = WebpEncodingMethod.Fastest,
-        UseAlphaCompression = false,
     };
     
     public static ImageHelperModel GetReducedImage(Stream resourceImage, int resizedWidth = ThumbnailResolution)
@@ -36,7 +36,7 @@ public static class ImageHelper
         {
             if (height < resizedWidth)
             {
-                image.SaveAsWebp(outStream, Encoder());
+                image.Save(outStream, Encoder());
                 return new ImageHelperModel
                 {
                     ImageData = outStream.ToArray(),
@@ -51,7 +51,7 @@ public static class ImageHelper
         {
             if (width < resizedWidth)
             {
-                image.SaveAsWebp(outStream, Encoder());
+                image.Save(outStream, Encoder());
                 return new ImageHelperModel
                 {
                     ImageData = outStream.ToArray(),
@@ -67,7 +67,7 @@ public static class ImageHelper
         var destHeight = (int)(height * nPercent);
 
         image.Mutate(i => i.Resize(destWidth, destHeight));
-        image.SaveAsWebp(outStream, Encoder());
+        image.Save(outStream, Encoder());
 
         return new ImageHelperModel
         {
@@ -92,7 +92,7 @@ public static class ImageHelper
         var outStream = new MemoryStream();
         using var image = Image.Load(resourceImage);
 
-        image.SaveAsWebp(outStream, Encoder());
+        image.Save(outStream, Encoder());
 
         return new ImageHelperModel
         {

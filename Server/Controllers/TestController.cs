@@ -1,6 +1,7 @@
 namespace How.Server.Controllers;
 
 using Common.ResultType;
+using Core.Infrastructure.Helpers;
 using Core.Infrastructure.Hubs;
 using Core.Services.CurrentUser;
 using Core.Services.Hubs.FileProcessingHubService;
@@ -40,6 +41,16 @@ public class TestController : BaseController
 
         return HttpResult(Result.Success());
     }
+    
+    [HttpPost]
+    [SwaggerOperation("Convert To Webp")]
+    [ProducesResponseType<Result>(200)]
+    [Route("api/test/image/convert/webp")]
+    public async Task<IActionResult> CreateEvent([FromForm] FileConvertRequestDTO request)
+    {
+        var convertedImage = ImageHelper.ConvertImageToWebp(request.File.OpenReadStream());
+        return File(convertedImage.ImageData, "image/webp");
+    }
 }
 
 
@@ -47,4 +58,9 @@ public class TestRequestDTO
 {
     public int Age { get; set; }
     public LocalDate Date { get; set; }
+}
+
+public class FileConvertRequestDTO
+{
+    public IFormFile File { get; set; }
 }
