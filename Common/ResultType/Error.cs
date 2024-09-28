@@ -1,6 +1,6 @@
 namespace How.Common.ResultType;
 
-public class Error : Dictionary<string, object>
+public class Error : Dictionary<string, string>
 {
     public string ErrorType { get; }
     public string ErrorMessage { get; }

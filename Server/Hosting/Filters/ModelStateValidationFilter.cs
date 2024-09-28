@@ -18,7 +18,7 @@ public class ModelStateValidationFilter : IActionFilter
             {
                 if (value.Errors.Any())
                 {
-                    error.Add(key, value.Errors.Select(e => e.ErrorMessage));
+                    error.Add(key, string.Join('\n',value.Errors.Select(e => e.ErrorMessage)));
                 }
             }
 

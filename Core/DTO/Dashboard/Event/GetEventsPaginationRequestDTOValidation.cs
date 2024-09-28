@@ -10,7 +10,7 @@ public class GetEventsPaginationRequestDTOValidation : AbstractValidator<GetEven
         RuleFor(r => r.Page)
             .GreaterThan(0)
             .WithMessage("Page must be greater than 0!");
-        
+
         RuleFor(r => r.Size)
             .LessThan(PaginationDTO.MaxSize)
             .WithMessage($"Page Size must be less than {PaginationDTO.MaxSize}!");
@@ -22,7 +22,7 @@ public class GetEventsPaginationRequestDTOValidation : AbstractValidator<GetEven
         RuleFor(r => r.Status)
             .IsInEnum()
             .WithMessage("Provide correct Event Status!");
-        
+
         RuleFor(r => r.Access)
             .IsInEnum()
             .WithMessage("Provide correct Event Active status!");
