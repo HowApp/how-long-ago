@@ -70,7 +70,7 @@ public class EventController : BaseController
     [SwaggerOperation("Set event Access status Public/private")]
     [ProducesResponseType<Result>(200)]
     [Route("api/dashboard/event/{id:int:min(1)}/access-status")]
-    public async Task<IActionResult> Deactivate(
+    public async Task<IActionResult> UpdateAccessStatus(
         [FromRoute] int id,
         [FromQuery] bool setPublic)
     {
