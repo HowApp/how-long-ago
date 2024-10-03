@@ -186,7 +186,7 @@ public class EventService : IEventService
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
-            queryBuilder.FilterCreatedBy(userId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(userId, InternalAccessFilter.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -297,7 +297,7 @@ public class EventService : IEventService
 
     public async Task<Result<GetEventsPaginationResponseDTO>> GetEventsPagination(
         GetEventsPaginationRequestDTO request,
-        AccessFilterType accessFilterType)
+        InternalAccessFilter internalAccessFilter)
     {
         try
         {
@@ -309,7 +309,7 @@ public class EventService : IEventService
                 Search = request.Search,
                 Status = request.Status,
                 Access = request.Access,
-                AccessFilterType = accessFilterType
+                InternalAccessFilter = internalAccessFilter
             };
 
             var queryResult = await _sender.Send(query);

@@ -9,7 +9,7 @@ public sealed class GetEventsPaginationQuery : PaginationModel, IQuery<Result<Ge
 {
     public int CurrentUserId { get; set; }
     public string Search { get; set; }
-    public EventStatus Status { get; set; }
-    public EventAccessType Access { get; set; }
-    public AccessFilterType AccessFilterType { get; set; }
+    public EventStatusFilter Status { get; set; }
+    public EventAccessFilter Access { get; set; }
+    public InternalAccessFilter InternalAccessFilter { get; set; }
 }

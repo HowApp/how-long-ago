@@ -36,19 +36,19 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
         _parameters.Add("@eventId", eventId);
     }
 
-    public void FilterCreatedBy(int userId, AccessFilterType accessFilterType = AccessFilterType.IncludeCreatedBy)
+    public void FilterCreatedBy(int userId, InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy)
     {
         _parameters.Add("@createdById", userId);
 
-        switch (accessFilterType)
+        switch (internalAccessFilter)
         {
-            case AccessFilterType.IncludeCreatedBy:
+            case InternalAccessFilter.IncludeCreatedBy:
                 _query.Append($@"
     AND
     e.{nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
 ");
                 break;
-            case AccessFilterType.IncludeShared:
+            case InternalAccessFilter.IncludeShared:
                 _query.Append($@"
     AND
     (e.{nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
@@ -64,7 +64,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
 ");
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(accessFilterType), accessFilterType, null);
+                throw new ArgumentOutOfRangeException(nameof(internalAccessFilter), internalAccessFilter, null);
         }
     }
 

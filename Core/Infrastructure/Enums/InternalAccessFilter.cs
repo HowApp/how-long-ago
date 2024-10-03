@@ -1,6 +1,6 @@
 namespace How.Core.Infrastructure.Enums;
 
-public enum AccessFilterType
+public enum InternalAccessFilter
 {
     None = 1,
     IncludeCreatedBy = 2,

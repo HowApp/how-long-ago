@@ -48,7 +48,7 @@ public class EventController : BaseController
     [Route("api/dashboard/event/list-pagination/shared")]
     public async Task<IActionResult> GetSharedEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
-        var result = await _eventService.GetEventsPagination(request, AccessFilterType.IncludeShared);
+        var result = await _eventService.GetEventsPagination(request, InternalAccessFilter.IncludeShared);
 
         return HttpResult(result);
     }

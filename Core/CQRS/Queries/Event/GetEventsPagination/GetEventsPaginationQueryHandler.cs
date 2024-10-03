@@ -33,17 +33,17 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
         {
             var innerFilter = string.Empty;
 
-            switch (request.AccessFilterType)
+            switch (request.InternalAccessFilter)
             {
-                case AccessFilterType.None:
+                case InternalAccessFilter.None:
                     innerFilter = $@"
 true";
                     break;
-                case AccessFilterType.IncludeCreatedBy:
+                case InternalAccessFilter.IncludeCreatedBy:
                     innerFilter = $@"
 e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
                     break;
-                case AccessFilterType.IncludeShared:
+                case InternalAccessFilter.IncludeShared:
                     innerFilter = $@"
 e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id
 OR
@@ -64,7 +64,7 @@ true";
             var accessFilter = string.Empty;
             switch (request.Access)
             {
-                case EventAccessType.None:
+                case EventAccessFilter.None:
                     accessFilter = $@"
 true";
                     break;
@@ -77,7 +77,7 @@ e.{nameof(Event.Access).ToSnake()} = @access";
             var activeStatusFilter = string.Empty;
             switch (request.Status)
             {
-                case EventStatus.None:
+                case EventStatusFilter.None:
                     activeStatusFilter = $@"
 true";
                     break;

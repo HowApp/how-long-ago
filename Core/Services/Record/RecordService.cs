@@ -50,7 +50,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -105,7 +105,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -160,7 +160,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -215,7 +215,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
             queryBuilder.FilterByStatus(EventStatus.Active);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
@@ -271,7 +271,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
-            queryBuilder.FilterCreatedBy(userId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(userId, InternalAccessFilter.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -343,7 +343,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
@@ -438,7 +438,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
-            queryBuilder.FilterCreatedBy(_userService.UserId, AccessFilterType.IncludeShared);
+            queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
             
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {

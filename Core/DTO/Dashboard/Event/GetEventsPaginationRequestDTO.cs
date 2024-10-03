@@ -6,6 +6,6 @@ using Infrastructure.Enums;
 public sealed class GetEventsPaginationRequestDTO : PaginationDTO
 {
     public string Search { get; set; } = string.Empty;
-    public EventStatus Status { get; set; }
-    public EventAccessType Access { get; set; }
+    public EventStatusFilter Status { get; set; }
+    public EventAccessFilter Access { get; set; }
 }
