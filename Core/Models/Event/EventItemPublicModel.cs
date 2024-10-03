@@ -3,12 +3,10 @@ namespace How.Core.Models.Event;
 using Infrastructure.Enums;
 using NodaTime;
 
-public class EventItemModel
+public class EventItemPublicModel
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public EventStatus Status { get; set; }
-    public EventAccessType Access { get; set; }
     public Instant CreatedAt { get; set; }
     public string EventMainHash { get; set; }
     public string EventThumbnailHash { get; set; }

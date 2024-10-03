@@ -7,5 +7,5 @@ public interface IPublicEventService
 {
     Task<Result<GetEventsPaginationPublicResponseDTO>> GetEventsPagination(
         GetEventsPaginationPublicRequestDTO publicRequest);
-    Task<Result<GetEventByIdResponseDTO>> GetEventById(int eventId);
+    Task<Result<GetEventPublicByIdResponseDTO>> GetEventById(int eventId);
 }

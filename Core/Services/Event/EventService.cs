@@ -322,13 +322,13 @@ public class EventService : IEventService
             var result = new GetEventsPaginationResponseDTO
             {
                 Count = queryResult.Data.Count,
-                Events = new List<EventItemModelDTO>(queryResult.Data.Events.Count),
+                Events = new List<EventItemPrivateModelDTO>(queryResult.Data.Events.Count),
             };
             
             foreach (var eventItem in queryResult.Data.Events)
             {
                 result.Events.Add(
-                    new EventItemModelDTO
+                    new EventItemPrivateModelDTO
                     {
                         Id = eventItem.Id,
                         Name = eventItem.Name,

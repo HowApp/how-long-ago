@@ -13,43 +13,42 @@ using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 using Models.Event;
 
-public class GetEventByIdQueryHandler : IQueryHandler<GetEventByIdQuery, Result<GetEventByIdQueryResult>>
+public class GetEventPublicByIdQueryHandler : IQueryHandler<GetEventPublicByIdQuery, Result<GetEventPublicByIdQueryResult>>
 {
-    private readonly ILogger<GetEventByIdQueryHandler> _logger;
+    private readonly ILogger<GetEventPublicByIdQueryHandler> _logger;
     private readonly DapperConnection _dapper;
 
-    public GetEventByIdQueryHandler(ILogger<GetEventByIdQueryHandler> logger, DapperConnection dapper)
+    public GetEventPublicByIdQueryHandler(ILogger<GetEventPublicByIdQueryHandler> logger, DapperConnection dapper)
     {
         _logger = logger;
         _dapper = dapper;
     }
 
-    public async Task<Result<GetEventByIdQueryResult>> Handle(GetEventByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetEventPublicByIdQueryResult>> Handle(GetEventPublicByIdQuery request, CancellationToken cancellationToken)
     {
         try
         {
             var query = $@"
 SELECT 
-    e.{nameof(PKey.Id).ToSnake()} AS {nameof(GetEventByIdQueryResult.Id)},
-    e.{nameof(Event.Name).ToSnake()} AS {nameof(GetEventByIdQueryResult.Name)},
-    e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(GetEventByIdQueryResult.CreatedAt)},
-    e.{nameof(Event.Access).ToSnake()} As {nameof(GetEventByIdQueryResult.Access)},
-    event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventByIdQueryResult.EventMainHash)},
-    event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventByIdQueryResult.EventThumbnailHash)},
-    u.{nameof(PKey.Id).ToSnake()} AS {nameof(GetEventByIdQueryResult.OwnerId)},
-    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(GetEventByIdQueryResult.OwnerFirstName)},
-    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(GetEventByIdQueryResult.OwnerLastName)},
-    user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventByIdQueryResult.OwnerMainHash)},
-    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventByIdQueryResult.OwnerThumbnailHash)},
-    user_likes.likes AS {nameof(GetEventByIdQueryResult.Likes)},
-    user_likes.dislikes AS {nameof(GetEventByIdQueryResult.Dislikes)},
-    user_likes.current_user_state AS {nameof(GetEventByIdQueryResult.OwnLikeState)},
+    e.{nameof(PKey.Id).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.Id)},
+    e.{nameof(Event.Name).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.Name)},
+    e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.CreatedAt)},
+    event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.EventMainHash)},
+    event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.EventThumbnailHash)},
+    u.{nameof(PKey.Id).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerId)},
+    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerFirstName)},
+    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerLastName)},
+    user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerMainHash)},
+    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerThumbnailHash)},
+    user_likes.likes AS {nameof(GetEventPublicByIdQueryResult.Likes)},
+    user_likes.dislikes AS {nameof(GetEventPublicByIdQueryResult.Dislikes)},
+    user_likes.current_user_state AS {nameof(GetEventPublicByIdQueryResult.OwnLikeState)},
     (SELECT EXISTS(
         SELECT 1 FROM {nameof(BaseDbContext.SavedEvents).ToSnake()} se 
                  WHERE se.{nameof(SavedEvent.EventId).ToSnake()} = e.{nameof(PKey.Id).ToSnake()} AND
                        se.{nameof(SavedEvent.UserId).ToSnake()} = @created_by_id)
-     ) AS {nameof(EventItemModel.IsSavedByUser)},
-    es.saved_count AS {nameof(GetEventByIdQueryResult.SavedCount)}
+     ) AS {nameof(EventItemPrivateModel.IsSavedByUser)},
+    es.saved_count AS {nameof(GetEventPublicByIdQueryResult.SavedCount)}
 FROM {nameof(BaseDbContext.Events).ToSnake()} e
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} event_image ON 
     e.{nameof(Event.StorageImageId).ToSnake()} = event_image.{nameof(PKey.Id).ToSnake()}
@@ -98,7 +97,7 @@ LIMIT 1;
             
             await using var connection = _dapper.InitConnection();
             
-            var eventItem = await connection.QueryFirstOrDefaultAsync<GetEventByIdQueryResult>(
+            var eventItem = await connection.QueryFirstOrDefaultAsync<GetEventPublicByIdQueryResult>(
                 query,
                 new
                 {
@@ -113,8 +112,8 @@ LIMIT 1;
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetEventByIdQueryResult>(
-                new Error(ErrorType.Event, $"Error while executing {nameof(GetEventByIdQuery)}"));
+            return Result.Failure<GetEventPublicByIdQueryResult>(
+                new Error(ErrorType.Event, $"Error while executing {nameof(GetEventPublicByIdQuery)}"));
         }
     }
 }

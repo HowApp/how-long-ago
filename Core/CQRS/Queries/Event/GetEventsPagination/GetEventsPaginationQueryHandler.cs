@@ -37,53 +37,79 @@ public class GetEventsPaginationQueryHandler : IQueryHandler<GetEventsPagination
             {
                 case AccessFilterType.None:
                     innerFilter = $@"
-    true";
+true";
                     break;
                 case AccessFilterType.IncludeCreatedBy:
                     innerFilter = $@"
-    e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
+e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
                     break;
                 case AccessFilterType.IncludeShared:
                     innerFilter = $@"
-    e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id
-    OR
-    EXISTS(
-        SELECT 1 
-        FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
-        WHERE 
-            su.{nameof(SharedUser.UserOwnerId).ToSnake()} = e.{nameof(Event.OwnerId).ToSnake()}
-          AND 
-            su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)";
+e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id
+OR
+EXISTS(
+    SELECT 1 
+    FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
+    WHERE 
+        su.{nameof(SharedUser.UserOwnerId).ToSnake()} = e.{nameof(Event.OwnerId).ToSnake()}
+      AND 
+        su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)";
+                break;
+            default:
+                innerFilter = $@"
+true";
+                    break;
+            }
+            
+            var accessFilter = string.Empty;
+            switch (request.Access)
+            {
+                case EventAccessType.None:
+                    accessFilter = $@"
+true";
                     break;
                 default:
-                    innerFilter = $@"
-    true";
+                    accessFilter = $@"
+e.{nameof(Event.Access).ToSnake()} = @access";
+                    break;
+            }
+            
+            var activeStatusFilter = string.Empty;
+            switch (request.Status)
+            {
+                case EventStatus.None:
+                    activeStatusFilter = $@"
+true";
+                    break;
+                default:
+                    activeStatusFilter = $@"
+e.{nameof(Event.Status).ToSnake()} = @status";
                     break;
             }
 
             var query = $@"
 SELECT 
-    e.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemModel.Id)},
-    e.{nameof(Event.Name).ToSnake()} AS {nameof(EventItemModel.Name)},
-    e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(EventItemModel.CreatedAt)},
-    e.{nameof(Event.Status).ToSnake()} As {nameof(EventItemModel.Status)},
-    e.{nameof(Event.Access).ToSnake()} As {nameof(EventItemModel.Access)},
-    event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.EventMainHash)},
-    event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.EventThumbnailHash)},
-    u.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemModel.OwnerId)},
-    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(EventItemModel.OwnerFirstName)},
-    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(EventItemModel.OwnerLastName)},
-    user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.OwnerMainHash)},
-    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemModel.OwnerThumbnailHash)},
-    user_likes.likes AS {nameof(EventItemModel.Likes)},
-    user_likes.dislikes AS {nameof(EventItemModel.Dislikes)},
-    user_likes.current_user_state AS {nameof(EventItemModel.OwnLikeState)},
+    e.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemPrivateModel.Id)},
+    e.{nameof(Event.Name).ToSnake()} AS {nameof(EventItemPrivateModel.Name)},
+    e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(EventItemPrivateModel.CreatedAt)},
+    e.{nameof(Event.Status).ToSnake()} As {nameof(EventItemPrivateModel.Status)},
+    e.{nameof(Event.Access).ToSnake()} As {nameof(EventItemPrivateModel.Access)},
+    event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.EventMainHash)},
+    event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.EventThumbnailHash)},
+    u.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerId)},
+    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerFirstName)},
+    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerLastName)},
+    user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerMainHash)},
+    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerThumbnailHash)},
+    user_likes.likes AS {nameof(EventItemPrivateModel.Likes)},
+    user_likes.dislikes AS {nameof(EventItemPrivateModel.Dislikes)},
+    user_likes.current_user_state AS {nameof(EventItemPrivateModel.OwnLikeState)},
     (SELECT EXISTS(
         SELECT 1 FROM {nameof(BaseDbContext.SavedEvents).ToSnake()} se 
                  WHERE se.{nameof(SavedEvent.EventId).ToSnake()} = e.{nameof(PKey.Id).ToSnake()} AND
                        se.{nameof(SavedEvent.UserId).ToSnake()} = @created_by_id)
-     ) AS {nameof(EventItemModel.IsSavedByUser)},
-    es.saved_count AS {nameof(EventItemModel.SavedCount)}
+     ) AS {nameof(EventItemPrivateModel.IsSavedByUser)},
+    es.saved_count AS {nameof(EventItemPrivateModel.SavedCount)}
 FROM {nameof(BaseDbContext.Events).ToSnake()} e 
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} event_image ON 
     e.{nameof(Event.StorageImageId).ToSnake()} = event_image.{nameof(PKey.Id).ToSnake()}
@@ -122,9 +148,9 @@ LEFT JOIN (
 ) es ON es.saved_count_id = e.{nameof(PKey.Id).ToSnake()}
 WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     AND
-    e.{nameof(Event.Status).ToSnake()} = @status
+     ({activeStatusFilter})
     AND
-    e.{nameof(Event.Access).ToSnake()} = @access
+    ({accessFilter})
     AND
     LOWER(e.{nameof(Event.Name).ToSnake()}) ILIKE '%' || @search || '%'
     AND
@@ -139,9 +165,9 @@ SELECT COUNT(1)
 FROM {nameof(BaseDbContext.Events).ToSnake()} e 
 WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     AND
-    e.{nameof(Event.Status).ToSnake()} = @status
+    ({activeStatusFilter})
     AND
-    e.{nameof(Event.Access).ToSnake()} = @access
+    ({accessFilter})
     AND
     e.{nameof(Event.Name).ToSnake()} ILIKE '%' || @search || '%'
     AND
@@ -159,7 +185,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                     search = request.Search
                 });
 
-            var events = await connection.QueryAsync<EventItemModel>(
+            var events = await connection.QueryAsync<EventItemPrivateModel>(
                 query,
                 new
                 {

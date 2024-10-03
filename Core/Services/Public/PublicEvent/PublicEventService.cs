@@ -6,7 +6,6 @@ using CQRS.Queries.Public.Event.GetEventsPaginationPublic;
 using CurrentUser;
 using DTO.Public.Event;
 using DTO.Models;
-using Infrastructure.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -26,7 +25,8 @@ public class PublicEventService : IPublicEventService
         _userService = userService;
     }
 
-    public async Task<Result<GetEventsPaginationPublicResponseDTO>> GetEventsPagination(GetEventsPaginationPublicRequestDTO publicRequest)
+    public async Task<Result<GetEventsPaginationPublicResponseDTO>> GetEventsPagination(
+        GetEventsPaginationPublicRequestDTO publicRequest)
     {
         try
         {
@@ -48,17 +48,16 @@ public class PublicEventService : IPublicEventService
             var result = new GetEventsPaginationPublicResponseDTO
             {
                 Count = queryResult.Data.Count,
-                Events = new List<EventItemModelDTO>(queryResult.Data.Events.Count),
+                Events = new List<EventItemPublicModelDTO>(queryResult.Data.Events.Count),
             };
             
             foreach (var eventItem in queryResult.Data.Events)
             {
                 result.Events.Add(
-                    new EventItemModelDTO
+                    new EventItemPublicModelDTO
                     {
                         Id = eventItem.Id,
                         Name = eventItem.Name,
-                        Access = eventItem.Access,
                         Image = new ImageModelDTO
                         {
                             MainHash = eventItem.EventMainHash,
@@ -94,32 +93,33 @@ public class PublicEventService : IPublicEventService
         }
     }
 
-    public async Task<Result<GetEventByIdResponseDTO>> GetEventById(int eventId)
+    public async Task<Result<GetEventPublicByIdResponseDTO>> GetEventById(int eventId)
     {
         try
         {
-            var query = new GetEventByIdQuery
+            var query = new GetEventPublicByIdQuery
             {
                 CurrentUserId = _userService.UserId,
                 EventId = eventId
             };
+
             var queryResult = await _sender.Send(query);
 
             if (queryResult.Failed)
             {
-                return Result.Failure<GetEventByIdResponseDTO>(queryResult.Error);
+                return Result.Failure<GetEventPublicByIdResponseDTO>(queryResult.Error);
             }
 
             if (queryResult.Data is null)
             {
-                return Result.Failure<GetEventByIdResponseDTO>(new Error(ErrorType.Event, $"Event not found!"), 404);
+                return Result.Failure<GetEventPublicByIdResponseDTO>(
+                    new Error(ErrorType.Event, $"Event not found!"), 404);
             }
             
-            var result = new GetEventByIdResponseDTO
+            var result = new GetEventPublicByIdResponseDTO
             {
                 Id = queryResult.Data.Id,
                 Name = queryResult.Data.Name,
-                Access = queryResult.Data.Access,
                 Image = new ImageModelDTO
                 {
                     MainHash = queryResult.Data.EventMainHash,
@@ -144,12 +144,12 @@ public class PublicEventService : IPublicEventService
                 IsSavedByUser = queryResult.Data.IsSavedByUser
             };
 
-            return new Result<GetEventByIdResponseDTO>(result);
+            return new Result<GetEventPublicByIdResponseDTO>(result);
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetEventByIdResponseDTO>(
+            return Result.Failure<GetEventPublicByIdResponseDTO>(
                 new Error(ErrorType.Event, $"Error at {nameof(GetEventById)}"));
         }
     }
