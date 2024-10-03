@@ -332,6 +332,7 @@ public class EventService : IEventService
                     {
                         Id = eventItem.Id,
                         Name = eventItem.Name,
+                        Status = eventItem.Status,
                         Access = eventItem.Access,
                         Image = new ImageModelDTO
                         {

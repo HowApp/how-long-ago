@@ -7,6 +7,7 @@ public class EventItemModelDTO
 {
     public int Id { get; set; }
     public string Name { get; set; }
+    public EventStatus Status { get; set; }
     public EventAccessType Access { get; set; }
     public ImageModelDTO Image { get; set; }
     public UserInfoModelShortDTO UserInfo { get; set; }

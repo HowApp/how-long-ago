@@ -7,6 +7,7 @@ public class EventItemModel
 {
     public int Id { get; set; }
     public string Name { get; set; }
+    public EventStatus Status { get; set; }
     public EventAccessType Access { get; set; }
     public Instant CreatedAt { get; set; }
     public string EventMainHash { get; set; }
