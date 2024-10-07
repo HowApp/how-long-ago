@@ -41,6 +41,17 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
+    
+    [HttpGet]
+    [SwaggerOperation("Get own Event by ID")]
+    [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/own")]
+    public async Task<IActionResult> GetOwnEventById([FromRoute] int eventId)
+    {
+        var result = await _eventService.GetEventById(eventId);
+
+        return HttpResult(result);
+    }
 
     [HttpGet]
     [SwaggerOperation("Get shared Events list with pagination")]
@@ -49,6 +60,17 @@ public class EventController : BaseController
     public async Task<IActionResult> GetSharedEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
         var result = await _eventService.GetEventsPagination(request, InternalAccessFilter.IncludeShared);
+
+        return HttpResult(result);
+    }
+    
+    [HttpGet]
+    [SwaggerOperation("Get shared Event by ID")]
+    [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/shared")]
+    public async Task<IActionResult> GetSharedEventById([FromRoute] int eventId)
+    {
+        var result = await _eventService.GetEventById(eventId, InternalAccessFilter.IncludeShared);
 
         return HttpResult(result);
     }
@@ -94,7 +116,7 @@ public class EventController : BaseController
     
     [HttpPatch]
     [SwaggerOperation("Update like event state")]
-    [ProducesResponseType<Result>(200)]
+    [ProducesResponseType<Result<LikeState>>(200)]
     [Route("api/dashboard/event/{id:int:min(1)}/like")]
     public async Task<IActionResult> UpdateEventLikeState(
         [FromRoute] int id,
