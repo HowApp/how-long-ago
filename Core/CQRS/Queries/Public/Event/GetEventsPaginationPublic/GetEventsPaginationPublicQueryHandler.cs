@@ -36,26 +36,19 @@ public class GetEventsPaginationPublicQueryHandler : IQueryHandler<
         {
             var query = $@"
 SELECT 
-    e.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemPrivateModel.Id)},
-    e.{nameof(Event.Name).ToSnake()} AS {nameof(EventItemPrivateModel.Name)},
-    e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(EventItemPrivateModel.CreatedAt)},
-    e.{nameof(Event.Access).ToSnake()} As {nameof(EventItemPrivateModel.Access)},
-    event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.EventMainHash)},
-    event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.EventThumbnailHash)},
-    u.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerId)},
-    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerFirstName)},
-    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerLastName)},
-    user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerMainHash)},
-    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPrivateModel.OwnerThumbnailHash)},
-    user_likes.likes AS {nameof(EventItemPrivateModel.Likes)},
-    user_likes.dislikes AS {nameof(EventItemPrivateModel.Dislikes)},
-    user_likes.current_user_state AS {nameof(EventItemPrivateModel.OwnLikeState)},
-    (SELECT EXISTS(
-        SELECT 1 FROM {nameof(BaseDbContext.SavedEvents).ToSnake()} se 
-                 WHERE se.{nameof(SavedEvent.EventId).ToSnake()} = e.{nameof(PKey.Id).ToSnake()} AND
-                       se.{nameof(SavedEvent.UserId).ToSnake()} = @created_by_id)
-     ) AS {nameof(EventItemPrivateModel.IsSavedByUser)},
-    es.saved_count AS {nameof(EventItemPrivateModel.SavedCount)}
+    e.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemPublicModel.Id)},
+    e.{nameof(Event.Name).ToSnake()} AS {nameof(EventItemPublicModel.Name)},
+    e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(EventItemPublicModel.CreatedAt)},
+    event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPublicModel.EventMainHash)},
+    event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPublicModel.EventThumbnailHash)},
+    u.{nameof(PKey.Id).ToSnake()} AS {nameof(EventItemPublicModel.OwnerId)},
+    u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(EventItemPublicModel.OwnerFirstName)},
+    u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(EventItemPublicModel.OwnerLastName)},
+    user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPublicModel.OwnerMainHash)},
+    user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(EventItemPublicModel.OwnerThumbnailHash)},
+    user_likes.likes AS {nameof(EventItemPublicModel.Likes)},
+    user_likes.dislikes AS {nameof(EventItemPublicModel.Dislikes)},
+    es.saved_count AS {nameof(EventItemPublicModel.SavedCount)}
 FROM {nameof(BaseDbContext.Events).ToSnake()} e 
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} event_image ON 
     e.{nameof(Event.StorageImageId).ToSnake()} = event_image.{nameof(PKey.Id).ToSnake()}
@@ -75,15 +68,9 @@ LEFT JOIN (
         SELECT 
             le.{nameof(LikedEvent.EventId).ToSnake()} AS liked_event_id,
             COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 2 THEN 1 END) AS likes,
-            COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 3 THEN 1 END) AS dislikes,
-            coalesce(le_u.{nameof(LikedEvent.State).ToSnake()}, 1) AS current_user_state
+            COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 3 THEN 1 END) AS dislikes
         FROM {nameof(BaseDbContext.LikedEvents).ToSnake()} le 
-        LEFT JOIN {nameof(BaseDbContext.LikedEvents).ToSnake()} le_u ON 
-            le_u.{nameof(LikedEvent.EventId).ToSnake()} = le.{nameof(LikedEvent.EventId).ToSnake()} AND 
-            le_u.{nameof(LikedEvent.LikedByUserId).ToSnake()} = @created_by_id
-        GROUP BY 
-            le.{nameof(LikedEvent.EventId).ToSnake()},
-            le_u.{nameof(LikedEvent.State).ToSnake()}
+        GROUP BY le.{nameof(LikedEvent.EventId).ToSnake()}
         ) user_likes ON e.{nameof(PKey.Id).ToSnake()} = user_likes.liked_event_id
 LEFT JOIN (
     SELECT 
@@ -126,11 +113,10 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                     search = request.Search
                 });
 
-            var events = await connection.QueryAsync<EventItemPrivateModel>(
+            var events = await connection.QueryAsync<EventItemPublicModel>(
                 query,
                 new
                 {
-                    created_by_id = request.CurrentUserId,
                     status = (int)EventStatus.Active,
                     access = (int)EventAccessType.Public,
                     size = request.Size,

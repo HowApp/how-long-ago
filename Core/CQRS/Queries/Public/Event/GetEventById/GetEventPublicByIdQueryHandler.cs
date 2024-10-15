@@ -42,12 +42,6 @@ SELECT
     user_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerThumbnailHash)},
     user_likes.likes AS {nameof(GetEventPublicByIdQueryResult.Likes)},
     user_likes.dislikes AS {nameof(GetEventPublicByIdQueryResult.Dislikes)},
-    user_likes.current_user_state AS {nameof(GetEventPublicByIdQueryResult.OwnLikeState)},
-    (SELECT EXISTS(
-        SELECT 1 FROM {nameof(BaseDbContext.SavedEvents).ToSnake()} se 
-                 WHERE se.{nameof(SavedEvent.EventId).ToSnake()} = e.{nameof(PKey.Id).ToSnake()} AND
-                       se.{nameof(SavedEvent.UserId).ToSnake()} = @created_by_id)
-     ) AS {nameof(EventItemPrivateModel.IsSavedByUser)},
     es.saved_count AS {nameof(GetEventPublicByIdQueryResult.SavedCount)}
 FROM {nameof(BaseDbContext.Events).ToSnake()} e
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} event_image ON 
@@ -68,15 +62,9 @@ LEFT JOIN (
         SELECT 
             le.{nameof(LikedEvent.EventId).ToSnake()} AS liked_event_id,
             COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 2 THEN 1 END) AS likes,
-            COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 3 THEN 1 END) AS dislikes,
-            coalesce(le_u.{nameof(LikedEvent.State).ToSnake()}, 1) AS current_user_state
+            COUNT(CASE WHEN le.{nameof(LikedEvent.State).ToSnake()} = 3 THEN 1 END) AS dislikes
         FROM {nameof(BaseDbContext.LikedEvents).ToSnake()} le 
-        LEFT JOIN {nameof(BaseDbContext.LikedEvents).ToSnake()} le_u ON 
-            le_u.{nameof(LikedEvent.EventId).ToSnake()} = le.{nameof(LikedEvent.EventId).ToSnake()} AND 
-            le_u.{nameof(LikedEvent.LikedByUserId).ToSnake()} = @created_by_id
-        GROUP BY 
-            le.{nameof(LikedEvent.EventId).ToSnake()},
-            le_u.{nameof(LikedEvent.State).ToSnake()}
+        GROUP BY le.{nameof(LikedEvent.EventId).ToSnake()}
         ) user_likes ON e.{nameof(PKey.Id).ToSnake()} = user_likes.liked_event_id
 LEFT JOIN (
     SELECT 
@@ -101,7 +89,6 @@ LIMIT 1;
                 query,
                 new
                 {
-                    created_by_id = request.CurrentUserId,
                     status = (int)EventStatus.Active,
                     access = (int)EventAccessType.Public,
                     EventId = request.EventId,

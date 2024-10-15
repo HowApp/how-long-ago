@@ -1,6 +1,5 @@
 namespace How.Core.DTO.Models;
 
-using Infrastructure.Enums;
 using NodaTime;
 
 public class EventItemPublicModelDTO
@@ -12,7 +11,5 @@ public class EventItemPublicModelDTO
     public Instant CreatedAt { get; set; }
     public int Likes { get; set; }
     public int Dislikes { get; set; }
-    public LikeState OwnLikeState { get; set; }
     public int SavedCount { get; set; }
-    public bool IsSavedByUser { get; set; }
 }

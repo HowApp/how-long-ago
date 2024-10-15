@@ -3,7 +3,6 @@ namespace How.Core.Services.Public.PublicEvent;
 using Common.ResultType;
 using CQRS.Queries.Public.Event.GetEventById;
 using CQRS.Queries.Public.Event.GetEventsPaginationPublic;
-using CurrentUser;
 using DTO.Public.Event;
 using DTO.Models;
 using MediatR;
@@ -13,16 +12,13 @@ public class PublicEventService : IPublicEventService
 {
     private readonly ILogger<PublicEventService> _logger;
     private readonly ISender _sender;
-    private readonly ICurrentUserService _userService;
 
     public PublicEventService(
         ILogger<PublicEventService> logger,
-        ISender sender,
-        ICurrentUserService userService)
+        ISender sender)
     {
         _logger = logger;
         _sender = sender;
-        _userService = userService;
     }
 
     public async Task<Result<GetEventsPaginationPublicResponseDTO>> GetEventsPagination(
@@ -32,7 +28,6 @@ public class PublicEventService : IPublicEventService
         {
             var query = new GetEventsPaginationPublicQuery
             {
-                CurrentUserId = _userService.UserId,
                 Offset = (publicRequest.Page - 1) * publicRequest.Size,
                 Size = publicRequest.Size,
                 Search = publicRequest.Search
@@ -77,9 +72,7 @@ public class PublicEventService : IPublicEventService
                         CreatedAt = eventItem.CreatedAt,
                         Likes = eventItem.Likes,
                         Dislikes = eventItem.Dislikes,
-                        OwnLikeState = eventItem.OwnLikeState,
                         SavedCount = eventItem.SavedCount,
-                        IsSavedByUser = eventItem.IsSavedByUser,
                     });
             }
             
@@ -99,7 +92,6 @@ public class PublicEventService : IPublicEventService
         {
             var query = new GetEventPublicByIdQuery
             {
-                CurrentUserId = _userService.UserId,
                 EventId = eventId
             };
 
@@ -139,9 +131,7 @@ public class PublicEventService : IPublicEventService
                 CreatedAt = queryResult.Data.CreatedAt,
                 Likes = queryResult.Data.Likes,
                 Dislikes = queryResult.Data.Dislikes,
-                OwnLikeState = queryResult.Data.OwnLikeState,
-                SavedCount = queryResult.Data.SavedCount,
-                IsSavedByUser = queryResult.Data.IsSavedByUser
+                SavedCount = queryResult.Data.SavedCount
             };
 
             return new Result<GetEventPublicByIdResponseDTO>(result);

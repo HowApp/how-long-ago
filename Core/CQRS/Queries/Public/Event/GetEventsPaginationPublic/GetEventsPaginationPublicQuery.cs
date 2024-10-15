@@ -6,6 +6,5 @@ using Common.ResultType;
 
 public sealed class GetEventsPaginationPublicQuery : PaginationModel, IQuery<Result<GetEventsPaginationPublicQueryResult>>
 {
-    public int CurrentUserId { get; set; }
     public string Search { get; set; }
 }

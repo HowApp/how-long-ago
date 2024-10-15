@@ -1,6 +1,5 @@
 namespace How.Core.Models.Event;
 
-using Infrastructure.Enums;
 using NodaTime;
 
 public class EventItemPublicModel
@@ -17,7 +16,5 @@ public class EventItemPublicModel
     public string OwnerThumbnailHash { get; set; }
     public int Likes { get; set; }
     public int Dislikes { get; set; }
-    public LikeState OwnLikeState { get; set; }
     public int SavedCount { get; set; }
-    public bool IsSavedByUser { get; set; }
 }
