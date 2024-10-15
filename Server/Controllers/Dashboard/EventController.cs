@@ -78,7 +78,7 @@ public class EventController : BaseController
     [HttpGet]
     [SwaggerOperation("Get all Events list with pagination")]
     [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
-    [Route("api/dashboard/event/{eventId:int:min(1)}/all")]
+    [Route("api/dashboard/event/list-pagination/all")]
     public async Task<IActionResult> GetAllEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
         var result = await _eventService.GetEventsPagination(request, InternalAccessFilter.None);
