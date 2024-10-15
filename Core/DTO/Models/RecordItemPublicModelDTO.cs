@@ -1,9 +1,8 @@
 namespace How.Core.DTO.Models;
 
-using Infrastructure.Enums;
 using NodaTime;
 
-public class RecordItemModelDTO
+public class RecordItemPublicModelDTO
 {
     public int Id { get; set; }
     public string Description { get; set; }
@@ -11,5 +10,4 @@ public class RecordItemModelDTO
     public ICollection<ImageModelDTO> Images { get; set; } = new List<ImageModelDTO>();
     public int Likes { get; set; }
     public int Dislikes { get; set; }
-    public LikeState OwnLikeState { get; set; }
 }

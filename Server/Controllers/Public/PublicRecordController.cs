@@ -2,6 +2,7 @@ namespace How.Server.Controllers.Public;
 
 using Common.Constants;
 using Common.ResultType;
+using Core.DTO.Public.Record;
 using Core.DTO.Record;
 using Core.Services.Public.PublicRecord;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,7 @@ public class PublicRecordController : BaseController
 
     [HttpGet]
     [SwaggerOperation("Get Record list with pagination")]
-    [ProducesResponseType<Result<GetRecordsPaginationResponseDTO>>(200)]
+    [ProducesResponseType<Result<GetRecordsPaginationPublicResponseDTO>>(200)]
     [Route("api/public/event/{eventId:int:min(1)}/record/list-pagination")]
     public async Task<IActionResult> GetRecordsPagination(
         [FromRoute] int eventId,

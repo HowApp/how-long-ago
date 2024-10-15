@@ -31,12 +31,12 @@ public class GetRecordsPaginationQueryHandler : IQueryHandler<GetRecordsPaginati
         {
             var query = $@"
 SELECT 
-    r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemModelDTO.Id)},
-    r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemModelDTO.Description)},
-    r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemModelDTO.CreatedAt)},
-    user_likes.likes AS {nameof(RecordItemModelDTO.Likes)},
-    user_likes.dislikes AS {nameof(RecordItemModelDTO.Dislikes)},
-    user_likes.current_user_state AS {nameof(RecordItemModelDTO.OwnLikeState)},
+    r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemPrivateModelDTO.Id)},
+    r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemPrivateModelDTO.Description)},
+    r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemPrivateModelDTO.CreatedAt)},
+    user_likes.likes AS {nameof(RecordItemPrivateModelDTO.Likes)},
+    user_likes.dislikes AS {nameof(RecordItemPrivateModelDTO.Dislikes)},
+    user_likes.current_user_state AS {nameof(RecordItemPrivateModelDTO.OwnLikeState)},
     sf_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.MainHash)},
     sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)}
 FROM (
@@ -84,9 +84,9 @@ WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
                 return Result.Success(new GetRecordsPaginationResponseDTO());
             }
             
-            var recordDictionary = new Dictionary<int, RecordItemModelDTO>(count);
+            var recordDictionary = new Dictionary<int, RecordItemPrivateModelDTO>(count);
 
-            await connection.QueryAsync<RecordItemModelDTO, ImageModelDTO, RecordItemModelDTO>(
+            await connection.QueryAsync<RecordItemPrivateModelDTO, ImageModelDTO, RecordItemPrivateModelDTO>(
                 query,
                 (record, image) =>
                 {

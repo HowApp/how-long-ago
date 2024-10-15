@@ -3,7 +3,7 @@ namespace How.Core.Services.Public.PublicRecord;
 using Common.ResultType;
 using CQRS.Queries.General.CheckExistAccess;
 using CQRS.Queries.Public.Record.GetRecordsPaginationPublic;
-using CurrentUser;
+using DTO.Public.Record;
 using DTO.Record;
 using Infrastructure.Builders;
 using MediatR;
@@ -13,19 +13,16 @@ public class PublicRecordService : IPublicRecordService
 {
     private readonly ILogger<PublicRecordService> _logger;
     private readonly ISender _sender;
-    private readonly ICurrentUserService _userService;
 
     public PublicRecordService(
         ILogger<PublicRecordService> logger,
-        ISender sender,
-        ICurrentUserService userService)
+        ISender sender)
     {
         _logger = logger;
         _sender = sender;
-        _userService = userService;
     }
 
-    public async Task<Result<GetRecordsPaginationResponseDTO>> GetRecordsPagination(
+    public async Task<Result<GetRecordsPaginationPublicResponseDTO>> GetRecordsPagination(
         int eventId,
         GetRecordsPaginationRequestDTO request)
     {
@@ -40,18 +37,17 @@ public class PublicRecordService : IPublicRecordService
 
             if (eventExist.Failed)
             {
-                return Result.Failure<GetRecordsPaginationResponseDTO>(eventExist.Error);
+                return Result.Failure<GetRecordsPaginationPublicResponseDTO>(eventExist.Error);
             }
 
             if (!eventExist.Data)
             {
-                return Result.Failure<GetRecordsPaginationResponseDTO>(
+                return Result.Failure<GetRecordsPaginationPublicResponseDTO>(
                     new Error(ErrorType.Record, $"Event not found!"), 404);
             }
             
             var query = new GetRecordsPaginationPublicQuery
             {
-                CurrentUserId = _userService.UserId,
                 Offset = (request.Page - 1) * request.Size,
                 Size = request.Size,
                 EventId = eventId
@@ -61,10 +57,10 @@ public class PublicRecordService : IPublicRecordService
             
             if (queryResult.Failed)
             {
-                return Result.Failure<GetRecordsPaginationResponseDTO>(queryResult.Error);
+                return Result.Failure<GetRecordsPaginationPublicResponseDTO>(queryResult.Error);
             }
 
-            return new Result<GetRecordsPaginationResponseDTO>(new GetRecordsPaginationResponseDTO
+            return new Result<GetRecordsPaginationPublicResponseDTO>(new GetRecordsPaginationPublicResponseDTO
             {
                 Count = queryResult.Data.Count,
                 Records = queryResult.Data.Records
@@ -73,7 +69,7 @@ public class PublicRecordService : IPublicRecordService
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetRecordsPaginationResponseDTO>(
+            return Result.Failure<GetRecordsPaginationPublicResponseDTO>(
                 new Error(ErrorType.Record, $"Error at {nameof(GetRecordsPagination)}"));
         }
     }

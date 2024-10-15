@@ -3,10 +3,9 @@ namespace How.Core.CQRS.Queries.Public.Record.GetRecordsPaginationPublic;
 using Common.CQRS;
 using Common.Models;
 using Common.ResultType;
-using DTO.Record;
+using DTO.Public.Record;
 
-public sealed class GetRecordsPaginationPublicQuery : PaginationModel, IQuery<Result<GetRecordsPaginationResponseDTO>>
+public sealed class GetRecordsPaginationPublicQuery : PaginationModel, IQuery<Result<GetRecordsPaginationPublicResponseDTO>>
 {
-    public int CurrentUserId { get; set; }
     public int EventId { get; set; }
 }

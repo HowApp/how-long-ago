@@ -10,11 +10,11 @@ using Database.Entities.Event;
 using Database.Entities.Record;
 using Database.Entities.Storage;
 using DTO.Models;
-using DTO.Record;
+using DTO.Public.Record;
 using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 
-public class GetRecordsPaginationPublicQueryHandler : IQueryHandler<GetRecordsPaginationPublicQuery, Result<GetRecordsPaginationResponseDTO>>
+public class GetRecordsPaginationPublicQueryHandler : IQueryHandler<GetRecordsPaginationPublicQuery, Result<GetRecordsPaginationPublicResponseDTO>>
 {
     private readonly ILogger<GetRecordsPaginationPublicQueryHandler> _logger;
     private readonly DapperConnection _dapper;
@@ -25,7 +25,7 @@ public class GetRecordsPaginationPublicQueryHandler : IQueryHandler<GetRecordsPa
         _dapper = dapper;
     }
 
-    public async Task<Result<GetRecordsPaginationResponseDTO>> Handle(
+    public async Task<Result<GetRecordsPaginationPublicResponseDTO>> Handle(
         GetRecordsPaginationPublicQuery request,
         CancellationToken cancellationToken)
     {
@@ -33,12 +33,11 @@ public class GetRecordsPaginationPublicQueryHandler : IQueryHandler<GetRecordsPa
         {
             var query = $@"
 SELECT 
-    r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemModelDTO.Id)},
-    r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemModelDTO.Description)},
-    r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemModelDTO.CreatedAt)},
-    user_likes.likes AS {nameof(RecordItemModelDTO.Likes)},
-    user_likes.dislikes AS {nameof(RecordItemModelDTO.Dislikes)},
-    user_likes.current_user_state AS {nameof(RecordItemModelDTO.OwnLikeState)},
+    r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemPublicModelDTO.Id)},
+    r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemPublicModelDTO.Description)},
+    r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemPublicModelDTO.CreatedAt)},
+    user_likes.likes AS {nameof(RecordItemPublicModelDTO.Likes)},
+    user_likes.dislikes AS {nameof(RecordItemPublicModelDTO.Dislikes)},
     sf_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.MainHash)},
     sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)}
 FROM (
@@ -64,13 +63,9 @@ LEFT JOIN (
         SELECT 
             lr.{nameof(LikedRecord.RecordId).ToSnake()} AS liked_record_id,
             COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 2 THEN 1 END) AS likes,
-            COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 3 THEN 1 END) AS dislikes,
-            coalesce(lr_u.{nameof(LikedRecord.State).ToSnake()}, 1) AS current_user_state
+            COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 3 THEN 1 END) AS dislikes
         FROM {nameof(BaseDbContext.LikedRecords).ToSnake()} lr 
-        LEFT JOIN {nameof(BaseDbContext.LikedRecords).ToSnake()} lr_u ON 
-            lr_u.{nameof(LikedRecord.RecordId).ToSnake()} = lr.{nameof(LikedRecord.RecordId).ToSnake()} AND 
-            lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @created_by_id
-        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
+        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
 ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC;
 ";
 
@@ -99,12 +94,12 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
 
             if (count == 0)
             {
-                return Result.Success(new GetRecordsPaginationResponseDTO());
+                return Result.Success(new GetRecordsPaginationPublicResponseDTO());
             }
             
-            var recordDictionary = new Dictionary<int, RecordItemModelDTO>(count);
+            var recordDictionary = new Dictionary<int, RecordItemPublicModelDTO>(count);
 
-            await connection.QueryAsync<RecordItemModelDTO, ImageModelDTO, RecordItemModelDTO>(
+            await connection.QueryAsync<RecordItemPublicModelDTO, ImageModelDTO, RecordItemPublicModelDTO>(
                 query,
                 (record, image) =>
                 {
@@ -125,7 +120,6 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
                 },
                 param: new
                 {
-                    created_by_id = request.CurrentUserId,
                     status = (int)EventStatus.Active,
                     access = (int)EventAccessType.Public,
                     eventId = request.EventId,
@@ -134,7 +128,7 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
                 },
                 splitOn: $"id,{nameof(ImageModelDTO.MainHash)}");
 
-            return Result.Success(new GetRecordsPaginationResponseDTO
+            return Result.Success(new GetRecordsPaginationPublicResponseDTO
             {
                 Count = count,
                 Records = recordDictionary.Values.ToArray()
@@ -143,7 +137,7 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-            return Result.Failure<GetRecordsPaginationResponseDTO>(
+            return Result.Failure<GetRecordsPaginationPublicResponseDTO>(
                 new Error(ErrorType.Record, $"Error while executing {nameof(GetRecordsPaginationPublicQuery)}"));
         }
     }
