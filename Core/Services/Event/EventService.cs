@@ -372,7 +372,9 @@ public class EventService : IEventService
 
     public async Task<Result<GetEventByIdResponseDTO>> GetEventById(
         int eventId,
-        InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy)
+        InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy,
+        EventStatusFilter status = EventStatusFilter.None,
+        EventAccessFilter access = EventAccessFilter.None)
     {
         try
         {
@@ -380,6 +382,8 @@ public class EventService : IEventService
             {
                 CurrentUserId = _userService.UserId,
                 EventId = eventId,
+                Status = status,
+                Access = access,
                 InternalAccessFilter = internalAccessFilter
             };
 

@@ -32,13 +32,8 @@ public class GetEventByIdQueryHandler : IQueryHandler<GetEventByIdQuery, Result<
 
             switch (request.InternalAccessFilter)
             {
-                case InternalAccessFilter.None:
-                    innerFilter = $@"
-true";
-                    break;
                 case InternalAccessFilter.IncludeCreatedBy:
-                    innerFilter = $@"
-e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
+                    innerFilter = $@"e.{nameof(Event.OwnerId).ToSnake()} = @created_by_id";
                     break;
                 case InternalAccessFilter.IncludeShared:
                     innerFilter = $@"
@@ -53,8 +48,29 @@ EXISTS(
         su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)";
                     break;
                 default:
-                    innerFilter = $@"
-true";
+                    innerFilter = $@"true";
+                    break;
+            }
+            
+            var innerStatusFilter = string.Empty;
+            switch (request.Status)
+            {
+                case EventStatusFilter.None:
+                    innerStatusFilter = $@"true";
+                    break;
+                default:
+                    innerStatusFilter = $@"e.{nameof(Event.Status).ToSnake()} = {(int)request.Status}";
+                    break;
+            }
+            
+            var innerAccessFilter = string.Empty;
+            switch (request.Access)
+            {
+                case EventAccessFilter.None:
+                    innerAccessFilter = $@"true";
+                    break;
+                default:
+                    innerAccessFilter = $@"e.{nameof(Event.Access).ToSnake()} = {(int)request.Status}";
                     break;
             }
             
@@ -122,6 +138,10 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @EventId
     e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
     AND
     ({innerFilter})
+    AND
+    ({innerStatusFilter})
+    AND
+    ({innerAccessFilter})
 LIMIT 1;
 ";
             
@@ -132,7 +152,7 @@ LIMIT 1;
                 new
                 {
                     created_by_id = request.CurrentUserId,
-                    EventId = request.EventId,
+                    EventId = request.EventId
                 });
             
             return Result.Success(eventItem);

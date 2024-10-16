@@ -17,7 +17,9 @@ public interface IEventService
         InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy);
     Task<Result<GetEventByIdResponseDTO>> GetEventById(
         int eventId,
-        InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy);
+        InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy,
+        EventStatusFilter status = EventStatusFilter.None,
+        EventAccessFilter access = EventAccessFilter.None);
     Task<Result> DeleteEvent(int eventId);
     Task<Result> AddEventToSaved(int eventId);
     Task<Result> DeleteEventFromSaved(int eventId);

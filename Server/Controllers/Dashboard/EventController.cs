@@ -76,12 +76,27 @@ public class EventController : BaseController
     }
     
     [HttpGet]
-    [SwaggerOperation("Get all Events list with pagination")]
+    [SwaggerOperation("Get public active Events list with pagination")]
     [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
-    [Route("api/dashboard/event/list-pagination/all")]
-    public async Task<IActionResult> GetAllEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
+    [Route("api/dashboard/event/list-pagination/public-active")]
+    public async Task<IActionResult> GetPublicActiveEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
         var result = await _eventService.GetEventsPagination(request, InternalAccessFilter.None);
+
+        return HttpResult(result);
+    }
+    
+    [HttpGet]
+    [SwaggerOperation("Get public active Event by ID")]
+    [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/public-active")]
+    public async Task<IActionResult> GetPublicActiveEventById([FromRoute] int eventId)
+    {
+        var result = await _eventService.GetEventById(
+            eventId,
+            InternalAccessFilter.None,
+            EventStatusFilter.Active,
+            EventAccessFilter.Public);
 
         return HttpResult(result);
     }
