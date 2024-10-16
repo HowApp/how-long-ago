@@ -394,6 +394,11 @@ public class EventService : IEventService
                 return Result.Failure<GetEventByIdResponseDTO>(queryResult.Error);
             }
 
+            if (queryResult.Data is null)
+            {
+                return Result.Failure<GetEventByIdResponseDTO>(new Error(ErrorType.Event, "Event not found!"));
+            }
+            
             var result = new GetEventByIdResponseDTO
                 {
                     Id = queryResult.Data.Id,

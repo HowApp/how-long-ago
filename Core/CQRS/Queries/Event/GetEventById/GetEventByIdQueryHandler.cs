@@ -70,7 +70,7 @@ EXISTS(
                     innerAccessFilter = $@"true";
                     break;
                 default:
-                    innerAccessFilter = $@"e.{nameof(Event.Access).ToSnake()} = {(int)request.Status}";
+                    innerAccessFilter = $@"e.{nameof(Event.Access).ToSnake()} = {(int)request.Access}";
                     break;
             }
             
