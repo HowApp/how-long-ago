@@ -81,7 +81,6 @@ public class EventController : BaseController
     [Route("api/dashboard/event/list-pagination/public-active")]
     public async Task<IActionResult> GetPublicActiveEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
     {
-        // TODO fix access and status state
         var result = await _eventService.GetEventsPagination(request, InternalAccessFilter.None);
 
         return HttpResult(result);
