@@ -24,7 +24,7 @@ public class Program
         using (var scope = serviceScopeFactory!.CreateScope())
         {
             var temporaryDbContext = scope.ServiceProvider.GetRequiredService<TemporaryStorageDbContext>();
-            await temporaryDbContext!.Database.EnsureCreatedAsync();
+            await temporaryDbContext!.Database.MigrateAsync();
             await temporaryDbContext!.Database.ExecuteSqlAsync(sql: $"TRUNCATE TABLE temporary.files RESTART IDENTITY;");
 
             var dbContext = scope.ServiceProvider.GetRequiredService<BaseDbContext>();
