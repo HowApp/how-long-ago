@@ -22,8 +22,10 @@ using Core.Services.SharedUser;
 using Dapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hosting;
 using Hosting.Filters;
 using MediatR.NotificationPublishers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -58,7 +60,9 @@ public static class ServiceCollectionExtensions
             options.Filters.Add<ModelStateValidationFilter>();
             options.Filters.Add<ExceptionFilter>();
         }).AddJsonOptions(s => s.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
-        
+
+        services.AddHttpContextAccessor();
+
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
@@ -76,12 +80,45 @@ public static class ServiceCollectionExtensions
         
         services.AddDataAccess(configuration)
             .AddConfigurations(configuration)
+            .AddCustomServices()
+            .AddCustomAuthentication(configuration)
             .AddSwagger()
             .AddSignalR();
         
         return services;
     }
 
+    private static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        var identityServerConfiguration = new IdentityServerConfiguration();
+        configuration.Bind(nameof(IdentityServerConfiguration), identityServerConfiguration);
+        
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                // base-address of identity server
+                options.Authority = identityServerConfiguration.Authority;
+                options.Audience = identityServerConfiguration.Audience;
+        
+                options.TokenValidationParameters.ValidateAudience = true;
+        
+                // it's recommended to check the type header to avoid "JWT confusion" attacks
+                options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
+                options.MapInboundClaims = false;
+        
+                // if token does not contain a dot, it is a reference token
+                options.ForwardDefaultSelector = Selector.ForwardReferenceToken("introspection");
+            })
+            .AddOAuth2Introspection("introspection", options =>
+            {
+                options.Authority = identityServerConfiguration.Authority;
+        
+                options.ClientId = identityServerConfiguration.ClientId;
+                options.ClientSecret = identityServerConfiguration.ClientSecret;
+            });
+        
+        return services;
+    }
     private static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? 
@@ -172,6 +209,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    // TODO add identity server auth to swagger
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     private static IServiceCollection AddSwagger(this IServiceCollection services)
     {

@@ -35,7 +35,7 @@ SELECT
     e.{nameof(Event.CreatedAt).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.CreatedAt)},
     event_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.EventMainHash)},
     event_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.EventThumbnailHash)},
-    u.{nameof(PKey.Id).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerId)},
+    u.{nameof(HowUser.UserId).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerId)},
     u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerFirstName)},
     u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerLastName)},
     user_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetEventPublicByIdQueryResult.OwnerMainHash)},
@@ -51,7 +51,7 @@ LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} event_main ON
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} event_thumbnail ON 
     event_image.{nameof(StorageImage.ThumbnailId).ToSnake()} = event_thumbnail.{nameof(PKey.Id).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.Users).ToSnake()} u ON 
-    e.{nameof(Event.OwnerId).ToSnake()} = u.{nameof(PKey.Id).ToSnake()}
+    e.{nameof(Event.OwnerId).ToSnake()} = u.{nameof(HowUser.UserId).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} user_image ON 
     u.{nameof(HowUser.StorageImageId).ToSnake()} = user_image.{nameof(PKey.Id).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} user_main ON 
