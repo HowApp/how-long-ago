@@ -4,7 +4,6 @@ using Common.Configurations;
 using Common.Constants;
 using Core;
 using Core.Database;
-using Core.Database.Entities.Identity;
 using Core.Infrastructure.Background.BackgroundTaskQueue;
 using Core.Infrastructure.Background.Workers;
 using Core.Infrastructure.NpgsqlExtensions;
@@ -25,7 +24,6 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hosting.Filters;
 using MediatR.NotificationPublishers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -78,10 +76,7 @@ public static class ServiceCollectionExtensions
         
         services.AddDataAccess(configuration)
             .AddConfigurations(configuration)
-            .AddIdentity()
-            .AddCustomServices()
             .AddSwagger()
-            .AddCookies()
             .AddSignalR();
         
         return services;
@@ -210,53 +205,6 @@ public static class ServiceCollectionExtensions
                 Description = "How Public",
                 Version = SwaggerDocConstants.Public,
             });
-        });
-
-        return services;
-    }
-
-    private static IServiceCollection AddIdentity(this IServiceCollection services)
-    {
-        services.AddIdentity<HowUser, HowRole>()
-            .AddEntityFrameworkStores<BaseDbContext>();
-
-        services.Configure<IdentityOptions>(o =>
-        {
-            // Password settings.
-            o.Password.RequireDigit = true;
-            o.Password.RequireLowercase = true;
-            o.Password.RequireNonAlphanumeric = true;
-            o.Password.RequireUppercase = true;
-            o.Password.RequiredLength = 8;
-            o.Password.RequiredUniqueChars = 4;
-            
-            // Lockout settings.
-            o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            o.Lockout.MaxFailedAccessAttempts = 5;
-            o.Lockout.AllowedForNewUsers = true;
-            
-            // User settings.
-            o.User.AllowedUserNameCharacters =
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            o.User.RequireUniqueEmail = true;
-        });
-
-        return services;
-    }
-
-    private static IServiceCollection AddCookies(this IServiceCollection services)
-    {
-        services.ConfigureApplicationCookie(o =>
-        {
-            // Cookie settings
-            o.Cookie.HttpOnly = false;
-            o.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-
-            o.Events.OnRedirectToLogin = context =>
-            {
-                context.Response.StatusCode = 401;
-                return Task.CompletedTask;
-            };
         });
 
         return services;

@@ -135,7 +135,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
 
             if (!commandResult.Data.Any())
             {
-                RollBackImageProcessing();
+                await RollBackImageProcessing();
                 
                 _logger.LogError("Record Images not created!");
                 await _fileProcessing.NotifyUser(userId, "Record Images not created!");

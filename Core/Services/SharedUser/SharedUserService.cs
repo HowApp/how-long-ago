@@ -103,7 +103,6 @@ public class SharedUserService : ISharedUserService
                 Id = r.Id,
                 FirstName = r.FirstName,
                 LastName = r.LastName,
-                UserName = r.UserName,
                 Image = new ImageModelDTO
                 {
                     MainHash = r.MainHash,

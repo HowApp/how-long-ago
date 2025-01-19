@@ -32,11 +32,11 @@ public class UpdateUserImageCommandHandler : ICommandHandler<UpdateUserImageComm
             var updateImageSql = $@"
 UPDATE {nameof(BaseDbContext.Users).ToSnake()}
 SET {nameof(HowUser.StorageImageId).ToSnake()} = @imageId
-WHERE {nameof(HowUser.Id).ToSnake()} = @userId
+WHERE {nameof(HowUser.UserId).ToSnake()} = @userId
 RETURNING (
     SELECT coalesce(u.{nameof(HowUser.StorageImageId).ToSnake()}, 0) 
     FROM {nameof(BaseDbContext.Users).ToSnake()} u 
-    WHERE u.{nameof(HowUser.Id).ToSnake()} = @userId);
+    WHERE u.{nameof(HowUser.UserId).ToSnake()} = @userId);
 ";
             
             var oldImageId = await connection.QueryFirstOrDefaultAsync<int>(

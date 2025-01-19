@@ -28,7 +28,7 @@ UPDATE {nameof(BaseDbContext.Users).ToSnake()}
 SET 
     {nameof(HowUser.FirstName).ToSnake()} = @first_name,
     {nameof(HowUser.LastName).ToSnake()} = @last_name
-WHERE {nameof(HowUser.Id).ToSnake()} = @userId
+WHERE {nameof(HowUser.UserId).ToSnake()} = @userId
 RETURNING *;
 ";
             await using var connection = _dapper.InitConnection();

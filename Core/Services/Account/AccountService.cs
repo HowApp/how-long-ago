@@ -92,7 +92,6 @@ public class AccountService : IAccountService
                 Id = r.Id,
                 FirstName = r.FirstName,
                 LastName = r.LastName,
-                UserName = r.UserName,
                 Image = new ImageModelDTO
                 {
                     MainHash = r.MainHash,

@@ -4,7 +4,6 @@ using System.Globalization;
 using Entities.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.NameTranslation;
-using Seeds;
 
 public static class ModelBuilderExtensions
 {
@@ -71,65 +70,6 @@ public static class ModelBuilderExtensions
         modelBuilder.Entity<HowUser>(b =>
         {
             b.ToTable("Users");
-        });
-
-        modelBuilder.Entity<HowUserClaim>(b =>
-        {
-            b.ToTable("UserClaims");
-        });
-
-        modelBuilder.Entity<HowUserLogin>(b =>
-        {
-            b.ToTable("UserLogins");
-        });
-
-        modelBuilder.Entity<HowUserToken>(b =>
-        {
-            b.ToTable("UserTokens");
-        });
-
-        modelBuilder.Entity<HowRole>(b =>
-        {
-            b.ToTable("Roles");
-        });
-
-        modelBuilder.Entity<HowRoleClaim>(b =>
-        {
-            b.ToTable("RoleClaims");
-        });
-
-        modelBuilder.Entity<HowUserRole>(b =>
-        {
-            b.ToTable("UserRoles");
-        });
-    }
-
-    public static void SetIdentityRule(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.SeedRoles();
-        
-        modelBuilder.Entity<HowUser>(b =>
-        {
-            // Each User can have many entries in the UserRole join table
-            b.HasMany(e => e.UserRoles)
-                .WithOne(e => e.User)
-                .HasForeignKey(ur => ur.UserId)
-                .IsRequired();
-        });
-        
-        modelBuilder.Entity<HowRole>(b =>
-        {
-            // Each Role can have many entries in the UserRole join table
-            b.HasMany(e => e.UserRoles)
-                .WithOne(e => e.Role)
-                .HasForeignKey(ur => ur.RoleId)
-                .IsRequired();
-        });
-        
-        modelBuilder.Entity<HowUserRole>(b =>
-        {
-            // Primary key
-            b.HasKey(r => new { r.UserId, r.RoleId });
         });
     }
 }

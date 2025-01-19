@@ -1,39 +1,19 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace How.Server.Migrations.PublicSchema
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "public");
-
-            migrationBuilder.CreateTable(
-                name: "roles",
-                schema: "public",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:IdentitySequenceOptions", "'3', '1', '', '', 'False', '1'")
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    normalized_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    concurrency_stamp = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_roles", x => x.id);
-                });
 
             migrationBuilder.CreateTable(
                 name: "storage_files",
@@ -52,29 +32,6 @@ namespace How.Server.Migrations.PublicSchema
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_storage_files", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "role_claims",
-                schema: "public",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    role_id = table.Column<int>(type: "integer", nullable: false),
-                    claim_type = table.Column<string>(type: "text", nullable: true),
-                    claim_value = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_role_claims", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_role_claims_roles_role_id",
-                        column: x => x.role_id,
-                        principalSchema: "public",
-                        principalTable: "roles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,29 +72,17 @@ namespace How.Server.Migrations.PublicSchema
                 schema: "public",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
+                    user_id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     first_name = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     last_name = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    storage_image_id = table.Column<int>(type: "integer", nullable: true),
-                    user_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    normalized_user_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    normalized_email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    email_confirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    password_hash = table.Column<string>(type: "text", nullable: true),
-                    security_stamp = table.Column<string>(type: "text", nullable: true),
-                    concurrency_stamp = table.Column<string>(type: "text", nullable: true),
-                    phone_number = table.Column<string>(type: "text", nullable: true),
-                    phone_number_confirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    two_factor_enabled = table.Column<bool>(type: "boolean", nullable: false),
-                    lockout_end = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    lockout_enabled = table.Column<bool>(type: "boolean", nullable: false),
-                    access_failed_count = table.Column<int>(type: "integer", nullable: false)
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    is_suspended = table.Column<bool>(type: "boolean", nullable: false),
+                    storage_image_id = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_users", x => x.id);
+                    table.PrimaryKey("pk_users", x => x.user_id);
                     table.ForeignKey(
                         name: "fk_users_storage_images_storage_image_id",
                         column: x => x.storage_image_id,
@@ -178,7 +123,7 @@ namespace How.Server.Migrations.PublicSchema
                         column: x => x.owner_id,
                         principalSchema: "public",
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -200,108 +145,14 @@ namespace How.Server.Migrations.PublicSchema
                         column: x => x.user_owner_id,
                         principalSchema: "public",
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "fk_shared_users_users_user_shared_id",
                         column: x => x.user_shared_id,
                         principalSchema: "public",
                         principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "user_claims",
-                schema: "public",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    claim_type = table.Column<string>(type: "text", nullable: true),
-                    claim_value = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_user_claims", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_user_claims_users_user_id",
-                        column: x => x.user_id,
-                        principalSchema: "public",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "user_logins",
-                schema: "public",
-                columns: table => new
-                {
-                    login_provider = table.Column<string>(type: "text", nullable: false),
-                    provider_key = table.Column<string>(type: "text", nullable: false),
-                    provider_display_name = table.Column<string>(type: "text", nullable: true),
-                    user_id = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_user_logins", x => new { x.login_provider, x.provider_key });
-                    table.ForeignKey(
-                        name: "fk_user_logins_users_user_id",
-                        column: x => x.user_id,
-                        principalSchema: "public",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "user_roles",
-                schema: "public",
-                columns: table => new
-                {
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    role_id = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_user_roles", x => new { x.user_id, x.role_id });
-                    table.ForeignKey(
-                        name: "fk_user_roles_roles_role_id",
-                        column: x => x.role_id,
-                        principalSchema: "public",
-                        principalTable: "roles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_user_roles_users_user_id",
-                        column: x => x.user_id,
-                        principalSchema: "public",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "user_tokens",
-                schema: "public",
-                columns: table => new
-                {
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    login_provider = table.Column<string>(type: "text", nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    value = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_user_tokens", x => new { x.user_id, x.login_provider, x.name });
-                    table.ForeignKey(
-                        name: "fk_user_tokens_users_user_id",
-                        column: x => x.user_id,
-                        principalSchema: "public",
-                        principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -329,7 +180,7 @@ namespace How.Server.Migrations.PublicSchema
                         column: x => x.liked_by_user_id,
                         principalSchema: "public",
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -380,7 +231,7 @@ namespace How.Server.Migrations.PublicSchema
                         column: x => x.user_id,
                         principalSchema: "public",
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -408,7 +259,7 @@ namespace How.Server.Migrations.PublicSchema
                         column: x => x.liked_by_user_id,
                         principalSchema: "public",
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -440,16 +291,6 @@ namespace How.Server.Migrations.PublicSchema
                         principalTable: "storage_images",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.InsertData(
-                schema: "public",
-                table: "roles",
-                columns: new[] { "id", "concurrency_stamp", "name", "normalized_name" },
-                values: new object[,]
-                {
-                    { 1, "88d484e2-ee7a-49b8-95e6-e34qw5rqb625", "User", "USER" },
-                    { 2, "8b6258e2-ee7a-49b8-95e6-e34qw5rqd484", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -511,19 +352,6 @@ namespace How.Server.Migrations.PublicSchema
                 column: "event_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_role_claims_role_id",
-                schema: "public",
-                table: "role_claims",
-                column: "role_id");
-
-            migrationBuilder.CreateIndex(
-                name: "role_name_index",
-                schema: "public",
-                table: "roles",
-                column: "normalized_name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "ix_saved_events_event_id_user_id",
                 schema: "public",
                 table: "saved_events",
@@ -578,40 +406,16 @@ namespace How.Server.Migrations.PublicSchema
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_user_claims_user_id",
-                schema: "public",
-                table: "user_claims",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_user_logins_user_id",
-                schema: "public",
-                table: "user_logins",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_user_roles_role_id",
-                schema: "public",
-                table: "user_roles",
-                column: "role_id");
-
-            migrationBuilder.CreateIndex(
-                name: "email_index",
-                schema: "public",
-                table: "users",
-                column: "normalized_email");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_users_storage_image_id",
                 schema: "public",
                 table: "users",
                 column: "storage_image_id");
 
             migrationBuilder.CreateIndex(
-                name: "user_name_index",
+                name: "ix_users_user_id",
                 schema: "public",
                 table: "users",
-                column: "normalized_user_name",
+                column: "user_id",
                 unique: true);
         }
 
@@ -631,10 +435,6 @@ namespace How.Server.Migrations.PublicSchema
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "role_claims",
-                schema: "public");
-
-            migrationBuilder.DropTable(
                 name: "saved_events",
                 schema: "public");
 
@@ -643,27 +443,7 @@ namespace How.Server.Migrations.PublicSchema
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "user_claims",
-                schema: "public");
-
-            migrationBuilder.DropTable(
-                name: "user_logins",
-                schema: "public");
-
-            migrationBuilder.DropTable(
-                name: "user_roles",
-                schema: "public");
-
-            migrationBuilder.DropTable(
-                name: "user_tokens",
-                schema: "public");
-
-            migrationBuilder.DropTable(
                 name: "records",
-                schema: "public");
-
-            migrationBuilder.DropTable(
-                name: "roles",
                 schema: "public");
 
             migrationBuilder.DropTable(

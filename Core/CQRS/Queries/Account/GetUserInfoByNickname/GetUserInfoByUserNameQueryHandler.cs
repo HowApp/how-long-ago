@@ -28,17 +28,16 @@ public class GetUserInfoByUserNameQueryHandler : IQueryHandler<GetUserInfoByUser
         {
             var query = $@"
 SELECT 
-    u.{nameof(HowUser.Id).ToSnake()} AS {nameof(GetUserInfoByUserNameQueryResult.Id)},
+    u.{nameof(HowUser.UserId).ToSnake()} AS {nameof(GetUserInfoByUserNameQueryResult.Id)},
     u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(GetUserInfoByUserNameQueryResult.FirstName)},
     u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(GetUserInfoByUserNameQueryResult.LastName)},
-    u.{nameof(HowUser.UserName).ToSnake()} AS {nameof(GetUserInfoByUserNameQueryResult.UserName)},
     main_image.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetUserInfoByUserNameQueryResult.MainHash)},
     thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetUserInfoByUserNameQueryResult.ThumbnailHash)}
 FROM {nameof(BaseDbContext.Users).ToSnake()} u
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON u.{nameof(HowUser.StorageImageId).ToSnake()} = si.id
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} main_image ON main_image.id = si.{nameof(StorageImage.MainId).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} thumbnail on thumbnail.id = si.{nameof(StorageImage.ThumbnailId).ToSnake()}
-WHERE u.{nameof(HowUser.UserName).ToSnake()} ILIKE '%' || @search || '%'
+WHERE u.{nameof(HowUser.FirstName).ToSnake()} || u.{nameof(HowUser.LastName).ToSnake()} ILIKE '%' || @search || '%'
 LIMIT 50;
 ";
 

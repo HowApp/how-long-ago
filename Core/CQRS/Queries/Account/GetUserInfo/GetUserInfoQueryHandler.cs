@@ -26,7 +26,7 @@ public class GetUserInfoQueryHandler : IQueryHandler<GetUserInfoQuery, Result<Ge
         {
            var query = $@"
 SELECT 
-    u.{nameof(HowUser.Id).ToSnake()} AS {nameof(GetUserInfoQueryResult.Id)},
+    u.{nameof(HowUser.UserId).ToSnake()} AS {nameof(GetUserInfoQueryResult.Id)},
     u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(GetUserInfoQueryResult.FirstName)},
     u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(GetUserInfoQueryResult.LastName)},
     main_image.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetUserInfoQueryResult.MainHash)},
@@ -35,7 +35,7 @@ FROM {nameof(BaseDbContext.Users).ToSnake()} u
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON u.{nameof(HowUser.StorageImageId).ToSnake()} = si.id
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} main_image ON main_image.id = si.{nameof(StorageImage.MainId).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} thumbnail on thumbnail.id = si.{nameof(StorageImage.ThumbnailId).ToSnake()}
-WHERE u.{nameof(HowUser.Id).ToSnake()} = @userId
+WHERE u.{nameof(HowUser.UserId).ToSnake()} = @userId
 LIMIT 1
 ";
 

@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\PublicSchema\" />
     <Folder Include="Migrations\TemporarySchema\" />
   </ItemGroup>
 

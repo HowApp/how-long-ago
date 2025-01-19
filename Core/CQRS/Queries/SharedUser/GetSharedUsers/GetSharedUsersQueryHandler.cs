@@ -29,10 +29,9 @@ public class GetSharedUsersQueryHandler : IQueryHandler<GetSharedUsersQuery, Res
         {
             var query = $@"
 SELECT 
-    u.{nameof(HowUser.Id).ToSnake()} AS {nameof(GetSharedUsersQueryResult.Id)},
+    u.{nameof(HowUser.UserId).ToSnake()} AS {nameof(GetSharedUsersQueryResult.Id)},
     u.{nameof(HowUser.FirstName).ToSnake()} AS {nameof(GetSharedUsersQueryResult.FirstName)},
     u.{nameof(HowUser.LastName).ToSnake()} AS {nameof(GetSharedUsersQueryResult.LastName)},
-    u.{nameof(HowUser.UserName).ToSnake()} AS {nameof(GetSharedUsersQueryResult.UserName)},
     main_image.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetSharedUsersQueryResult.MainHash)},
     thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(GetSharedUsersQueryResult.ThumbnailHash)}
 FROM {nameof(BaseDbContext.Users).ToSnake()} u

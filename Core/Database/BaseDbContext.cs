@@ -7,23 +7,15 @@ using Entities.Identity;
 using Entities.Record;
 using Entities.SharedUser;
 using Extensions;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-public class BaseDbContext : IdentityDbContext<
-    HowUser, 
-    HowRole, 
-    int, 
-    HowUserClaim, 
-    HowUserRole, 
-    HowUserLogin, 
-    HowRoleClaim, 
-    HowUserToken>
+public class BaseDbContext : DbContext
 {
     public BaseDbContext(DbContextOptions<BaseDbContext> options) : base(options)
     {
     }
 
+    public DbSet<HowUser> Users { get; set; }
     public DbSet<StorageFile> StorageFiles { get; set; }
     public DbSet<StorageImage> StorageImages { get; set; }
 
@@ -43,7 +35,6 @@ public class BaseDbContext : IdentityDbContext<
         modelBuilder.HasDefaultSchema("public");
 
         modelBuilder.SetIdentityName();
-        modelBuilder.SetIdentityRule();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseDbContext).Assembly);
         modelBuilder.SetOnDeleteRule();
         modelBuilder.UseSnakeCaseNamingConvention();
