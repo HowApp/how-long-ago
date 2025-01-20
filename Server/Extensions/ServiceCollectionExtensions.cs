@@ -243,6 +243,35 @@ public static class ServiceCollectionExtensions
                 Description = "How Public",
                 Version = SwaggerDocConstants.Public,
             });
+
+            g.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,
+                new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri("https://localhost:5001/connect/authorize"),
+                            TokenUrl = new Uri("https://localhost:5001/connect/token"),
+                        }
+                    }   
+                });
+
+            g.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    [
+                        new OpenApiSecurityScheme 
+                        {
+                            Reference = new OpenApiReference 
+                            {
+                                Type = ReferenceType.SecurityScheme, 
+                                Id = "oauth2"}
+                            }
+                    ] = []
+                });
+
+            g.OperationFilter<AuthorizeCheckOperationFilter>();
         });
 
         return services;

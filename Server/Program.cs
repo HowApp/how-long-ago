@@ -44,6 +44,9 @@ public class Program
                 s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Identity}/swagger.json", SwaggerDocConstants.Identity);
                 s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Dashboard}/swagger.json", SwaggerDocConstants.Dashboard);
                 s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Public}/swagger.json", SwaggerDocConstants.Public);
+
+                s.OAuthClientId("how-api-swagger-client");
+                s.OAuthUsePkce();
             });
         }
         else
