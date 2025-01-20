@@ -1,9 +1,9 @@
-using System;
+namespace How.Server.Hosting.Filters;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-
-namespace How.Server.Hosting.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 public class AuthorizeCheckOperationFilter : IOperationFilter
 {
@@ -26,7 +26,7 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
                         new OpenApiSecurityScheme {Reference = new OpenApiReference 
                         {
                             Type = ReferenceType.SecurityScheme, 
-                            Id = "oauth2"}
+                            Id = JwtBearerDefaults.AuthenticationScheme}
                         }
                     ] = []
                 }

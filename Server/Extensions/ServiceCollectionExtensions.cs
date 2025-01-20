@@ -247,6 +247,7 @@ public static class ServiceCollectionExtensions
             g.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme,
                 new OpenApiSecurityScheme
                 {
+                    Name = "How API Swagger Client",
                     Type = SecuritySchemeType.OAuth2,
                     Flows = new OpenApiOAuthFlows
                     {
@@ -254,21 +255,12 @@ public static class ServiceCollectionExtensions
                         {
                             AuthorizationUrl = new Uri("https://localhost:5001/connect/authorize"),
                             TokenUrl = new Uri("https://localhost:5001/connect/token"),
+                            Scopes = new Dictionary<string, string> 
+                            {
+                                {"scope.how-api", "How API"},
+                            }
                         }
                     }   
-                });
-
-            g.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    [
-                        new OpenApiSecurityScheme 
-                        {
-                            Reference = new OpenApiReference 
-                            {
-                                Type = ReferenceType.SecurityScheme, 
-                                Id = "oauth2"}
-                            }
-                    ] = []
                 });
 
             g.OperationFilter<AuthorizeCheckOperationFilter>();

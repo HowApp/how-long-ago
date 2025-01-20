@@ -46,6 +46,8 @@ public class Program
                 s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Public}/swagger.json", SwaggerDocConstants.Public);
 
                 s.OAuthClientId("how-api-swagger-client");
+                // s.OAuthScopes(new[]{"scope.how-api"}); //add scope by default every login request
+                s.OAuthClientSecret(app.Configuration.GetSection("IdentityServerConfiguration:ClientSwaggerSecret").Value);
                 s.OAuthUsePkce();
             });
         }
