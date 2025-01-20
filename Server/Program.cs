@@ -23,12 +23,12 @@ public class Program
         var serviceScopeFactory = app.Services.GetService<IServiceScopeFactory>();
         using (var scope = serviceScopeFactory!.CreateScope())
         {
+            var dbContext = scope.ServiceProvider.GetRequiredService<BaseDbContext>();
+            await dbContext!.Database.MigrateAsync();
+
             var temporaryDbContext = scope.ServiceProvider.GetRequiredService<TemporaryStorageDbContext>();
             await temporaryDbContext!.Database.MigrateAsync();
             await temporaryDbContext!.Database.ExecuteSqlAsync(sql: $"TRUNCATE TABLE temporary.files RESTART IDENTITY;");
-
-            var dbContext = scope.ServiceProvider.GetRequiredService<BaseDbContext>();
-            await dbContext!.Database.MigrateAsync();
 
             var adminCredentials = scope.ServiceProvider.GetService<IOptions<AdminCredentials>>();
             await SeedAdmin.Seed(scope.ServiceProvider, adminCredentials!.Value);
