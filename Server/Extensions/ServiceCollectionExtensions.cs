@@ -6,6 +6,7 @@ using Core;
 using Core.Database;
 using Core.Infrastructure.Background.BackgroundTaskQueue;
 using Core.Infrastructure.Background.Workers;
+using Core.Infrastructure.MassTransit.Consumer;
 using Core.Infrastructure.NpgsqlExtensions;
 using Core.Services.Identity;
 using Core.Services.CurrentUser;
@@ -24,6 +25,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hosting;
 using Hosting.Filters;
+using MassTransit;
 using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -81,6 +83,7 @@ public static class ServiceCollectionExtensions
         services.AddDataAccess(configuration)
             .AddConfigurations(configuration)
             .AddCustomServices()
+            .ConfigureMassTransit(configuration)
             .AddCustomAuthentication(configuration)
             .AddSwagger()
             .AddSignalR();
@@ -88,6 +91,43 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    private static IServiceCollection ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration)
+    {
+        var rabbitMq = new RabbitMqConfiguration();
+        configuration.Bind(nameof(RabbitMqConfiguration), rabbitMq);
+        
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumer<UserCreatedConsumer>();
+            
+            x.UsingRabbitMq((context, config) =>
+            {
+                config.Host(rabbitMq.Host, "/", host =>
+                {
+                    host.Username(rabbitMq.User);
+                    host.Password(rabbitMq.Password);
+                });
+                config.ConfigureEndpoints(context);
+            });
+        });
+
+        services.AddOptions<MassTransitHostOptions>()
+            .Configure(options =>
+            {
+                options.WaitUntilStarted = true;
+                options.StartTimeout = TimeSpan.FromSeconds(15);
+                options.StopTimeout = TimeSpan.FromSeconds(30);
+            });
+        
+        services.AddOptions<HostOptions>()
+            .Configure(options =>
+            {
+                options.StartupTimeout = TimeSpan.FromSeconds(30);
+                options.ShutdownTimeout = TimeSpan.FromSeconds(30);
+            });
+        
+        return services;
+    }
     private static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var identityServerConfiguration = new IdentityServerConfiguration();
