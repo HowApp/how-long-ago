@@ -6,6 +6,7 @@ using Core.Database;
 using Core.Database.Seeds;
 using Core.Infrastructure.Hubs;
 using Extensions;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -14,6 +15,12 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        builder.WebHost.ConfigureKestrel(options => options.ListenAnyIP(7060, listenOptions =>
+        {
+            listenOptions.UseHttps();
+            listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+        }));
 
         // Add services to the container.
         builder.Services.SetupServices(builder.Configuration);
