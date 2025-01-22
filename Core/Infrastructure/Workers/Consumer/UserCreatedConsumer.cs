@@ -1,7 +1,7 @@
-namespace How.Core.Infrastructure.MassTransit.Consumer;
+namespace How.Core.Infrastructure.Workers.Consumer;
 
 using Common.MassTransitContracts.Consumer;
-using global::MassTransit;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 public class UserCreatedConsumer : IConsumer<UserRegisterMessage>
@@ -18,5 +18,16 @@ public class UserCreatedConsumer : IConsumer<UserRegisterMessage>
         _logger.LogInformation("Content Received: {UserId}", context.Message.UserId);
 
         return Task.CompletedTask;
+    }
+}
+
+public class UserCreatedConsumerDefinition : ConsumerDefinition<UserCreatedConsumer>
+{
+   protected override void ConfigureConsumer(
+       IReceiveEndpointConfigurator endpointConfigurator,
+       IConsumerConfigurator<UserCreatedConsumer> consumerConfigurator,
+       IRegistrationContext context)
+    {
+        consumerConfigurator.UseMessageRetry(retry => retry.Interval(3, TimeSpan.FromSeconds(3)));
     }
 }

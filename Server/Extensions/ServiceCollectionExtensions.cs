@@ -6,8 +6,8 @@ using Core;
 using Core.Database;
 using Core.Infrastructure.Background.BackgroundTaskQueue;
 using Core.Infrastructure.Background.Workers;
-using Core.Infrastructure.MassTransit.Consumer;
 using Core.Infrastructure.NpgsqlExtensions;
+using Core.Infrastructure.Workers.Consumer;
 using Core.Services.Identity;
 using Core.Services.CurrentUser;
 using Core.Services.Storage.FileStorage;
@@ -98,7 +98,7 @@ public static class ServiceCollectionExtensions
         
         services.AddMassTransit(x =>
         {
-            x.AddConsumer<UserCreatedConsumer>();
+            x.AddConsumer<UserCreatedConsumer, UserCreatedConsumerDefinition>();
             
             x.UsingRabbitMq((context, config) =>
             {
@@ -107,7 +107,8 @@ public static class ServiceCollectionExtensions
                     host.Username(rabbitMq.User);
                     host.Password(rabbitMq.Password);
                 });
-                config.ConfigureEndpoints(context);
+                config.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter("dev", false));
+                config.UseMessageRetry(retry => { retry.Interval(3, TimeSpan.FromSeconds(5)); });
             });
         });
 
