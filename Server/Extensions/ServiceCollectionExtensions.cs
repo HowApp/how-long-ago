@@ -98,8 +98,10 @@ public static class ServiceCollectionExtensions
         
         services.AddMassTransit(x =>
         {
-            x.AddConsumer<UserCreatedConsumer, UserCreatedConsumerDefinition>();
-            
+            x.AddConsumer<UserRegisterConsumer, UserRegisterConsumerDefinition>();
+
+            x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("dev", false));
+
             x.UsingRabbitMq((context, config) =>
             {
                 config.Host(rabbitMq.Host, "/", host =>
@@ -107,8 +109,8 @@ public static class ServiceCollectionExtensions
                     host.Username(rabbitMq.User);
                     host.Password(rabbitMq.Password);
                 });
-                config.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter("dev", false));
-                config.UseMessageRetry(retry => { retry.Interval(3, TimeSpan.FromSeconds(5)); });
+
+                config.ConfigureEndpoints(context);
             });
         });
 
