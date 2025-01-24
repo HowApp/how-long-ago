@@ -1,7 +1,7 @@
 namespace How.Core.Infrastructure.Builders;
 
 using System.Text;
-using Common.Extensions;
+using HowCommon.Extensions;
 using Dapper;
 using Database;
 using Database.Entities.Base;

@@ -1,6 +1,6 @@
 namespace How.Core.Infrastructure.Workers.Consumer;
 
-using Common.Extensions;
+using HowCommon.Extensions;
 using Dapper;
 using Database;
 using Database.Entities.Identity;

@@ -1,11 +1,11 @@
 namespace How.Core.CQRS.Commands.Event.CreateEvent;
 
 using Common.CQRS;
-using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
 using Database.Entities.Event;
+using HowCommon.Extensions;
 using Infrastructure.Enums;
 using Microsoft.Extensions.Logging;
 using NodaTime;

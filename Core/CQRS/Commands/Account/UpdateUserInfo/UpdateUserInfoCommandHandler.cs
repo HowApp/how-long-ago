@@ -1,11 +1,11 @@
 namespace How.Core.CQRS.Commands.Account.UpdateUserInfo;
 
 using Common.CQRS;
-using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
 using Database.Entities.Identity;
+using HowCommon.Extensions;
 using Microsoft.Extensions.Logging;
 
 public class UpdateUserInfoCommandHandler : ICommandHandler<UpdateUserInfoCommand, Result<int>>

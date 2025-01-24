@@ -1,12 +1,12 @@
 namespace How.Core.CQRS.Commands.Account.UpdateUserImage;
 
 using Common.CQRS;
-using Common.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
 using Database.Entities.Identity;
 using Database.Entities.Storage;
+using HowCommon.Extensions;
 using Microsoft.Extensions.Logging;
 
 public class UpdateUserImageCommandHandler : ICommandHandler<UpdateUserImageCommand, Result>

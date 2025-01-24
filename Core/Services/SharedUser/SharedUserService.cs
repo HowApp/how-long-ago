@@ -1,6 +1,6 @@
 namespace How.Core.Services.SharedUser;
 
-using Common.Extensions;
+using HowCommon.Extensions;
 using Common.ResultType;
 using CQRS.Commands.SharedUser.CreateSharedUser;
 using CQRS.Commands.SharedUser.DeleteSharedUser;

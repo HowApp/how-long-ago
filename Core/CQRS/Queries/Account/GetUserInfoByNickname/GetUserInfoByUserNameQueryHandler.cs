@@ -1,7 +1,7 @@
 namespace How.Core.CQRS.Queries.Account.GetUserInfoByNickname;
 
 using Common.CQRS;
-using Common.Extensions;
+using HowCommon.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;

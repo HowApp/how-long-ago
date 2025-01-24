@@ -25,6 +25,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hosting;
 using Hosting.Filters;
+using HowCommon.Configurations;
 using MassTransit;
 using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

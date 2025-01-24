@@ -4,7 +4,7 @@ using Dapper;
 using Database;
 using Database.Entities.Base;
 using Common.CQRS;
-using Common.Extensions;
+using HowCommon.Extensions;
 using Common.ResultType;
 using Microsoft.Extensions.Logging;
 

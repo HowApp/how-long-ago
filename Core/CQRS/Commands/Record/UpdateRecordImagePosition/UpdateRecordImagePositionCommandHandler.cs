@@ -2,7 +2,7 @@ namespace How.Core.CQRS.Commands.Record.UpdateRecordImagePosition;
 
 using System.Text;
 using Common.CQRS;
-using Common.Extensions;
+using HowCommon.Extensions;
 using Common.ResultType;
 using Dapper;
 using Database;
