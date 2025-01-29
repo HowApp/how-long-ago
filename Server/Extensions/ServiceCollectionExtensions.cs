@@ -7,7 +7,7 @@ using Core.Database;
 using Core.Infrastructure.Background.BackgroundTaskQueue;
 using Core.Infrastructure.Background.Workers;
 using Core.Infrastructure.NpgsqlExtensions;
-using Core.Infrastructure.Workers.Consumer;
+using Core.Infrastructure.Processing.Consumer;
 using Core.Services.Identity;
 using Core.Services.CurrentUser;
 using Core.Services.Storage.FileStorage;
@@ -253,8 +253,6 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    // TODO add identity server auth to swagger
-    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     private static IServiceCollection AddSwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();

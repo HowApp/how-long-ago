@@ -25,7 +25,7 @@
     
     <ItemGroup>
       <Folder Include="DTO\Dashboard\" />
-      <Folder Include="Infrastructure\Workers\Producer\" />
+      <Folder Include="Infrastructure\Processing\Producer\" />
     </ItemGroup>
 
 </Project>

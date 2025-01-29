@@ -1,4 +1,4 @@
-namespace How.Core.Infrastructure.Workers.Consumer;
+namespace How.Core.Infrastructure.Processing.Consumer;
 
 using MassTransit;
 
