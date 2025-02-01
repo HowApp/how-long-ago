@@ -1,22 +1,20 @@
 namespace How.Core.Infrastructure.Processing.Consumer;
 
-using HowCommon.Extensions;
-using Dapper;
-using Database;
-using Database.Entities.Identity;
+using CQRS.Commands.Internal.UserRegister;
 using HowCommon.MassTransitContract;
 using MassTransit;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 public class UserRegisterConsumer : IConsumer<UserRegisterMessage>
 {
-    private readonly DapperConnection _dapper;
     private readonly ILogger<UserRegisterConsumer> _logger;
+    private readonly ISender _sender;
 
-    public UserRegisterConsumer(ILogger<UserRegisterConsumer> logger, DapperConnection dapper)
+    public UserRegisterConsumer(ILogger<UserRegisterConsumer> logger, ISender sender)
     {
         _logger = logger;
-        _dapper = dapper;
+        _sender = sender;
     }
 
     public async Task Consume(ConsumeContext<UserRegisterMessage> context)
@@ -28,38 +26,18 @@ public class UserRegisterConsumer : IConsumer<UserRegisterMessage>
             _logger.LogError("Received User Register Message without User ID");
         }
         
-        var command = $@"
-INSERT INTO {nameof(BaseDbContext.Users).ToSnake()} (
-    {nameof(HowUser.UserId).ToSnake()},
-    {nameof(HowUser.IsDeleted).ToSnake()},
-    {nameof(HowUser.IsSuspended).ToSnake()} )
-VALUES (
-        @UserId,
-        false,
-        false)
-ON CONFLICT ({nameof(HowUser.UserId).ToSnake()})
-DO NOTHING
-RETURNING *;
-";
-
-        try
+        var result = await _sender.Send(new UserRegisterCommand
         {
-            await using var connection = _dapper.InitConnection();
-            var result = await connection.ExecuteAsync(
-                command,
-                new
-                {
-                    UserId = context.Message.UserId
-                });
+            UserId = context.Message.UserId,
+        });
 
-            if (result == 0)
-            {
-                _logger.LogInformation($"User not registered. User ID: {context.Message.UserId}");
-            }
+        if (result.Succeeded && result.Data == 0)
+        {
+            _logger.LogInformation($"User not registered. User ID: {context.Message.UserId}");
         }
-        catch (Exception e)
+        else
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(result.GetErrorMessages());
         }
     }
 }

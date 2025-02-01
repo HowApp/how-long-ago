@@ -5,6 +5,7 @@ using Common.Constants;
 using Core.Database;
 using Core.Database.Seeds;
 using Core.Infrastructure.Hubs;
+using Core.Services.GrpcCommunication;
 using Extensions;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -77,8 +78,9 @@ public class Program
         app.MapControllers();
 
         app.UseStaticFiles();
-        
+
         app.MapHub<FileProcessingHub>("/hubs/fileProcessing");
+        app.MapGrpcService<UserAccountGrpcService>();
 
         await app.RunAsync();
     }

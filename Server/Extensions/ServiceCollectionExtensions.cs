@@ -15,6 +15,7 @@ using Core.Services.Storage.ImageStorage;
 using Core.Services.Account;
 using Core.Services.BackgroundImageProcessing;
 using Core.Services.Event;
+using Core.Services.GrpcCommunication;
 using Core.Services.Hubs.FileProcessingHubService;
 using Core.Services.Public.PublicEvent;
 using Core.Services.Public.PublicRecord;
@@ -84,6 +85,7 @@ public static class ServiceCollectionExtensions
         services.AddDataAccess(configuration)
             .AddConfigurations(configuration)
             .AddCustomServices()
+            .AddGrpcServices()
             .ConfigureMassTransit(configuration)
             .AddCustomAuthentication(configuration)
             .AddSwagger()
@@ -251,6 +253,14 @@ public static class ServiceCollectionExtensions
         
         // Hub
         services.AddTransient<IFileProcessingHubService, FileProcessingHubService>();
+        
+        return services;
+    }
+
+    private static IServiceCollection AddGrpcServices(this IServiceCollection services)
+    {
+        services.AddGrpc();
+        services.AddTransient<UserAccountGrpcService>();
         
         return services;
     }
