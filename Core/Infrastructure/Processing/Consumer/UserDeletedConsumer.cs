@@ -1,22 +1,20 @@
 namespace How.Core.Infrastructure.Processing.Consumer;
 
-using Dapper;
-using Database;
-using Database.Entities.Identity;
-using HowCommon.Extensions;
+using CQRS.Commands.Internal.UserDelete;
 using HowCommon.MassTransitContract;
 using MassTransit;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 public class UserDeletedConsumer : IConsumer<UserDeletedMessage>
 {
-    private readonly DapperConnection _dapper;
     private readonly ILogger<UserDeletedConsumer> _logger;
+    private readonly ISender _sender;
 
-    public UserDeletedConsumer(DapperConnection dapper, ILogger<UserDeletedConsumer> logger)
+    public UserDeletedConsumer(ILogger<UserDeletedConsumer> logger, ISender sender)
     {
-        _dapper = dapper;
         _logger = logger;
+        _sender = sender;
     }
 
 
@@ -31,38 +29,19 @@ public class UserDeletedConsumer : IConsumer<UserDeletedMessage>
         
         var salt = "Deleted_" + Guid.NewGuid();
         
-        var command = $@"
-UPDATE {nameof(BaseDbContext.Users).ToSnake()} 
-SET
-    {nameof(HowUser.IsDeleted).ToSnake()} = true,
-    {nameof(HowUser.IsSuspended).ToSnake()} = true,
-    {nameof(HowUser.FirstName).ToSnake()} = @FirstName,
-    {nameof(HowUser.LastName).ToSnake()} = @LastName
-WHERE {nameof(HowUser.UserId).ToSnake()} = @UserId 
-    AND {nameof(HowUser.IsDeleted).ToSnake()} = FALSE
-RETURNING *;
-";
-
-        try
+        var result = await _sender.Send(new InternalUserDeleteCommand
         {
-            await using var connection = _dapper.InitConnection();
-            var result = await connection.ExecuteAsync(
-                command,
-                new
-                {
-                    UserId = context.Message.UserId,
-                    FirstName = salt.ToUpper(),
-                    LastName = salt.ToUpper()
-                });
-
-            if (result == 0)
-            {
-                _logger.LogInformation($"User not deleted. User ID: {context.Message.UserId}");
-            }
+            UserId = context.Message.UserId,
+            Salt = salt
+        });
+        
+        if (result.Succeeded && result.Data == 0)
+        {
+            _logger.LogInformation($"User not deleted. User ID: {context.Message.UserId}");
         }
-        catch (Exception e)
+        else
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(result.GetErrorMessages());
         }
     }
 }

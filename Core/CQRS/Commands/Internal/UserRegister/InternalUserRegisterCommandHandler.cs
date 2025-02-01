@@ -8,18 +8,18 @@ using Database.Entities.Identity;
 using HowCommon.Extensions;
 using Microsoft.Extensions.Logging;
 
-public class UserRegisterCommandHandler : ICommandHandler<UserRegisterCommand, Result<int>>
+public class InternalUserRegisterCommandHandler : ICommandHandler<InternalUserRegisterCommand, Result<int>>
 {
-    private readonly ILogger<UserRegisterCommandHandler> _logger;
+    private readonly ILogger<InternalUserRegisterCommandHandler> _logger;
     private readonly DapperConnection _dapper;
 
-    public UserRegisterCommandHandler(ILogger<UserRegisterCommandHandler> logger, DapperConnection dapper)
+    public InternalUserRegisterCommandHandler(ILogger<InternalUserRegisterCommandHandler> logger, DapperConnection dapper)
     {
         _logger = logger;
         _dapper = dapper;
     }
 
-    public async Task<Result<int>> Handle(UserRegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(InternalUserRegisterCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -51,7 +51,7 @@ RETURNING *;
         {
             _logger.LogError(e.Message);
             return Result.Failure<int>(
-                new Error(ErrorType.Internal, $"Error while executing {nameof(UserRegisterCommand)}"));
+                new Error(ErrorType.Internal, $"Error while executing {nameof(InternalUserRegisterCommand)}"));
         }
     }
 }

@@ -26,7 +26,7 @@ public class UserRegisterConsumer : IConsumer<UserRegisterMessage>
             _logger.LogError("Received User Register Message without User ID");
         }
         
-        var result = await _sender.Send(new UserRegisterCommand
+        var result = await _sender.Send(new InternalUserRegisterCommand
         {
             UserId = context.Message.UserId,
         });
