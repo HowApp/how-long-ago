@@ -104,6 +104,7 @@ public static class ServiceCollectionExtensions
             x.AddConsumer<UserRegisterConsumer, UserRegisterConsumerDefinition>();
             x.AddConsumer<UserDeletedConsumer, UserDeletedConsumerDefinition>();
             x.AddConsumer<UserSuspendStateConsumer, UserSuspendStateConsumerDefinition>();
+            x.AddConsumer<UserRegisterBulkConsumer, UserRegisterBulkConsumerDefinition>();
 
             x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("dev", false));
 
