@@ -24,6 +24,7 @@ public class UserRegisterBulkConsumer : IConsumer<UserRegiserBulkMessage>
         if (context.Message.UserIds.Length == 0)
         {
             _logger.LogError("Received User Register Bulk Message without User IDs");
+            return;
         }
 
         var result = await _sender.Send(new InternalUserRegisterBulkCommand
@@ -38,6 +39,13 @@ public class UserRegisterBulkConsumer : IConsumer<UserRegiserBulkMessage>
         else
         {
             _logger.LogError(result.GetErrorMessages());
+            return;
         }
+
+        // send response message
+        await context.Publish(new UserRegiserBulkResponseMessage
+        {
+            UserIds = context.Message.UserIds
+        });
     }
 }

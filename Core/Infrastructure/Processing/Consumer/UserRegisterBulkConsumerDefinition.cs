@@ -6,7 +6,7 @@ public class UserRegisterBulkConsumerDefinition : ConsumerDefinition<UserRegiste
 {
     public UserRegisterBulkConsumerDefinition()
     {
-        ConcurrentMessageLimit = 4;
+        ConcurrentMessageLimit = 1;
     }
 
     protected override void ConfigureConsumer(

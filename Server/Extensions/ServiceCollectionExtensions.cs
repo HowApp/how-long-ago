@@ -8,6 +8,7 @@ using Core.Infrastructure.Background.BackgroundTaskQueue;
 using Core.Infrastructure.Background.Workers;
 using Core.Infrastructure.NpgsqlExtensions;
 using Core.Infrastructure.Processing.Consumer;
+using Core.Infrastructure.Processing.Producer;
 using Core.Services.Identity;
 using Core.Services.CurrentUser;
 using Core.Services.Storage.FileStorage;
@@ -233,7 +234,7 @@ public static class ServiceCollectionExtensions
             cfg.RegisterServicesFromAssembly(typeof(AssemblyCoreReference).Assembly);
             cfg.NotificationPublisher = new TaskWhenAllPublisher();
         });
-        
+
         services.AddTransient<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<IFileStorageService, FileStorageService>();
@@ -242,19 +243,22 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IEventService, EventService>();
         services.AddTransient<IRecordService, RecordService>();
         services.AddTransient<ISharedUserService, SharedUserService>();
-        
+
         // Public
         services.AddTransient<IPublicEventService, PublicEventService>();
         services.AddTransient<IPublicRecordService, PublicRecordService>();
-        
+
         // Background
         services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddHostedService<QueueHostedService>();
         services.AddTransient<IBackgroundImageProcessing, BackgroundImageProcessing>();
-        
+
         // Hub
         services.AddTransient<IFileProcessingHubService, FileProcessingHubService>();
-        
+
+        // masstransit services
+        services.AddTransient<UserServiceAccountProducer>();
+
         return services;
     }
 
