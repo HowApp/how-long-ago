@@ -31,13 +31,18 @@ public class UserRegisterConsumer : IConsumer<UserRegisterMessage>
             UserId = context.Message.UserId,
         });
 
-        if (result.Succeeded && result.Data == 0)
+        if (!result.Succeeded)
         {
-            _logger.LogInformation($"User not registered. User ID: {context.Message.UserId}");
+            _logger.LogError(result.GetErrorMessages());
+        }
+        
+        if (result.Data == 0)
+        {
+            _logger.LogInformation($"User NOT registered. User ID: {context.Message.UserId}");
         }
         else
         {
-            _logger.LogError(result.GetErrorMessages());
+            _logger.LogInformation($"User registered. User ID: {context.Message.UserId}");
         }
     }
 }

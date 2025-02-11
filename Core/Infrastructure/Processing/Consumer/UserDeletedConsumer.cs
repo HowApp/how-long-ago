@@ -34,14 +34,19 @@ public class UserDeletedConsumer : IConsumer<UserDeletedMessage>
             UserId = context.Message.UserId,
             Salt = salt
         });
-        
-        if (result.Succeeded && result.Data == 0)
+
+        if (!result.Succeeded)
         {
-            _logger.LogInformation($"User not deleted. User ID: {context.Message.UserId}");
+            _logger.LogError(result.GetErrorMessages());
+        }
+        
+        if (result.Data == 0)
+        {
+            _logger.LogInformation($"User NOT deleted. User ID: {context.Message.UserId}");
         }
         else
         {
-            _logger.LogError(result.GetErrorMessages());
+            _logger.LogInformation($"User deleted. User ID: {context.Message.UserId}");
         }
     }
 }

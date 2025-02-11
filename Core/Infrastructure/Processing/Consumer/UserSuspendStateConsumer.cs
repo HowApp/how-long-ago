@@ -31,13 +31,17 @@ public class UserSuspendStateConsumer : IConsumer<UserSuspendedStateMessage>
             State = context.Message.IsSuspended,
         });
 
-        if (result.Succeeded && result.Data == 0)
+        if (!result.Succeeded)
         {
-            _logger.LogInformation($"User suspend state not updated. User ID: {context.Message.UserId}");
+            _logger.LogError(result.GetErrorMessages());
+        }
+        if (result.Data == 0)
+        {
+            _logger.LogInformation($"User suspend state NOT updated. User ID: {context.Message.UserId}");
         }
         else
         {
-            _logger.LogError(result.GetErrorMessages());
+            _logger.LogInformation($"User suspend state updated. User ID: {context.Message.UserId}");
         }
     }
 }
