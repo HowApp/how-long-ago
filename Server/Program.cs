@@ -4,6 +4,7 @@ using Common.Configurations;
 using Common.Constants;
 using Core.Database;
 using Core.Database.Seeds;
+using Core.Infrastructure.CertificateManagement;
 using Core.Infrastructure.Hubs;
 using Core.Services.GrpcCommunication;
 using Extensions;
@@ -17,11 +18,22 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
-        builder.WebHost.ConfigureKestrel(options => options.ListenAnyIP(7060, listenOptions =>
+        var cert = CertificateManager.GetInstance().GetOrCreateCertificate(builder.Configuration);
+        
+        builder.WebHost.ConfigureKestrel(options =>
         {
-            listenOptions.UseHttps();
-            listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-        }));
+            options.ListenAnyIP(7060, listenOptions =>
+            {
+                listenOptions.UseHttps();
+                listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+            });
+            
+            options.ListenAnyIP(7061, listenOptions =>
+            {
+                listenOptions.UseHttps(cert);
+                listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+            });
+        });
 
         // Add services to the container.
         builder.Services.SetupServices(builder.Configuration);
