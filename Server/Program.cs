@@ -18,9 +18,10 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
-        var cert = CertificateManager.GetInstance().GetOrCreateCertificate(builder.Configuration);
-        
+
+        var certificateManager = CertificateManager.GetInstance();
+        certificateManager.SetUpManagerConfig(builder.Configuration);
+
         builder.WebHost.ConfigureKestrel(options =>
         {
             options.ListenAnyIP(7060, listenOptions =>
@@ -31,7 +32,7 @@ public class Program
             
             options.ListenAnyIP(7061, listenOptions =>
             {
-                listenOptions.UseHttps(cert);
+                listenOptions.UseHttps(certificateManager.GetCertificate());
                 listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
             });
             
@@ -39,7 +40,7 @@ public class Program
             {
                 h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
                 h.CheckCertificateRevocation = false;
-                h.ServerCertificate = cert;
+                h.ServerCertificate = certificateManager.GetCertificate();
             });
         });
 
