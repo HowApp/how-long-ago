@@ -9,6 +9,7 @@ using Core.Infrastructure.Hubs;
 using Core.Services.GrpcCommunication;
 using Extensions;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -32,6 +33,13 @@ public class Program
             {
                 listenOptions.UseHttps(cert);
                 listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+            });
+            
+            options.ConfigureHttpsDefaults(h =>
+            {
+                h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+                h.CheckCertificateRevocation = false;
+                h.ServerCertificate = cert;
             });
         });
 
