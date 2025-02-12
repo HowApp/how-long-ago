@@ -1,10 +1,6 @@
 namespace How.Core.Infrastructure.CertificateManagement;
 
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using Common.Configurations;
-using Common.Constants;
-using Microsoft.Extensions.Configuration;
+using HowCommon.Infrastructure.CertificateManagement;
 
 public sealed class CertificateManager : CertificateManagerBase
 {
