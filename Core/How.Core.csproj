@@ -26,6 +26,7 @@
     
     <ItemGroup>
       <Folder Include="DTO\Dashboard\" />
+      <Folder Include="Infrastructure\GrpcCommunication\Client\" />
     </ItemGroup>
 
     <ItemGroup>
