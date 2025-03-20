@@ -136,7 +136,7 @@ public class AccountService : IAccountService
             {
                 return Result.Failure(new Error(ErrorType.Account, "User info not updated!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -197,7 +197,7 @@ public class AccountService : IAccountService
                 MainHash = image.Data.Main.Hash,
                 ThumbnailHash = image.Data.Thumbnail.Hash
             };
-            
+
             return Result.Success(result);
         }
         catch (Exception e)
@@ -209,7 +209,7 @@ public class AccountService : IAccountService
                     ImageId = imageId
                 }); 
             }
-            
+
             _logger.LogError(e.Message);
             return Result.Failure<UpdateUserImageResponseDTO>(
                 new Error(ErrorType.Account, $"Error at {nameof(UpdateUserImage)}"));

@@ -67,7 +67,7 @@ public class RecordService : IRecordService
                 return Result.Failure<int>(
                     new Error(ErrorType.Record, $"Event not found!"), 404);
             }
-            
+
             var command = new InsertRecordCommand
             {
                 CurrentUserId = _userService.UserId,
@@ -87,7 +87,7 @@ public class RecordService : IRecordService
                 return Result.Failure<int>(
                     new Error(ErrorType.Record, $"Record not created!"));
             }
-            
+
             return Result.Success(result.Data);
         }
         catch (Exception e)
@@ -130,9 +130,9 @@ public class RecordService : IRecordService
                 Size = request.Size,
                 EventId = eventId
             };
-            
+
             var queryResult = await _sender.Send(query);
-            
+
             if (queryResult.Failed)
             {
                 return Result.Failure<GetRecordsPaginationResponseDTO>(queryResult.Error);
@@ -161,12 +161,12 @@ public class RecordService : IRecordService
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
-            
+
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
                 QueryAccessBuilder = queryBuilder
             });
-                
+
             if (recordExist.Failed)
             {
                 return Result.Failure(recordExist.Error);
@@ -177,13 +177,13 @@ public class RecordService : IRecordService
                 return Result.Failure(
                     new Error(ErrorType.Record, $"Record not found!"), 404);
             }
-            
+
             var command = new UpdateRecordCommand
             {
                 RecordId = recordId,
                 Description = request.Description
             };
-            
+
             var result = await _sender.Send(command);
 
             if (result.Failed)
@@ -196,7 +196,7 @@ public class RecordService : IRecordService
                 return Result.Failure(
                     new Error(ErrorType.Record, $"Record not updated!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -217,12 +217,12 @@ public class RecordService : IRecordService
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
             queryBuilder.FilterByStatus(EventStatus.Active);
-            
+
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
                 QueryAccessBuilder = queryBuilder
             });
-            
+
             if (recordExist.Failed)
             {
                 return Result.Failure<LikeState>(recordExist.Error);
@@ -232,14 +232,14 @@ public class RecordService : IRecordService
             {
                 return Result.Failure<LikeState>(new Error(ErrorType.Record, $"Record not found!"), 404);
             }
-            
+
             var command = new UpdateRecordLikeStateCommand
             {
                 CurrentUserId = _userService.UserId,
                 RecordId = recordId,
                 LikeState = likeState
             };
-            
+
             var result = await _sender.Send(command);
 
             if (result.Failed)
@@ -251,7 +251,7 @@ public class RecordService : IRecordService
             {
                 return Result.Failure<LikeState>(new Error(ErrorType.Record, "Action not performed!"));
             }
-            
+
             return Result.Success(likeState);
         }
         catch (Exception e)
@@ -272,12 +272,12 @@ public class RecordService : IRecordService
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(userId, InternalAccessFilter.IncludeShared);
-            
+
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
                 QueryAccessBuilder = queryBuilder
             });
-                
+
             if (recordExist.Failed)
             {
                 return Result.Failure(recordExist.Error);
@@ -288,7 +288,7 @@ public class RecordService : IRecordService
                 return Result.Failure(
                     new Error(ErrorType.Record, $"Record not found!"), 404);
             }
-            
+
             List<int> temporaryFileIds = new List<int>(request.Files.Count);
 
             foreach (var t in request.Files)
@@ -309,19 +309,19 @@ public class RecordService : IRecordService
                 {
                     return Result.Failure(imageId.Error);
                 }
-                
+
                 temporaryFileIds.Add(imageId.Data);
             }
-            
+
             _backgroundTaskQueue.QueueBackgroundWorkItem(async (scope, token) =>
             {
                 _logger.LogInformation("Start processing records.");
-                
+
                 // Resolve services inside the scope
                 var recordService = scope.ServiceProvider.GetRequiredService<IBackgroundImageProcessing>();
 
                 await recordService.RecordImageProcessing(userId, recordId, temporaryFileIds.ToArray());
-                
+
                 _logger.LogInformation("Complete processing records.");
             });
 
@@ -344,12 +344,12 @@ public class RecordService : IRecordService
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
-            
+
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
                 QueryAccessBuilder = queryBuilder
             });
-                
+
             if (recordExist.Failed)
             {
                 return Result.Failure(recordExist.Error);
@@ -365,7 +365,7 @@ public class RecordService : IRecordService
             {
                 RecordId = recordId
             });
-            
+
             if (imageExistIds.Failed)
             {
                 return Result.Failure(imageExistIds.Error);
@@ -404,7 +404,7 @@ public class RecordService : IRecordService
                 {
                     ImageIds = recordImageToDelete
                 });
-                
+
                 if (deleteRecordImageResult.Failed)
                 {
                     return Result.Failure(deleteRecordImageResult.Error);
@@ -414,7 +414,7 @@ public class RecordService : IRecordService
                 {
                     ImageIds = deleteRecordImageResult.Data
                 });
-                
+
                 if (deleteStorageItemsResult.Failed)
                 {
                     return Result.Failure(deleteStorageItemsResult.Error);
@@ -439,12 +439,12 @@ public class RecordService : IRecordService
         {
             var queryBuilder = new RecordAccessAccessBuilder(eventId, recordId);
             queryBuilder.FilterCreatedBy(_userService.UserId, InternalAccessFilter.IncludeShared);
-            
+
             var recordExist = await _sender.Send(new CheckExistAccessQuery
             {
                 QueryAccessBuilder = queryBuilder
             });
-                
+
             if (recordExist.Failed)
             {
                 return Result.Failure(recordExist.Error);
@@ -455,12 +455,12 @@ public class RecordService : IRecordService
                 return Result.Failure(
                     new Error(ErrorType.Record, $"Record not found!"), 404);
             }
-            
+
             var imageExistIds = await _sender.Send(new GetImageIdsQuery
             {
                 RecordId = recordId
             });
-            
+
             if (imageExistIds.Failed)
             {
                 return Result.Failure(imageExistIds.Error);
@@ -472,7 +472,7 @@ public class RecordService : IRecordService
                 {
                     ImageIds = imageExistIds.Data
                 });
-                
+
                 if (deleteRecordImageResult.Failed)
                 {
                     return Result.Failure(deleteRecordImageResult.Error);
@@ -482,7 +482,7 @@ public class RecordService : IRecordService
                 {
                     ImageIds = deleteRecordImageResult.Data
                 });
-                
+
                 if (deleteStorageItemsResult.Failed)
                 {
                     return Result.Failure(deleteStorageItemsResult.Error);
@@ -493,18 +493,18 @@ public class RecordService : IRecordService
             {
                 RecordIds = new []{recordId}
             });
-            
+
             if (deleteRecord.Failed)
             {
                 return Result.Failure(deleteRecord.Error);
             }
-            
+
             if (deleteRecord.Data < 1)
             {
                 return Result.Failure(
                     new Error(ErrorType.Event, $"Record not deleted!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)

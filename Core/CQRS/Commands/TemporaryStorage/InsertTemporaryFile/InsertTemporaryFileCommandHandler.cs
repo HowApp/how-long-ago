@@ -24,7 +24,7 @@ public class InsertTemporaryFileCommandHandler : ICommandHandler<InsertTemporary
         try
         {
             await using var connection = _dapper.InitTemporaryConnection();
-            
+
             var command = $@"
 INSERT INTO {nameof(TemporaryStorageDbContext.Files).ToSnake()} (
     {nameof(File.Name).ToSnake()},
@@ -40,13 +40,13 @@ RETURNING {nameof(File.Id).ToSnake()};
                     name = request.File.FileName,
                     content = request.File.Content
                 });
-            
+
             if (result == 0)
             {
                 _logger.LogError($"Error while insert {nameof(File)} at {nameof(InsertTemporaryFileCommand)}");
                 return Result.Failure<int>(new Error(ErrorType.TemporaryuFile, "Temporary File was not inserted!"));
             }
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

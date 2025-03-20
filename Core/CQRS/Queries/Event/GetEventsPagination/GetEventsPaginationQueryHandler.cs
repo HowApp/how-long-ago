@@ -60,7 +60,7 @@ EXISTS(
 true";
                     break;
             }
-            
+
             var accessFilter = string.Empty;
             switch (request.Access)
             {
@@ -73,7 +73,7 @@ true";
 e.{nameof(Event.Access).ToSnake()} = @access";
                     break;
             }
-            
+
             var activeStatusFilter = string.Empty;
             switch (request.Status)
             {
@@ -196,7 +196,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                     offset = request.Offset,
                     search = request.Search
                 });
-            
+
             return Result.Success(new GetEventsPaginationQueryResult
             {
                 Count = count,

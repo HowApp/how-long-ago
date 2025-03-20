@@ -45,7 +45,7 @@ RETURNING *;
                     id = request.EventId,
                     created_by_id = request.CurrentUserId
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

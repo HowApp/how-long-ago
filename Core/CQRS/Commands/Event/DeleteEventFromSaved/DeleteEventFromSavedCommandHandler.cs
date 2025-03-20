@@ -29,7 +29,7 @@ WHERE {nameof(SavedEvent.EventId).ToSnake()} = @eventId AND
       {nameof(SavedEvent.UserId).ToSnake()} = @userId
 RETURNING *;
 ";
-            
+
             await using var connection = _dapper.InitConnection();
             var result = await connection.ExecuteAsync(
                 command, new
@@ -37,7 +37,7 @@ RETURNING *;
                     eventId = request.EventId,
                     userId = request.CurrentUserId
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

@@ -32,13 +32,13 @@ WHERE {nameof(File.Id).ToSnake()} = ANY(@imageIds);
             {
                 imageIds = request.FileId.ToArray()
             });
-            
+
             if (result == 0)
             {
                 _logger.LogError($"Error while insert {nameof(File)} at {nameof(DeleteTemporaryFileCommand)}");
                 return Result.Failure<int>(new Error(ErrorType.TemporaryuFile, "Temporary File was not deleted!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)

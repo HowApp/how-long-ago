@@ -10,7 +10,7 @@ using SixLabors.ImageSharp.Processing;
 public static class ImageHelper
 {
     private const int ThumbnailResolution = AppConstants.Images.ThumbnailResolution;
-    
+
     private static WebpEncoder Encoder() => new WebpEncoder
     {
         SkipMetadata = false,
@@ -18,12 +18,12 @@ public static class ImageHelper
         Quality = 50,
         Method = WebpEncodingMethod.Fastest,
     };
-    
+
     public static ImageHelperModel GetReducedImage(Stream resourceImage, int resizedWidth = ThumbnailResolution)
     {
         using var outStream = new MemoryStream();
         using var image = Image.Load(resourceImage);
-        
+
         float nPercent;
         var width = image.Width;
         var height = image.Height;

@@ -18,7 +18,7 @@ public class SharedUserController : BaseController
     {
         _userService = userService;
     }
-    
+
     [HttpPost]
     [SwaggerOperation("Create shared User, return ID")]
     [ProducesResponseType<Result<int>>(200)]
@@ -40,7 +40,7 @@ public class SharedUserController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpDelete]
     [SwaggerOperation("Delete shared Users")]
     [ProducesResponseType<Result>(200)]

@@ -71,7 +71,7 @@ FROM {nameof(BaseDbContext.Records).ToSnake()} r
 WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
 ";
             await using var connection = _dapper.InitConnection();
-            
+
             var count = await connection.QuerySingleAsync<int>(
                 countQuery,
                 new
@@ -83,7 +83,7 @@ WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
             {
                 return Result.Success(new GetRecordsPaginationResponseDTO());
             }
-            
+
             var recordDictionary = new Dictionary<int, RecordItemPrivateModelDTO>(count);
 
             await connection.QueryAsync<RecordItemPrivateModelDTO, ImageModelDTO, RecordItemPrivateModelDTO>(
@@ -102,7 +102,7 @@ WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
                     }
 
                     recordDictionary.TryAdd(currentRecord.Id, currentRecord);
-                    
+
                     return null;
                 },
                 param: new

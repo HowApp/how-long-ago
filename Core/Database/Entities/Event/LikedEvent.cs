@@ -7,9 +7,9 @@ public class LikedEvent
 {
     public int EventId { get; set; }
     public Event Event { get; set; }
-    
+
     public int LikedByUserId { get; set; }
     public HowUser LikedByUser { get; set; }
-    
+
     public LikeState State { get; set; }
 }

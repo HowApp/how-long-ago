@@ -27,7 +27,7 @@ public class CreateImageCommandHandler : ICommandHandler<CreateImageCommand, Res
     {
         await using var connection = _dapper.InitConnection();
         await using var transaction = await connection.BeginTransactionAsync(CancellationToken.None);
-        
+
         try
         {
             var mainId = await InsertFile(request.Image.Main, connection, transaction);
@@ -40,7 +40,7 @@ public class CreateImageCommandHandler : ICommandHandler<CreateImageCommand, Res
                 return Result.Failure<int>(
                     new Error(ErrorType.Account, $"Error while insert {nameof(StorageFile)} at {nameof(CreateImageCommand)}"));
             }
-            
+
             var command = @$"
 INSERT INTO {nameof(BaseDbContext.StorageImages).ToSnake()} (
     {nameof(StorageImage.ImageHeight).ToSnake()},
@@ -71,7 +71,7 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
                 return Result.Failure<int>(
                     new Error(ErrorType.Account, $"Error while insert {nameof(StorageImage)} at {nameof(CreateImageCommand)}"));
             }
-            
+
             await transaction.CommitAsync(CancellationToken.None);
             return Result.Success(result);
         }

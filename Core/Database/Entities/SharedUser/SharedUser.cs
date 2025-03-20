@@ -7,7 +7,7 @@ public class SharedUser : PKey
 {
     public int UserOwnerId { get; set; }
     public HowUser UserOwner { get; set; }
-    
+
     public int UserSharedId { get; set; }
     public HowUser UserShared { get; set; }
 }

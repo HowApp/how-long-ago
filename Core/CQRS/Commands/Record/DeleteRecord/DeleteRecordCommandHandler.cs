@@ -27,14 +27,14 @@ DELETE FROM {nameof(BaseDbContext.Records).ToSnake()}
 WHERE id = ANY(@recordIds)
 RETURNING *;
 ";
-            
+
             await using var connection = _dapper.InitConnection();
             var result = await connection.ExecuteAsync(
                 command, new
                 {
                     recordIds = request.RecordIds
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

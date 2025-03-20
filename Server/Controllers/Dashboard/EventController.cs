@@ -41,7 +41,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get own Event by ID")]
     [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
@@ -63,7 +63,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get shared Event by ID")]
     [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
@@ -74,7 +74,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get public active Events list with pagination")]
     [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
@@ -85,7 +85,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get public active Event by ID")]
     [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
@@ -152,7 +152,6 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
 
     [HttpPut]
     [SwaggerOperation("Update event image, returning hash")]
@@ -177,7 +176,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPost]
     [SwaggerOperation("Add Event to saved")]
     [ProducesResponseType<Result>(200)]
@@ -188,7 +187,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpDelete]
     [SwaggerOperation("Delete event")]
     [ProducesResponseType<Result>(200)]
@@ -199,6 +198,6 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     // TODO add ability to get saved events
 }

@@ -8,5 +8,4 @@ public interface IEventAccessQueryAccessBuilder : IQueryAccessBuilder
     void FilterCreatedBy(int userId, InternalAccessFilter internalAccessFilter);
     void FilterByStatus(EventStatus status);
     void FilterByAccessType(EventAccessType accessType);
-    
 }

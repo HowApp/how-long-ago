@@ -40,7 +40,7 @@ RETURNING *;
                     description = request.Description,
                     record_id = request.RecordId
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

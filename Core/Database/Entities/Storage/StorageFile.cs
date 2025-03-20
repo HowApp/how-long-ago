@@ -9,7 +9,7 @@ public class StorageFile : PKey
     public string Path { get; set; }
     public string Extension { get; set; }
     public long Size { get; set; }
-    
+
     // TODO remove after setup cloud storage
     public byte[] Content { get; set; } = [];
 }

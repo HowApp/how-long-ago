@@ -30,7 +30,7 @@ public class UpdateRecordImagePositionCommandHandler : ICommandHandler<UpdateRec
             {
                 return Result.Failure<int>(new Error(ErrorType.Record, "Input array is empty"));
             }
-            
+
             var command = new StringBuilder();
             var parameters = new DynamicParameters();
 
@@ -51,7 +51,7 @@ RETURNING *;
                         { $"@id_{i}", request.ImageIds[i]}
                     });
             }
-            
+
             await using var connection = _dapper.InitConnection();
             var result = await connection.ExecuteAsync(command.ToString(), parameters);
 

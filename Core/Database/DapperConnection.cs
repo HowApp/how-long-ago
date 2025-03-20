@@ -18,16 +18,16 @@ public class DapperConnection
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
         dataSourceBuilder.UseNodaTime();
         var dataSource = dataSourceBuilder.Build();
-        
+
         var connection = dataSource.OpenConnection();
         return connection;
     }
-    
+
     public NpgsqlConnection InitTemporaryConnection()
     {
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(_temporaryConnectionString);
         var dataSource = dataSourceBuilder.Build();
-        
+
         var connection = dataSource.OpenConnection();
         return connection;
     }

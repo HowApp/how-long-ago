@@ -49,7 +49,7 @@ WHERE EXISTS(
             var result = await connection.QueryAsync<GetSharedUsersQueryResult>(
                 query,
                 new { userId = request.CurrentUserId });
-            
+
             return Result.Success(result.ToList());
         }
         catch (Exception e)

@@ -48,7 +48,7 @@ WHERE le.{nameof(LikedEvent.LikedByUserId).ToSnake()} = @likedByUserId AND le.{n
                     likedByUserId = request.CurrentUserId,
                     state = request.LikeState
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

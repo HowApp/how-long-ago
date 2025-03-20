@@ -51,7 +51,7 @@ WHERE
                     likedByUserId = request.CurrentUserId,
                     state = request.LikeState
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

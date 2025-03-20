@@ -26,7 +26,7 @@ public class InsertRecordCommandHandler : ICommandHandler<InsertRecordCommand, R
         {
             var command = $@"
 INSERT INTO {nameof(BaseDbContext.Records).ToSnake()} (
-    {nameof(Record.EventId).ToSnake()},                                   
+    {nameof(Record.EventId).ToSnake()},
     {nameof(Record.Description).ToSnake()},
     {nameof(Record.CreatedById).ToSnake()},
     {nameof(Record.CreatedAt).ToSnake()}

@@ -15,7 +15,7 @@ using Swashbuckle.AspNetCore.Annotations;
 public class TestController : BaseController
 {
     private readonly IFileProcessingHubService _fileProcessing;
-    
+
     public TestController(IFileProcessingHubService fileProcessing)
     {
         _fileProcessing = fileProcessing;
@@ -30,8 +30,7 @@ public class TestController : BaseController
         _fileProcessing.NotifyCurrentUser("Your file has been processed.");
         return HttpResult(Result.Success());
     }
-    
-    
+
     [HttpGet]
     [SwaggerOperation("Create Event, return ID")]
     [ProducesResponseType<Result>(200)]
@@ -41,7 +40,7 @@ public class TestController : BaseController
 
         return HttpResult(Result.Success());
     }
-    
+
     [HttpPost]
     [SwaggerOperation("Convert To Webp")]
     [ProducesResponseType<Result>(200)]

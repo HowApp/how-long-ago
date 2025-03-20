@@ -14,12 +14,12 @@ public class Event : BaseChanged
     public EventStatus Status { get; set; }
     public EventAccessType Access { get; set; }
     public bool IsDeleted { get; set; }
-    
+
     public int OwnerId { get; set; }
     public HowUser Owner { get; set; }
-    
+
     public ICollection<Record> Records { get; set; }
-    
+
     public int? StorageImageId { get; set; }
     public StorageImage StorageImage { get; set; }
 }

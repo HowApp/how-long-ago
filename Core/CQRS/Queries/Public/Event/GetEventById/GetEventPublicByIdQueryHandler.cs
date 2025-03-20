@@ -82,9 +82,9 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @EventId
     e.{nameof(Event.Access).ToSnake()} = @access
 LIMIT 1;
 ";
-            
+
             await using var connection = _dapper.InitConnection();
-            
+
             var eventItem = await connection.QueryFirstOrDefaultAsync<GetEventPublicByIdQueryResult>(
                 query,
                 new
@@ -93,7 +93,7 @@ LIMIT 1;
                     access = (int)EventAccessType.Public,
                     EventId = request.EventId,
                 });
-            
+
             return Result.Success(eventItem);
         }
         catch (Exception e)

@@ -18,7 +18,7 @@ public class AccountController : BaseController
     {
         _accountService = accountService;
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get current user info")]
     [ProducesResponseType<Result<GetUserInfoResponseDTO>>(200)]
@@ -29,7 +29,7 @@ public class AccountController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get user info by User Name")]
     [ProducesResponseType<Result<GetUserInfoByUserNameResponseDTO>>(200)]
@@ -51,7 +51,7 @@ public class AccountController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPut]
     [SwaggerOperation("Update user image, returning hash")]
     [ProducesResponseType<Result<UpdateUserImageResponseDTO>>(200)]

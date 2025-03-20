@@ -27,7 +27,7 @@ public class CheckExistQueryHandler : IQueryHandler<CheckExistQuery, Result<bool
 SELECT EXISTS(SELECT 1 FROM {request.Table} WHERE {nameof(PKey.Id).ToSnake()} = @id);
 ";
             await using var connection = _dapper.InitConnection();
-            
+
             var result = await connection.QuerySingleAsync<bool>(
                 query,
                 new

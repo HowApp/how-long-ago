@@ -45,7 +45,7 @@ WHERE se.{nameof(SavedEvent.EventId).ToSnake()} = @eventId AND
                     userId = request.CurrentUserId,
                     eventId = request.EventId
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

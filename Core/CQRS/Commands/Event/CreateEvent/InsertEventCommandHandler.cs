@@ -54,7 +54,7 @@ RETURNING {nameof(Event.Id).ToSnake()};
                     changed_at = SystemClock.Instance.GetCurrentInstant(),
                     access = (int)EventAccessType.Private
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

@@ -35,7 +35,7 @@ public class SharedUserService : ISharedUserService
                 return Result.Failure<int>(
                     new Error(ErrorType.Record, $"You can't perform this operation to yourself"), 418);
             }
-            
+
             var sharedUserExist = await _sender.Send(new CheckExistQuery
             {
                 Id = request.UserId,
@@ -52,7 +52,7 @@ public class SharedUserService : ISharedUserService
                 return Result.Failure<int>(
                     new Error(ErrorType.Record, $"User not found!"), 404);
             }
-            
+
             var command = new CreateSharedUserCommand
             {
                 CurrentUserId = _userService.UserId,
@@ -71,7 +71,7 @@ public class SharedUserService : ISharedUserService
                 return Result.Failure<int>(
                     new Error(ErrorType.SharedUser, $"Shared User not created!"));
             }
-            
+
             return Result.Success(result.Data);
         }
         catch (Exception e)
@@ -134,7 +134,7 @@ public class SharedUserService : ISharedUserService
                 CurrentUserId = _userService.UserId,
                 SharedUserId = request.SharedUserId
             });
-            
+
             if (result.Failed)
             {
                 return Result.Failure(result.Error);
@@ -145,7 +145,7 @@ public class SharedUserService : ISharedUserService
                 return Result.Failure(
                     new Error(ErrorType.Event, $"Shared User not deleted!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)

@@ -27,7 +27,7 @@ public class CreateRecordImagesCommandHandler : ICommandHandler<CreateRecordImag
         {
             var sql = new StringBuilder();
             var replacedItem = "@record_id, @position, @image_id";
-            
+
             var command = $@"
 INSERT INTO {nameof(BaseDbContext.RecordImages).ToSnake()} (
     {nameof(RecordImage.RecordId).ToSnake()},
@@ -38,14 +38,14 @@ VALUES ({replacedItem})
 RETURNING {nameof(PKey.Id).ToSnake()};
 ";
             sql.Append(command);
-        
+
             var values = new List<string>();
             var parameters = new DynamicParameters();
-            
+
             for (int i = 0; i < request.ImageIds.Length; i++)
             {
                 values.Add(@$"(@record_id_{i}, @position_{i}, @image_id_{i})");
-            
+
                 parameters.AddDynamicParams(
                     new Dictionary<string, object>
                     {
@@ -56,7 +56,7 @@ RETURNING {nameof(PKey.Id).ToSnake()};
             }
 
             sql.Replace($"({replacedItem})", string.Join(", \n", values));
-        
+
             await using var connection = _dapper.InitConnection();
             var result = await connection.QueryAsync<int>(sql.ToString(), parameters);
 

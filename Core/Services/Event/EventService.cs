@@ -66,7 +66,7 @@ public class EventService : IEventService
                 return Result.Failure<int>(
                     new Error(ErrorType.Event, $"Event not created!"));
             }
-            
+
             return Result.Success(result.Data);
         }
         catch (Exception e)
@@ -87,7 +87,7 @@ public class EventService : IEventService
                 EventId = eventId,
                 Status = setActive ? EventStatus.Active : EventStatus.Inactive
             };
-            
+
             var result = await _sender.Send(command);
 
             if (result.Failed)
@@ -101,7 +101,7 @@ public class EventService : IEventService
                 return Result.Failure(
                     new Error(ErrorType.Event, message));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -122,7 +122,7 @@ public class EventService : IEventService
                 EventId = eventId,
                 Access = setPublic ? EventAccessType.Public : EventAccessType.Private
             };
-            
+
             var result = await _sender.Send(command);
 
             if (result.Failed)
@@ -136,7 +136,7 @@ public class EventService : IEventService
                 return Result.Failure(
                     new Error(ErrorType.Event, message));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -157,7 +157,7 @@ public class EventService : IEventService
                 EventId = eventId,
                 Name = request.Name
             };
-            
+
             var result = await _sender.Send(command);
 
             if (result.Failed)
@@ -170,7 +170,7 @@ public class EventService : IEventService
                 return Result.Failure(
                     new Error(ErrorType.Event, $"Event not updated!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -204,7 +204,7 @@ public class EventService : IEventService
                 return Result.Failure(
                     new Error(ErrorType.Record, $"Event not found!"), 404);
             }
-            
+
             using var memoryStream = new MemoryStream();
             await request.File.CopyToAsync(memoryStream);
 
@@ -230,10 +230,10 @@ public class EventService : IEventService
                 var recordService = scope.ServiceProvider.GetRequiredService<IBackgroundImageProcessing>();
 
                 await recordService.EventImageProcessing(userId, eventId, temporaryImageId.Data);
-                
+
                 _logger.LogInformation("Complete processing records.");
             });
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -266,14 +266,14 @@ public class EventService : IEventService
             {
                 return Result.Failure<LikeState>(new Error(ErrorType.Event, $"Event not found!"), 404);
             }
-            
+
             var command = new UpdateEventLikeStateCommand
             {
                 CurrentUserId = _userService.UserId,
                 EventId = eventId,
                 LikeState = likeState
             };
-            
+
             var result = await _sender.Send(command);
 
             if (result.Failed)
@@ -285,7 +285,7 @@ public class EventService : IEventService
             {
                 return Result.Failure<LikeState>(new Error(ErrorType.Event, "Action not performed!"));
             }
-            
+
             return Result.Success(likeState);
         }
         catch (Exception e)
@@ -325,7 +325,7 @@ public class EventService : IEventService
                 Count = queryResult.Data.Count,
                 Events = new List<EventItemPrivateModelDTO>(queryResult.Data.Events.Count),
             };
-            
+
             foreach (var eventItem in queryResult.Data.Events)
             {
                 result.Events.Add(
@@ -359,7 +359,7 @@ public class EventService : IEventService
                         IsSavedByUser = eventItem.IsSavedByUser,
                     });
             }
-            
+
             return Result.Success(result);
         }
         catch (Exception e)
@@ -398,7 +398,7 @@ public class EventService : IEventService
             {
                 return Result.Failure<GetEventByIdResponseDTO>(new Error(ErrorType.Event, "Event not found!"));
             }
-            
+
             var result = new GetEventByIdResponseDTO
                 {
                     Id = queryResult.Data.Id,
@@ -448,7 +448,7 @@ public class EventService : IEventService
                 CurrentUserId = _userService.UserId,
                 EventId = eventId,
             };
-            
+
             var result = await _sender.Send(command);
 
             if (result.Failed)
@@ -461,7 +461,7 @@ public class EventService : IEventService
                 return Result.Failure(
                     new Error(ErrorType.Event, $"Event not deleted!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -479,7 +479,7 @@ public class EventService : IEventService
             var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
             queryBuilder.FilterByAccessType(EventAccessType.Public);
             queryBuilder.FilterByStatus(EventStatus.Active);
-            
+
             var eventAccess = await _sender.Send(new CheckExistAccessQuery
             {
                 QueryAccessBuilder = queryBuilder
@@ -503,7 +503,7 @@ public class EventService : IEventService
             };
 
             var result = await _sender.Send(command);
-            
+
             if (result.Failed)
             {
                 return Result.Failure(result.Error);
@@ -514,7 +514,7 @@ public class EventService : IEventService
                 return Result.Failure(
                     new Error(ErrorType.Event, $"Event not added to Saved!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -534,7 +534,7 @@ public class EventService : IEventService
                 CurrentUserId = _userService.UserId,
                 EventId = eventId
             });
-            
+
             if (result.Failed)
             {
                 return Result.Failure(result.Error);
@@ -545,7 +545,7 @@ public class EventService : IEventService
                 return Result.Failure(
                     new Error(ErrorType.Event, $"Event not deleted from Saved!"));
             }
-            
+
             return Result.Success();
         }
         catch (Exception e)

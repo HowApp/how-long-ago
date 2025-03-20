@@ -25,9 +25,9 @@ public class BaseDbContext : DbContext
     public DbSet<Record> Records { get; set; } 
     public DbSet<LikedRecord> LikedRecords { get; set; }
     public DbSet<RecordImage> RecordImages { get; set; }
-    
+
     public DbSet<SharedUser> SharedUsers { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

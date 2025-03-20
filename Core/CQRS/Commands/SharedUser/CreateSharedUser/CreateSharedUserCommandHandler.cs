@@ -44,7 +44,7 @@ WHERE su.{nameof(SharedUser.UserOwnerId).ToSnake()} = @ownerId AND su.{nameof(Sh
                     ownerId = request.CurrentUserId,
                     sharedId = request.SharedUserId
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

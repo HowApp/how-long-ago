@@ -48,7 +48,7 @@ public static class ServiceCollectionExtensions
     {
         var baseAppSettings = new BaseApplicationSettings();
         configuration.Bind(nameof(BaseApplicationSettings), baseAppSettings);
-        
+
         services.AddCors(options =>
         {
             options.AddPolicy(AppConstants.CorsPolicy, builder =>
@@ -75,14 +75,14 @@ public static class ServiceCollectionExtensions
                 NullValueHandling = NullValueHandling.Ignore
             }
             .ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-        
+
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssemblyContaining<BaseDbContext>();
-        
+
         services.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressModelStateInvalidFilter = true;
         });
-        
+
         services.AddDataAccess(configuration)
             .AddConfigurations(configuration)
             .AddCustomServices()
@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
             .AddCustomAuthentication(configuration)
             .AddSwagger()
             .AddSignalR();
-        
+
         return services;
     }
 
@@ -99,7 +99,7 @@ public static class ServiceCollectionExtensions
     {
         var rabbitMq = new RabbitMqConfiguration();
         configuration.Bind(nameof(RabbitMqConfiguration), rabbitMq);
-        
+
         services.AddMassTransit(x =>
         {
             x.AddConsumer<UserRegisterConsumer, UserRegisterConsumerDefinition>();
@@ -128,52 +128,52 @@ public static class ServiceCollectionExtensions
                 options.StartTimeout = TimeSpan.FromSeconds(15);
                 options.StopTimeout = TimeSpan.FromSeconds(30);
             });
-        
+
         services.AddOptions<HostOptions>()
             .Configure(options =>
             {
                 options.StartupTimeout = TimeSpan.FromSeconds(30);
                 options.ShutdownTimeout = TimeSpan.FromSeconds(30);
             });
-        
+
         return services;
     }
     private static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var identityServerConfiguration = new IdentityServerConfiguration();
         configuration.Bind(nameof(IdentityServerConfiguration), identityServerConfiguration);
-        
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 // base-address of identity server
                 options.Authority = identityServerConfiguration.Authority;
                 options.Audience = identityServerConfiguration.Audience;
-        
+
                 options.TokenValidationParameters.ValidateAudience = true;
-        
+
                 // it's recommended to check the type header to avoid "JWT confusion" attacks
                 options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
                 options.MapInboundClaims = false;
-        
+
                 // if token does not contain a dot, it is a reference token
                 options.ForwardDefaultSelector = Selector.ForwardReferenceToken("introspection");
             })
             .AddOAuth2Introspection("introspection", options =>
             {
                 options.Authority = identityServerConfiguration.Authority;
-        
+
                 options.ClientId = identityServerConfiguration.ClientId;
                 options.ClientSecret = identityServerConfiguration.ClientSecret;
             });
-        
+
         return services;
     }
     private static IServiceCollection AddDataAccess(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? 
                                throw new ApplicationException("Database Connection string is null!");
-        
+
         var connectionTemporaryString = configuration.GetConnectionString("TemporaryStorageConnection") ?? 
                                throw new ApplicationException("Database Temporary Connection string is null!");
 
@@ -187,7 +187,7 @@ public static class ServiceCollectionExtensions
 
                     b.MigrationsHistoryTable(tableName: HistoryRepository.DefaultTableName, schema: "public");
                 });
-            
+
             o.UseSnakeCaseNamingConvention();
         });
 
@@ -197,10 +197,10 @@ public static class ServiceCollectionExtensions
                 b =>
                 {
                     b.MigrationsAssembly("How.Server");
-                    
+
                     b.MigrationsHistoryTable(tableName: HistoryRepository.DefaultTableName, schema: "temporary");
                 });
-            
+
             o.UseSnakeCaseNamingConvention();
         });
 
@@ -214,9 +214,9 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<DapperConnection>(o => 
             new DapperConnection(connectionString, connectionTemporaryString));
-        
+
         SqlMapper.AddTypeHandler(InstantHandler.Default);
-        
+
         return services;
     }
 
@@ -266,7 +266,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddGrpc();
         services.AddTransient<UserAccountGrpcService>();
-        
+
         return services;
     }
 
@@ -277,7 +277,7 @@ public static class ServiceCollectionExtensions
         {
             g.ConfigureForNodaTime();
             g.EnableAnnotations();
-            
+
             g.SwaggerDoc(SwaggerDocConstants.Account, new OpenApiInfo
             {
                 Title = "How",

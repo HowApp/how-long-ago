@@ -1,6 +1,3 @@
 namespace How.Common;
 
-public sealed class AssemblyCommonReference
-{
-    
-}
+public sealed class AssemblyCommonReference { }

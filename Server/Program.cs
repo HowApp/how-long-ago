@@ -29,13 +29,13 @@ public class Program
                 listenOptions.UseHttps();
                 listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
             });
-            
+
             options.ListenAnyIP(7061, listenOptions =>
             {
                 listenOptions.UseHttps(certificateManager.GetCertificate());
                 listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
             });
-            
+
             options.ConfigureHttpsDefaults(h =>
             {
                 h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;

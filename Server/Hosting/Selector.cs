@@ -20,7 +20,7 @@ public static class Selector
 
         return Select;
     }
-    
+
     // Extracts scheme and credential from Authorization header (if present)
     public static (string, string) GetSchemeAndCredential(HttpContext context)
     {

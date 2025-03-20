@@ -43,20 +43,20 @@ public class ImageStorageService : IImageStorageService
             originalStream.Position = 0;
 
             var convertedImage = ImageHelper.ConvertImageToWebp(originalStream);
-            
+
             await using var convertedStream = new MemoryStream(convertedImage.ImageData);
             var reducedImage = ImageHelper.GetReducedImage(convertedStream);
-            
+
             // Don't trust the file name sent by the client. To display
             // the file name, HTML-encode the value.
             var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
-            
+
             var trustedImageNameForDisplay = $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
             var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
-            
+
             var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
             var thumbnailHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
-            
+
             var item = new StorageImage
             {
                 ImageHeight = convertedImage.Height,
@@ -82,12 +82,12 @@ public class ImageStorageService : IImageStorageService
                     Content = reducedImage.ImageData
                 }
             };
-            
+
             _dbContext.StorageImages.Add(item);
             await _dbContext.SaveChangesAsync(CancellationToken.None);
 
             GC.Collect();
-            
+
             return Result.Success();
         }
         catch (Exception e)
@@ -121,7 +121,7 @@ public class ImageStorageService : IImageStorageService
             var result = new Result<ImageInternalModel>(new ImageInternalModel());
             await ProcessImage(originalStream, file.FileName, result);
             GC.Collect();
-            
+
             return result;
         }
         catch (Exception e)
@@ -153,7 +153,7 @@ public class ImageStorageService : IImageStorageService
 
             var result = new Result<ImageInternalModel>(new ImageInternalModel());
             await ProcessImage(originalStream, fileName, result);
-            
+
             GC.Collect();
 
             return result;
@@ -170,20 +170,20 @@ public class ImageStorageService : IImageStorageService
     private async Task ProcessImage(MemoryStream originalStream, string fileName, Result<ImageInternalModel> result)
     {
         var convertedImage = ImageHelper.ConvertImageToWebp(originalStream);
-            
+
         await using var convertedStream = new MemoryStream(convertedImage.ImageData);
         var reducedImage = ImageHelper.GetReducedImage(convertedStream);
-            
+
         // Don't trust the file name sent by the client. To display
         // the file name, HTML-encode the value.
         var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
-            
+
         var trustedImageNameForDisplay = $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(fileName))}.{extensions}";
         var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
-            
+
         var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
         var thumbnailHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
-        
+
         var imageModel = new ImageInternalModel
         {
             ImageHeight = convertedImage.Height,
@@ -209,7 +209,7 @@ public class ImageStorageService : IImageStorageService
                 Content = reducedImage.ImageData
             }
         };
-        
+
         result.Data = imageModel;
     }
 }

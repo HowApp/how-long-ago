@@ -40,7 +40,7 @@ RETURNING {nameof(StorageImage.MainId).ToSnake()}, {nameof(StorageImage.Thumbnai
             var combinedArray = new int[length * 2];
             Array.Copy(sourceArr.Select(a => a.Item1).ToArray(), combinedArray, length);
             Array.Copy(sourceArr.Select(a => a.Item2).ToArray(), 0, combinedArray, length, length);
-            
+
             var removeFileSql = $@"
 DELETE FROM {nameof(BaseDbContext.StorageFiles).ToSnake()}
 WHERE {nameof(StorageFile.Id).ToSnake()} = ANY(@imageId);
@@ -49,7 +49,7 @@ WHERE {nameof(StorageFile.Id).ToSnake()} = ANY(@imageId);
             {
                 imageId = combinedArray
             });
-            
+
             return Result.Success();
         }
         catch (Exception e)

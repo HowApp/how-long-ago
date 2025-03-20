@@ -13,7 +13,7 @@ public class BackgroundTaskQueue : IBackgroundTaskQueue
         {
             throw new ArgumentNullException(nameof(_queue));
         }
-        
+
         _queue.Enqueue(workItem);
         _semaphore.Release();
     }

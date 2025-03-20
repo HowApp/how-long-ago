@@ -13,13 +13,13 @@ public class CertificateManagerBase
     protected static string CN = string.Empty;
     protected static string CertFileName = string.Empty;
     protected static string CertPath = string.Empty;
-    
+
     protected X509Certificate2 Certificate;
-    
+
     public X509Certificate2 GetCertificate()
     {
         DoNeedThrow();
-        
+
         if (Certificate is null)
         {
             GetOrCreateCertificate();
@@ -27,7 +27,7 @@ public class CertificateManagerBase
 
         return Certificate;
     }
-    
+
     public void SetUpManagerConfig(IConfiguration configuration)
     {
         var certConfig = new CertificateConfiguration();
@@ -41,13 +41,13 @@ public class CertificateManagerBase
         GetOrCreateCertificate();
         DoNeedThrow();
     }
-    
+
     protected virtual void GetOrCreateCertificate()
     {
         if (File.Exists(CertPath))
         {
             Certificate = new X509Certificate2(CertPath, CertPassword);
-            
+
             if (Certificate.NotAfter <= DateTime.UtcNow)
             {
                 throw new CryptographicException("Service certificate is expired");
@@ -58,11 +58,11 @@ public class CertificateManagerBase
             throw new FileNotFoundException("Certificate not found");
         }
     }
-    
+
     private string  GetCertificatePath(string certName)
     {
         var directory = string.Empty;
-        
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "dev-cert", CertificateConstant.ProductName);

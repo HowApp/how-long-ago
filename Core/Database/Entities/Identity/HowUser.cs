@@ -10,10 +10,10 @@ public class HowUser
     public string FirstName { get; set; }
     [StringLength(2048)]
     public string LastName { get; set; }
-    
+
     public bool IsDeleted { get; set; }
     public bool IsSuspended{ get; set; }
-    
+
     public int? StorageImageId { get; set; }
     public StorageImage StorageImage { get; set; }
 }

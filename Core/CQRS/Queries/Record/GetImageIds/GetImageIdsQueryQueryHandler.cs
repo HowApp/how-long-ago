@@ -28,7 +28,7 @@ SELECT ri.{nameof(RecordImage.Id).ToSnake()}
 FROM {nameof(BaseDbContext.RecordImages).ToSnake()} ri
 WHERE ri.{nameof(RecordImage.RecordId).ToSnake()} = @record_id
 ";
-            
+
             await using var connection = _dapper.InitConnection();
             var result = await connection.QueryAsync<int>(
                 query,

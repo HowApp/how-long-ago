@@ -34,7 +34,7 @@ public class FileProcessingHubService : IFileProcessingHubService
             _logger.LogError(e, e.Message);
         }
     }
-    
+
     public async Task NotifyUser(int userId, string message)
     {
         try

@@ -51,7 +51,7 @@ EXISTS(
                     innerFilter = $@"true";
                     break;
             }
-            
+
             var innerStatusFilter = string.Empty;
             switch (request.Status)
             {
@@ -62,7 +62,7 @@ EXISTS(
                     innerStatusFilter = $@"e.{nameof(Event.Status).ToSnake()} = {(int)request.Status}";
                     break;
             }
-            
+
             var innerAccessFilter = string.Empty;
             switch (request.Access)
             {
@@ -73,7 +73,7 @@ EXISTS(
                     innerAccessFilter = $@"e.{nameof(Event.Access).ToSnake()} = {(int)request.Access}";
                     break;
             }
-            
+
             var query = $@"
 SELECT 
     e.{nameof(PKey.Id).ToSnake()} AS {nameof(GetEventByIdQueryResult.Id)},
@@ -144,9 +144,9 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @EventId
     ({innerAccessFilter})
 LIMIT 1;
 ";
-            
+
             await using var connection = _dapper.InitConnection();
-            
+
             var eventItem = await connection.QueryFirstOrDefaultAsync<GetEventByIdQueryResult>(
                 query,
                 new
@@ -154,7 +154,7 @@ LIMIT 1;
                     created_by_id = request.CurrentUserId,
                     EventId = request.EventId
                 });
-            
+
             return Result.Success(eventItem);
         }
         catch (Exception e)

@@ -19,7 +19,7 @@ public static class ModelBuilderExtensions
                 .ForEach(fk => fk.DeleteBehavior = DeleteBehavior.Restrict);
         }
     }
-    
+
     public static ModelBuilder UseSnakeCaseNamingConvention(this ModelBuilder modelBuilder)
     {
         foreach (var entity in modelBuilder.Model.GetEntityTypes())

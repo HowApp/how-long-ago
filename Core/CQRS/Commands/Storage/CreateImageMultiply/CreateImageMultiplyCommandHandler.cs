@@ -26,7 +26,7 @@ public class CreateImageMultiplyCommandHandler : ICommandHandler<CreateImageMult
     {
         await using var connection = _dapper.InitConnection();
         await using var transaction = await connection.BeginTransactionAsync(CancellationToken.None);
-        
+
         try
         {
             var mainId = await InsertFile(request.Images.Select(i => i.Main).ToList(), connection, transaction);
@@ -39,10 +39,10 @@ public class CreateImageMultiplyCommandHandler : ICommandHandler<CreateImageMult
                 return Result.Failure<int[]>(
                     new Error(ErrorType.Account, $"Error while insert {nameof(StorageFile)} at {nameof(CreateImageMultiplyCommand)}"));
             }
-            
+
             var sql = new StringBuilder();
             var replacedItem = "@image_height, @image_width, @thumbnail_height, @thumbnail_width, @main_id, @thumbnail_id";
-            
+
             var command = @$"
 INSERT INTO {nameof(BaseDbContext.StorageImages).ToSnake()} (
     {nameof(StorageImage.ImageHeight).ToSnake()},
@@ -56,14 +56,14 @@ VALUES
 RETURNING {nameof(StorageImage.Id).ToSnake()};
 ";
             sql.Append(command);
-            
+
             var values = new List<string>();
             var parameters = new DynamicParameters();
-            
+
             for (int i = 0; i < request.Images.Count; i++)
             {
                 values.Add(@$"(@image_height_{i}, @image_width_{i}, @thumbnail_height_{i}, @thumbnail_width_{i}, @main_id_{i}, @thumbnail_id_{i})");
-                
+
                 parameters.AddDynamicParams(
                     new Dictionary<string, object>
                     {
@@ -75,11 +75,11 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
                         { $"@thumbnail_id_{i}", thumbnailId[i]},
                     });
             }
-            
+
             sql.Replace($"({replacedItem})", string.Join(", \n", values));
-            
+
             var result = (await connection.QueryAsync<int>(sql.ToString(), parameters, transaction)).ToArray();
-            
+
             if (!result.Any())
             {
                 await transaction.RollbackAsync(CancellationToken.None);
@@ -87,7 +87,7 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
                 return Result.Failure<int[]>(
                     new Error(ErrorType.Account, $"Error while insert {nameof(StorageImage)} at {nameof(CreateImageMultiplyCommand)}"));
             }
-            
+
             await transaction.CommitAsync(CancellationToken.None);
             return Result.Success(result);
         }
@@ -99,12 +99,12 @@ RETURNING {nameof(StorageImage.Id).ToSnake()};
                 new Error(ErrorType.Account, $"Error while executing {nameof(CreateImageMultiplyCommand)}"));
         }
     }
-    
+
     private async Task<int[]> InsertFile(List<FileInternalModel> files, NpgsqlConnection connection, NpgsqlTransaction transaction)
     {
         var sql = new StringBuilder();
         var replacedItem = "@hash, @name, @path, @extension, @size, @content";
-        
+
         var command = $@"
 INSERT INTO {nameof(BaseDbContext.StorageFiles).ToSnake()} (
     {nameof(StorageFile.Hash).ToSnake()},
@@ -118,14 +118,14 @@ VALUES
 RETURNING {nameof(StorageFile.Id).ToSnake()};
 ";
         sql.Append(command);
-        
+
         var values = new List<string>();
         var parameters = new DynamicParameters();
 
         for (int i = 0; i < files.Count; i++)
         {
             values.Add(@$"(@hash_{i}, @name_{i}, @path_{i}, @extension_{i}, @size_{i}, @content_{i})");
-            
+
             parameters.AddDynamicParams(
                 new Dictionary<string, object>
                 {
@@ -139,7 +139,7 @@ RETURNING {nameof(StorageFile.Id).ToSnake()};
         }
 
         sql.Replace($"({replacedItem})", string.Join(", \n", values));
-        
+
         var result = await connection.QueryAsync<int>(sql.ToString(), parameters, transaction);
 
         return result.ToArray();

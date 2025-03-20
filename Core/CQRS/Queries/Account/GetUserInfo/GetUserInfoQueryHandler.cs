@@ -44,13 +44,12 @@ LIMIT 1
                query,
                new { userId = request.CurrentUserId });
 
-           
            if (result is null)
            {
                return Result.Failure<GetUserInfoQueryResult>(
                    new Error(ErrorType.Account, "User not found!"), 404);
            }
-           
+
            return Result.Success(result);
         }
         catch (Exception e)

@@ -46,7 +46,7 @@ public class RecordController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPatch]
     [SwaggerOperation("Update record")]
     [ProducesResponseType<Result>(200)]
@@ -60,7 +60,7 @@ public class RecordController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPatch]
     [SwaggerOperation("Update like record state")]
     [ProducesResponseType<Result>(200)]
@@ -102,7 +102,7 @@ public class RecordController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPatch]
     [SwaggerOperation("Update record images")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]
@@ -116,7 +116,7 @@ public class RecordController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpDelete]
     [SwaggerOperation("Delete Record by ID")]
     [ProducesResponseType<Result<CreateRecordImagesResponseDTO>>(200)]

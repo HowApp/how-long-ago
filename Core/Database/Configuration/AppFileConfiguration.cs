@@ -10,7 +10,7 @@ public class AppFileConfiguration : IEntityTypeConfiguration<StorageFile>
     {
         builder.HasIndex(x => x.Hash).IsUnique();
         builder.HasIndex(x => x.Path).IsUnique();
-        
+
         builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.Path).IsRequired();
     }

@@ -45,16 +45,16 @@ public class PublicRecordService : IPublicRecordService
                 return Result.Failure<GetRecordsPaginationPublicResponseDTO>(
                     new Error(ErrorType.Record, $"Event not found!"), 404);
             }
-            
+
             var query = new GetRecordsPaginationPublicQuery
             {
                 Offset = (request.Page - 1) * request.Size,
                 Size = request.Size,
                 EventId = eventId
             };
-            
+
             var queryResult = await _sender.Send(query);
-            
+
             if (queryResult.Failed)
             {
                 return Result.Failure<GetRecordsPaginationPublicResponseDTO>(queryResult.Error);

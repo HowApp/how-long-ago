@@ -36,7 +36,7 @@ ON CONFLICT ({nameof(HowUser.UserId).ToSnake()})
 DO NOTHING
 RETURNING *;
 ";
-            
+
             await using var connection = _dapper.InitConnection();
             var result = await connection.ExecuteAsync(
                 command,
@@ -44,7 +44,7 @@ RETURNING *;
                 {
                     UserId = request.UserId
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

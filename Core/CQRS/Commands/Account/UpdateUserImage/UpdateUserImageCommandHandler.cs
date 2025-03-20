@@ -26,7 +26,7 @@ public class UpdateUserImageCommandHandler : ICommandHandler<UpdateUserImageComm
     {
         await using var connection = _dapper.InitConnection();
         await using var transaction = await connection.BeginTransactionAsync(CancellationToken.None);
-        
+
         try
         {
             var updateImageSql = $@"
@@ -38,7 +38,7 @@ RETURNING (
     FROM {nameof(BaseDbContext.Users).ToSnake()} u 
     WHERE u.{nameof(HowUser.UserId).ToSnake()} = @userId);
 ";
-            
+
             var oldImageId = await connection.QueryFirstOrDefaultAsync<int>(
                 updateImageSql, new
                 {
@@ -71,7 +71,7 @@ WHERE {nameof(StorageFile.Id).ToSnake()} = ANY(@imageId);
                 },
                 transaction);
             }
-            
+
             await transaction.CommitAsync(CancellationToken.None);
             return Result.Success();
         }

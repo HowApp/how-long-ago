@@ -27,7 +27,7 @@ public class EventAccessQueryAccessBuilder : IEventAccessQueryAccessBuilder
     public void Init(int eventId)
     {
         _query.Clear();
-        
+
         _query.Append($@"
 SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE AND
@@ -71,7 +71,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     public void FilterByStatus(EventStatus status)
     {
         _parameters.Add("@eventStatus", status);
-        
+
         _query.Append($@"
     AND
     e.{nameof(Event.Status).ToSnake()} = @eventStatus
@@ -81,7 +81,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     public void FilterByAccessType(EventAccessType accessType)
     {
         _parameters.Add("@accessType", accessType);
-        
+
         _query.Append($@"
     AND
     e.{nameof(Event.Access).ToSnake()} = @accessType

@@ -19,7 +19,7 @@ public class RecordAccessAccessBuilder : IRecordAccessAccessBuilder
     public RecordAccessAccessBuilder(int eventId, int recordId)
     {
         _query.Append($@"SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e WHERE 1 = 0");
-        
+
         if (eventId >= 0 && recordId >= 0)
         {
             Init(eventId, recordId);
@@ -29,7 +29,7 @@ public class RecordAccessAccessBuilder : IRecordAccessAccessBuilder
     public void Init(int eventId, int recordId)
     {
         _query.Clear();
-        
+
         _query.Append($@"
 SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
          RIGHT JOIN {nameof(BaseDbContext.Records).ToSnake()} r ON r.{nameof(Record.EventId).ToSnake()} = @eventId
@@ -44,7 +44,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     public void FilterCreatedBy(int userId, InternalAccessFilter internalAccessFilter)
     {
         _parameters.Add("@createdById", userId);
-        
+
         switch (internalAccessFilter)
         {
             case InternalAccessFilter.IncludeCreatedBy:
@@ -76,7 +76,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     public void FilterByStatus(EventStatus status)
     {
         _parameters.Add("@eventStatus", status);
-        
+
         _query.Append($@"
     AND
     e.{nameof(Event.Status).ToSnake()} = @eventStatus
@@ -86,7 +86,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
     public void FilterByAccessType(EventAccessType accessType)
     {
         _parameters.Add("@accessType", accessType);
-        
+
         _query.Append($@"
     AND
     e.{nameof(Event.Access).ToSnake()} = @accessType

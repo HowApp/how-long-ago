@@ -34,7 +34,7 @@ RETURNING {nameof(StorageImage.MainId).ToSnake()}, {nameof(StorageImage.Thumbnai
                 {
                     imageId = request.ImageId
                 });
-            
+
             var removeFileSql = $@"
 DELETE FROM {nameof(BaseDbContext.StorageFiles).ToSnake()}
 WHERE {nameof(StorageFile.Id).ToSnake()} = ANY(@imageId);
@@ -43,7 +43,7 @@ WHERE {nameof(StorageFile.Id).ToSnake()} = ANY(@imageId);
             {
                 imageId = new int[] {oldFiles.Item1, oldFiles.Item2 }
             });
-            
+
             return Result.Success();
         }
         catch (Exception e)

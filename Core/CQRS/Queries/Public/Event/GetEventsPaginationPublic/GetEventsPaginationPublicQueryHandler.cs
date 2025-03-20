@@ -123,7 +123,7 @@ WHERE e.{nameof(Event.IsDeleted).ToSnake()} = FALSE
                     offset = request.Offset,
                     search = request.Search
                 });
-            
+
             return Result.Success(new GetEventsPaginationPublicQueryResult
             {
                 Count = count,

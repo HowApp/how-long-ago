@@ -38,7 +38,7 @@ RETURNING *;
                     currentUserId = request.CurrentUserId,
                     sharedUserId = request.SharedUserId
                 });
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

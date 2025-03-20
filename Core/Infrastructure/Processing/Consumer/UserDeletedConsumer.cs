@@ -26,9 +26,9 @@ public class UserDeletedConsumer : IConsumer<UserDeletedMessage>
         {
             _logger.LogError("Received User Deleted Message without User ID");
         }
-        
+
         var salt = "Deleted_" + Guid.NewGuid();
-        
+
         var result = await _sender.Send(new InternalUserDeleteCommand
         {
             UserId = context.Message.UserId,
@@ -39,7 +39,7 @@ public class UserDeletedConsumer : IConsumer<UserDeletedMessage>
         {
             _logger.LogError(result.GetErrorMessages());
         }
-        
+
         if (result.Data == 0)
         {
             _logger.LogInformation($"User NOT deleted. User ID: {context.Message.UserId}");

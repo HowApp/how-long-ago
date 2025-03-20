@@ -33,7 +33,7 @@ FROM {nameof(TemporaryStorageDbContext.Files).ToSnake()} f
 WHERE f.{nameof(PKey.Id).ToSnake()} = @fileId
 LIMIT 1;
 ";
-            
+
             await using var connection = _dapper.InitTemporaryConnection();
             var result = await connection.QueryFirstOrDefaultAsync<TemporaryFileModel>(
                 query, 

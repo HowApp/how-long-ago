@@ -27,7 +27,7 @@ public class CheckExistAccessQueryHandler : IQueryHandler<CheckExistAccessQuery,
                     new Error(ErrorType.QueryBuilder, $"Query builder is NULL!"));
             }
             var queryData = request.QueryAccessBuilder.BuildQuery();
-            
+
             await using var connection = _dapper.InitConnection();
 
             var result = await connection.QuerySingleAsync<bool>(

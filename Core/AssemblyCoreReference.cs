@@ -1,6 +1,3 @@
 namespace How.Core;
 
-public sealed class AssemblyCoreReference
-{
-    
-}
+public sealed class AssemblyCoreReference { }

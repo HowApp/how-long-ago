@@ -28,7 +28,7 @@ SELECT COALESCE(MAX(ri.{nameof(RecordImage.Position).ToSnake()}), -1)
 FROM {nameof(BaseDbContext.RecordImages).ToSnake()} ri
 WHERE ri.{nameof(RecordImage.RecordId).ToSnake()} = @record_id
 ";
-            
+
             await using var connection = _dapper.InitConnection();
             var result = await connection.ExecuteScalarAsync<int>(
                 query,

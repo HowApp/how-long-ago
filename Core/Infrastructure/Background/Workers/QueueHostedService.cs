@@ -28,7 +28,7 @@ public class QueueHostedService : BackgroundService
         _logger.LogInformation("QueueHostedService is starting.");
 
         var tasks = new List<Task>();
-        
+
         while (!cancellationToken.IsCancellationRequested)
         {
             while (tasks.Count < MaxDegreeParallelism)
@@ -51,14 +51,14 @@ public class QueueHostedService : BackgroundService
                             }
                         }
                     }, cancellationToken);
-                    
+
                     tasks.Add(task);
                 }
             }
-            
+
             tasks.Remove(await Task.WhenAny(tasks));
         }
-        
+
         _logger.LogInformation("QueueHostedService is stopping.");
     }
 }

@@ -45,7 +45,7 @@ LIMIT 50;
             var result = await connection.QueryAsync<GetUserInfoByUserNameQueryResult>(
                 query,
                 new { search = request.Search });
-            
+
             return Result.Success(result.ToList());
         }
         catch (Exception e)

@@ -20,7 +20,7 @@ public class ExceptionFilter : IExceptionFilter
     public void OnException(ExceptionContext context)
     {
         var result = new Result();
-        
+
         switch (context.Exception)
         {
             case BaseException fileTypeException:
@@ -30,11 +30,11 @@ public class ExceptionFilter : IExceptionFilter
             default:
                 result = Result.Failure(new Error(ErrorType.UnexpectedError, "Unexpected error..."));
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                
+
                 _logger.LogError($"{context.Exception}");
                 break;
         }
-        
+
         context.Result = new JsonResult(result);
     }
 }

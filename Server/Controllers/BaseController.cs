@@ -13,17 +13,17 @@ public class BaseController : ControllerBase
         {
             return Ok(result);
         }
-        
+
         return StatusCode((int)HttpStatusCode.BadRequest, result);
     }
-    
+
     protected IActionResult HttpResult<T>(Result<T> result)
     {
         if (result.Succeeded)
         {
             return Ok(result);
         }
-        
+
         return StatusCode((int)HttpStatusCode.BadRequest, result);
     }
 }

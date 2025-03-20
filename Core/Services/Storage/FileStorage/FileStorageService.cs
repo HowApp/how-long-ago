@@ -94,7 +94,7 @@ public class FileStorageService : IFileStorageService
                     ErrorType.Storage,
                     $"File not found!"), 404);
             }
-            
+
             var result = new GetFileFromDatabaseByteResponseDTO
             {
                 FileName = image.FileName,
@@ -141,7 +141,7 @@ public class FileStorageService : IFileStorageService
                 MimeType = CommonMIMETypesHelper.GetMIMEType(image.Extension),
                 Content = memoryStream
             };
-            
+
             return Result.Success(result);
         }
         catch (Exception e)

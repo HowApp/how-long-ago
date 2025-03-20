@@ -20,9 +20,9 @@ public class TemporaryStorageDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.HasDefaultSchema("temporary");
-        
+
         modelBuilder.SetOnDeleteRule();
         modelBuilder.UseSnakeCaseNamingConvention();
     }

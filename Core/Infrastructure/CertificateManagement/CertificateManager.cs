@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 public sealed class CertificateManager : CertificateManagerBase
 {
     private static CertificateManager _instance;
-    
+
     private static readonly object Lock = new object();
 
     private CertificateManager()

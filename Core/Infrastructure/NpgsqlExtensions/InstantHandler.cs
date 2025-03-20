@@ -13,7 +13,7 @@ public class InstantHandler : SqlMapper.TypeHandler<Instant>
     }
 
     public static readonly InstantHandler Default = new InstantHandler();
-    
+
     public override void SetValue(IDbDataParameter parameter, Instant value)
     {
         parameter.Value = value.ToDateTimeUtc();
@@ -36,7 +36,7 @@ public class InstantHandler : SqlMapper.TypeHandler<Instant>
         {
             return instant;
         }
-        
+
         if (value is DateTimeOffset dateTimeOffset)
         {
             return Instant.FromDateTimeOffset(dateTimeOffset);

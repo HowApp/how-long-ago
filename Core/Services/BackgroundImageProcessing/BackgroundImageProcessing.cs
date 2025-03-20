@@ -46,7 +46,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
         try
         {
             var imagesInternal = new List<ImageInternalModel>();
-            
+
             foreach (var item in fileIds)
             {
                 var temporaryImage = await _sender.Send(new GetTemporaryFileQuery
@@ -68,19 +68,19 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
                     if (image.Failed)
                     {
                         _logger.LogError(image.GetErrorMessages());
-                        
+
                         await DeleteTemporaryFiles();
-                        
+
                         await _fileProcessing.NotifyUser(userId, image.GetErrorMessages());
                         return;
                     }
-                
+
                     imagesInternal.Add(image.Data);
                 }
             }
 
             await DeleteTemporaryFiles();
-            
+
             var createImages = await _sender.Send(new CreateImageMultiplyCommand
             {
                 Images = imagesInternal
@@ -106,16 +106,16 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             {
                 RecordId = recordId
             });
-            
+
             if (maxPosition.Failed)
             {
                 await RollBackImageProcessing();
-                
+
                 _logger.LogError(maxPosition.GetErrorMessages());
                 await _fileProcessing.NotifyUser(userId, maxPosition.GetErrorMessages());
                 return;
             }
-            
+
             var command = new CreateRecordImagesCommand
             {
                 RecordId = recordId,
@@ -128,7 +128,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             if (commandResult.Failed)
             {
                 await RollBackImageProcessing();
-                
+
                 _logger.LogError(commandResult.GetErrorMessages());
                 return;
             }
@@ -136,12 +136,12 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             if (!commandResult.Data.Any())
             {
                 await RollBackImageProcessing();
-                
+
                 _logger.LogError("Record Images not created!");
                 await _fileProcessing.NotifyUser(userId, "Record Images not created!");
                 return;
             }
-            
+
             var resultImageData = new CreateRecordImagesResponseDTO
             {
                 ImagePaths = imagesInternal.Select(i => new UploadImageResponseModelDTO
@@ -158,7 +158,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
         {
             await RollBackImageProcessing();
             await DeleteTemporaryFiles();
-            
+
             _logger.LogError(e.Message);
             await _fileProcessing.NotifyUser(userId, "Images processing failed!");
         }
@@ -185,7 +185,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
                 await DeleteTemporaryFiles();
                 await _fileProcessing.NotifyUser(userId, "Temporary Image is null!");
             }
-            
+
             var image = await _imageStorage.CreateImageInternal(
                 temporaryImage.Data.Content,
                 temporaryImage.Data.FileName);
@@ -193,9 +193,9 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             if (image.Failed)
             {
                 _logger.LogError(image.GetErrorMessages());
-                        
+
                 await DeleteTemporaryFiles();
-                        
+
                 await _fileProcessing.NotifyUser(userId, image.GetErrorMessages());
                 return;
             }
@@ -215,7 +215,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             }
 
             _processedImageIds = new int[]{createImages.Data};
-            
+
             var updateEventImage = await _sender.Send(new UpdateEventImageCommand
             {
                 CurrentUserId = userId,
@@ -226,7 +226,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             if (updateEventImage.Failed)
             {
                 await RollBackImageProcessing();
-                
+
                 _logger.LogError(updateEventImage.GetErrorMessages());
                 return;
             }
@@ -236,7 +236,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
                 MainHash = image.Data.Main.Hash,
                 ThumbnailHash = image.Data.Thumbnail.Hash
             };
-            
+
             var result = Result.Success(resultImageData);
             await _fileProcessing.NotifyUser(userId, result.Serialize());
         }
@@ -244,7 +244,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
         {
             await RollBackImageProcessing();
             await DeleteTemporaryFiles();
-            
+
             _logger.LogError(e.Message);
             await _fileProcessing.NotifyUser(userId, "Images processing failed!");
         }
@@ -265,7 +265,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             }
         }
     }
-    
+
     private async Task DeleteTemporaryFiles()
     {
         if (_temporaryFilesIds.Any())
@@ -274,7 +274,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
             {
                 FileId = _temporaryFilesIds
             });
-            
+
             if (result.Failed)
             {
                 _logger.LogError(result.GetErrorMessages());

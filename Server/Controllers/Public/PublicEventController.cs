@@ -16,7 +16,7 @@ public class PublicEventController : BaseController
     {
         _eventService = eventService;
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get Events list with pagination")]
     [ProducesResponseType<Result<GetEventsPaginationPublicResponseDTO>>(200)]
@@ -27,7 +27,7 @@ public class PublicEventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpGet]
     [SwaggerOperation("Get Event detail by id")]
     [ProducesResponseType<Result<GetEventPublicByIdResponseDTO>>(200)]

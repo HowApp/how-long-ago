@@ -18,7 +18,7 @@ public class UserAccountGrpcService : UserAccount.UserAccountBase
         _logger = logger;
         _sender = sender;
     }
-    
+
     public override async Task<Reply> UserRegister(RegisterUserRequest request, ServerCallContext context)
     {
         _logger.LogInformation("Content Received User ID: {UserId}", request.UserId);
@@ -56,12 +56,12 @@ public class UserAccountGrpcService : UserAccount.UserAccountBase
     public override async Task<Reply> UserDelete(DeleteUserRequest request, ServerCallContext context)
     {
         _logger.LogInformation("Content Received User ID: {UserId}", request.UserId);
-        
+
         if (request.UserId == 0)
         {
             _logger.LogError("Received User Delete Message without User ID");
         }
-        
+
         var salt = "Deleted_" + Guid.NewGuid();
 
         var result = await _sender.Send(new InternalUserDeleteCommand
@@ -69,9 +69,9 @@ public class UserAccountGrpcService : UserAccount.UserAccountBase
             UserId = request.UserId,
             Salt = salt
         });
-        
+
         var reply = new Reply();
-        
+
         if (result.Succeeded)
         {
             if (result.Data == 0)
@@ -93,20 +93,20 @@ public class UserAccountGrpcService : UserAccount.UserAccountBase
     public override async Task<Reply> UserSuspend(SuspendUser request, ServerCallContext context)
     {
         _logger.LogInformation("Content Received User ID: {UserId}", request.UserId);
-        
+
         if (request.UserId == 0)
         {
             _logger.LogError("Received User update Suspend state Message without User ID");
         }
-        
+
         var result = await _sender.Send(new InternalUserUpdateSuspendCommand
         {
             UserId = request.UserId,
             State = request.State
         });
-        
+
         var reply = new Reply();
-        
+
         if (result.Succeeded)
         {
             if (result.Data == 0)

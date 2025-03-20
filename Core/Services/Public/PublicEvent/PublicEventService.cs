@@ -45,7 +45,7 @@ public class PublicEventService : IPublicEventService
                 Count = queryResult.Data.Count,
                 Events = new List<EventItemPublicModelDTO>(queryResult.Data.Events.Count),
             };
-            
+
             foreach (var eventItem in queryResult.Data.Events)
             {
                 result.Events.Add(
@@ -75,7 +75,7 @@ public class PublicEventService : IPublicEventService
                         SavedCount = eventItem.SavedCount,
                     });
             }
-            
+
             return Result.Success(result);
         }
         catch (Exception e)
@@ -107,7 +107,7 @@ public class PublicEventService : IPublicEventService
                 return Result.Failure<GetEventPublicByIdResponseDTO>(
                     new Error(ErrorType.Event, $"Event not found!"), 404);
             }
-            
+
             var result = new GetEventPublicByIdResponseDTO
             {
                 Id = queryResult.Data.Id,
