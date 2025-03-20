@@ -4,12 +4,9 @@ using Common.Configurations;
 using Common.Constants;
 using Core.Database;
 using Core.Database.Seeds;
-using Core.Infrastructure.CertificateManagement;
+using Core.Infrastructure.GrpcCommunication.Services;
 using Core.Infrastructure.Hubs;
-using Core.Services.GrpcCommunication;
 using Extensions;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -19,30 +16,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        var certificateManager = CertificateManager.GetInstance();
-        certificateManager.SetUpManagerConfig(builder.Configuration);
-
-        builder.WebHost.ConfigureKestrel(options =>
-        {
-            options.ListenAnyIP(7060, listenOptions =>
-            {
-                listenOptions.UseHttps();
-                listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-            });
-
-            options.ListenAnyIP(7061, listenOptions =>
-            {
-                listenOptions.UseHttps(certificateManager.GetCertificate());
-                listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-            });
-
-            options.ConfigureHttpsDefaults(h =>
-            {
-                h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
-                h.CheckCertificateRevocation = false;
-                h.ServerCertificate = certificateManager.GetCertificate();
-            });
-        });
+        builder.ConfigureKestrel();
 
         // Add services to the container.
         builder.Services.SetupServices(builder.Configuration);

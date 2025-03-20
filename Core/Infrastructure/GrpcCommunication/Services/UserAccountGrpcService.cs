@@ -1,4 +1,4 @@
-namespace How.Core.Services.GrpcCommunication;
+namespace How.Core.Infrastructure.GrpcCommunication.Services;
 
 using Common;
 using CQRS.Commands.Internal.UserDelete;
