@@ -34,6 +34,11 @@ example of secrets to run app
     "ClientSecret": "/your_secret_for_resource/",
     "ClientSwaggerSecret": "/your_secret_for_swagger/"
   },
+  "CertificateConfiguration": {
+    "Password": "",
+    "CertFileName": ".pfx",
+    "CN": ""
+  },
   "RabbitMqConfiguration": {
     "Host": "127.0.0.1",
     "User": "admin",

@@ -17,7 +17,7 @@ public class CurrentUserService : ICurrentUserService
     {
         get
         {
-            if (!Int32.TryParse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            if (!Int32.TryParse(_httpContextAccessor.HttpContext.User.FindFirstValue("sub"), out var userId))
             {
                 userId = -1;
             }

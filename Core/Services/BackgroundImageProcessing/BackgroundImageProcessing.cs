@@ -24,7 +24,7 @@ public class BackgroundImageProcessing : IBackgroundImageProcessing
     private readonly ISender _sender;
     private readonly IImageStorageService _imageStorage;
     private readonly IFileProcessingHubService _fileProcessing;
-    
+
     private int[] _temporaryFilesIds = [];
     private int[] _processedImageIds = [];
 
