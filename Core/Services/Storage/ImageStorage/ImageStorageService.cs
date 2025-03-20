@@ -51,11 +51,14 @@ public class ImageStorageService : IImageStorageService
             // the file name, HTML-encode the value.
             var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
 
-            var trustedImageNameForDisplay = $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
+            var trustedImageNameForDisplay =
+                $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
             var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
 
-            var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
-            var thumbnailHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
+            var imageHash =
+                HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
+            var thumbnailHash =
+                HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
 
             var item = new StorageImage
             {
@@ -86,8 +89,6 @@ public class ImageStorageService : IImageStorageService
             _dbContext.StorageImages.Add(item);
             await _dbContext.SaveChangesAsync(CancellationToken.None);
 
-            GC.Collect();
-
             return Result.Success();
         }
         catch (Exception e)
@@ -96,6 +97,10 @@ public class ImageStorageService : IImageStorageService
             return Result.Failure(new Error(
                 ErrorType.Storage,
                 $"Error while executing {nameof(PostImageToDatabase)}"));
+        }
+        finally
+        {
+            GC.Collect();
         }
     }
 
@@ -120,7 +125,6 @@ public class ImageStorageService : IImageStorageService
 
             var result = new Result<ImageInternalModel>(new ImageInternalModel());
             await ProcessImage(originalStream, file.FileName, result);
-            GC.Collect();
 
             return result;
         }
@@ -130,6 +134,10 @@ public class ImageStorageService : IImageStorageService
             return Result.Failure<ImageInternalModel>(new Error(
                 ErrorType.Storage,
                 $"Error while executing {nameof(CreateImageInternal)}"));
+        }
+        finally
+        {
+            GC.Collect();
         }
     }
 
@@ -154,8 +162,6 @@ public class ImageStorageService : IImageStorageService
             var result = new Result<ImageInternalModel>(new ImageInternalModel());
             await ProcessImage(originalStream, fileName, result);
 
-            GC.Collect();
-
             return result;
         }
         catch (Exception e)
@@ -164,6 +170,10 @@ public class ImageStorageService : IImageStorageService
             return Result.Failure<ImageInternalModel>(new Error(
                 ErrorType.Storage,
                 $"Error while executing {nameof(CreateImageInternal)}"));
+        }
+        finally
+        {
+            GC.Collect();
         }
     }
 
