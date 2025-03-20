@@ -15,7 +15,7 @@ public class PaginationDTO
             {
                 _page = 1;
             }
-            
+
             _page = value;
         }
     }

@@ -36,7 +36,7 @@ WHERE {nameof(File.Id).ToSnake()} = ANY(@imageIds);
             if (result == 0)
             {
                 _logger.LogError($"Error while insert {nameof(File)} at {nameof(DeleteTemporaryFileCommand)}");
-                return Result.Failure<int>(new Error(ErrorType.TemporaryuFile, "Temporary File was not deleted!"));
+                return Result.Failure<int>(new Error(ErrorType.TemporaryFile, "Temporary File was not deleted!"));
             }
 
             return Result.Success();
@@ -45,7 +45,7 @@ WHERE {nameof(File.Id).ToSnake()} = ANY(@imageIds);
         {
             _logger.LogError(e.Message);
             return Result.Failure(
-                new Error(ErrorType.TemporaryuFile, $"Error while executing {nameof(DeleteTemporaryFileCommand)}"));
+                new Error(ErrorType.TemporaryFile, $"Error while executing {nameof(DeleteTemporaryFileCommand)}"));
         }
     }
 }

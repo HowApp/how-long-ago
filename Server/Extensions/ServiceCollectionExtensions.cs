@@ -163,8 +163,8 @@ public static class ServiceCollectionExtensions
             {
                 options.Authority = identityServerConfiguration.Authority;
 
-                options.ClientId = identityServerConfiguration.ClientId;
-                options.ClientSecret = identityServerConfiguration.ClientSecret;
+                options.ClientId = identityServerConfiguration.ApiClientId;
+                options.ClientSecret = identityServerConfiguration.ApiClientSecret;
             });
 
         return services;
@@ -310,16 +310,19 @@ public static class ServiceCollectionExtensions
                     Type = SecuritySchemeType.OAuth2,
                     Flows = new OpenApiOAuthFlows
                     {
+                        ClientCredentials = null,
                         AuthorizationCode = new OpenApiOAuthFlow
                         {
                             AuthorizationUrl = new Uri("https://localhost:5001/connect/authorize"),
                             TokenUrl = new Uri("https://localhost:5001/connect/token"),
-                            Scopes = new Dictionary<string, string> 
+                            Scopes = new Dictionary<string, string>
                             {
-                                {"scope.how-api", "How API"},
+                                {
+                                    "scope.how-api", "How API"
+                                },
                             }
                         }
-                    }   
+                    }
                 });
 
             g.OperationFilter<AuthorizeCheckOperationFilter>();

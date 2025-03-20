@@ -8,7 +8,7 @@ public class BaseException : Exception
     {
         Inconsistencies = new Dictionary<string, string>();
     }
-    
+
     public BaseException(string message, Dictionary<string, string> inconsistencies) : base(message)
     {
         Inconsistencies = inconsistencies;

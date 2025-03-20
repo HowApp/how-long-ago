@@ -33,9 +33,9 @@ public static class AppFileTypeHelper
                 { "File extension", $"Extension {ext} is null." }
             });
         }
-        
+
         ext = ext.Replace(".", "").ToLower();
-        
+
         if (!Extensions.TryGetValue(ext, out AppFileExt fileType))
         {
             throw new FileTypeException(new Dictionary<string, string>
@@ -59,7 +59,7 @@ public static class AppFileTypeHelper
 
         return fileType;
     }
-    
+
     public static string GetFileTypeFromExtensions(AppFileExt[] extensions)
     {
         var extensionCollection = extensions.Select(e =>

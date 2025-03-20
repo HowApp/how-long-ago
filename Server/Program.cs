@@ -40,6 +40,9 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            var identityServerConfiguration = new IdentityServerConfiguration();
+            app.Configuration.Bind(nameof(IdentityServerConfiguration), identityServerConfiguration);
+
             app.UseSwagger();
             app.UseSwaggerUI(s =>
             {
@@ -47,10 +50,9 @@ public class Program
                 s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Identity}/swagger.json", SwaggerDocConstants.Identity);
                 s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Dashboard}/swagger.json", SwaggerDocConstants.Dashboard);
                 s.SwaggerEndpoint($"/swagger/{SwaggerDocConstants.Public}/swagger.json", SwaggerDocConstants.Public);
-
-                s.OAuthClientId("how-api-swagger-client");
+                s.OAuthClientId(identityServerConfiguration.SwaggerClientId);
                 // s.OAuthScopes(new[]{"scope.how-api"}); //add scope by default every login request
-                s.OAuthClientSecret(app.Configuration.GetSection("IdentityServerConfiguration:ClientSwaggerSecret").Value);
+                s.OAuthClientSecret(identityServerConfiguration.SwaggerClientSecret);
                 s.OAuthUsePkce();
             });
         }

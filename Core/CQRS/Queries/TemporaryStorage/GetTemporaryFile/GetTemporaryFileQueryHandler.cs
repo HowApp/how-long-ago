@@ -48,7 +48,7 @@ LIMIT 1;
         {
             _logger.LogError(e.Message);
             return Result.Failure<TemporaryFileModel>(
-                new Error(ErrorType.TemporaryuFile, $"Error while executing {nameof(GetTemporaryFileQuery)}"));
+                new Error(ErrorType.TemporaryFile, $"Error while executing {nameof(GetTemporaryFileQuery)}"));
         }
     }
 }

@@ -44,7 +44,7 @@ RETURNING {nameof(File.Id).ToSnake()};
             if (result == 0)
             {
                 _logger.LogError($"Error while insert {nameof(File)} at {nameof(InsertTemporaryFileCommand)}");
-                return Result.Failure<int>(new Error(ErrorType.TemporaryuFile, "Temporary File was not inserted!"));
+                return Result.Failure<int>(new Error(ErrorType.TemporaryFile, "Temporary File was not inserted!"));
             }
 
             return Result.Success(result);
@@ -53,7 +53,7 @@ RETURNING {nameof(File.Id).ToSnake()};
         {
             _logger.LogError(e.Message);
             return Result.Failure<int>(
-                new Error(ErrorType.TemporaryuFile, $"Error while executing {nameof(InsertTemporaryFileCommandHandler)}"));
+                new Error(ErrorType.TemporaryFile, $"Error while executing {nameof(InsertTemporaryFileCommandHandler)}"));
         }
     }
 }

@@ -8,7 +8,7 @@ public class Result
     public bool Failed => !Succeeded;
     public int Code { get; }
     public Error? Error { get; }
-    
+
     public Result(Error? error, int code = 400)
     {
         Succeeded = false;
@@ -26,7 +26,7 @@ public class Result
     public static Result Failure(Error? error, int code = 400) => new(error, code);
     public static Result<TData> Success<TData>(TData data, int code = 200) => new(data, code);
     public static Result<TData> Failure<TData>(Error? error, int code = 400) => new(error, code);
-    
+
     public string GetErrorMessages()
     {
         if (Succeeded)
@@ -60,7 +60,7 @@ public class Result<TData> : Result
     public Result(Error? error, int code = 400) : base(error, code)
     {
     }
-    
+
     public Result(TData data, int code = 200) : base(code)
     {
         Data = data;

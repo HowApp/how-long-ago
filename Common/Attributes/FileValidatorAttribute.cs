@@ -12,7 +12,7 @@ public class FileValidatorAttribute : ValidationAttribute
     private readonly AppFileExt[] _allowedExtensions;
     private readonly long _maxSizeBytes;
     private readonly int _maxNumbers;
-     
+
     public FileValidatorAttribute(AppFileExt[] allowedExtensions, long maxSizeBytes, int maxNumbers = 1)
     {
         _allowedExtensions = allowedExtensions;
@@ -43,7 +43,7 @@ public class FileValidatorAttribute : ValidationAttribute
                     {"File", $"Allowed to upload only {_maxNumbers} items."}
                 });
             }
-            
+
             foreach (var item in files)
             {
                 ValidateFile(item);
@@ -56,7 +56,7 @@ public class FileValidatorAttribute : ValidationAttribute
                 {"File", "The Provided object is not a file or file collection."}
             });
         }
-        
+
         return ValidationResult.Success;
     }
 
@@ -69,7 +69,7 @@ public class FileValidatorAttribute : ValidationAttribute
                 {"FileContent", "The Provided file is empty."}
             });
         }
-        
+
         if (file.Length > _maxSizeBytes)
         {
             throw new FileValidationException(new Dictionary<string, string>()
@@ -77,7 +77,7 @@ public class FileValidatorAttribute : ValidationAttribute
                 {"FileContent", $"Maximum allowed file size is {_maxSizeBytes / 1024L / 1024L} megabytes."}
             });
         }
-        
+
         var extension = Path.GetExtension(file.FileName);
 
         if (!_allowedExtensions.Contains(AppFileTypeHelper.GetFileTypeFromExtensions(extension)))
