@@ -133,7 +133,7 @@ public class EventController : BaseController
     [Route("api/dashboard/event/{id:int:min(1)}/update")]
     public async Task<IActionResult> UpdateEvent(
         [FromRoute] int id,
-        [FromForm] UpdateEventRequestDTO request)
+        [FromBody] UpdateEventRequestDTO request)
     {
         var result = await _eventService.UpdateEvent(id, request);
 
@@ -153,7 +153,7 @@ public class EventController : BaseController
         return HttpResult(result);
     }
 
-    [HttpPut]
+    [HttpPost]
     [SwaggerOperation("Update event image, returning hash")]
     [ProducesResponseType<Result<UpdateEventImageResponseDTO>>(200)]
     [Route("api/dashboard/event/{id:int:min(1)}/image")]

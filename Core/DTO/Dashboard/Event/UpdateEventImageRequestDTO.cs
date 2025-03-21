@@ -4,5 +4,5 @@ using Models;
 
 public class UpdateEventImageRequestDTO : UploadImageRequestModelDTO
 {
-    
+
 }

@@ -8,6 +8,7 @@ using Database;
 using Database.Entities.Event;
 using Database.Entities.Storage;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 public class UpdateEventImageCommandHandler : ICommandHandler<UpdateEventImageCommand, Result>
 {
@@ -29,19 +30,24 @@ public class UpdateEventImageCommandHandler : ICommandHandler<UpdateEventImageCo
         {
             var updateImageSql = $@"
 UPDATE {nameof(BaseDbContext.Events).ToSnake()}
-SET {nameof(Event.StorageImageId).ToSnake()} = @imageId
-WHERE {nameof(Event.Id).ToSnake()} = @userId
+SET 
+{nameof(Event.StorageImageId).ToSnake()} = @imageId,
+{nameof(Event.ChangedById).ToSnake()} = @userId,
+{nameof(Event.ChangedAt).ToSnake()} = @changedAt
+WHERE {nameof(Event.Id).ToSnake()} = @eventId
 RETURNING (
     SELECT coalesce(u.{nameof(Event.StorageImageId).ToSnake()}, 0) 
-    FROM {nameof(BaseDbContext.Users).ToSnake()} u 
-    WHERE u.{nameof(Event.Id).ToSnake()} = @userId);
+    FROM {nameof(BaseDbContext.Events).ToSnake()} u 
+    WHERE u.{nameof(Event.Id).ToSnake()} = @eventId);
 ";
 
             var oldImageId = await connection.QueryFirstOrDefaultAsync<int>(
                 updateImageSql, new
                 {
                     imageId = request.ImageId,
-                    userId = request.CurrentUserId
+                    eventId = request.EventId,
+                    userId = request.CurrentUserId,
+                    changedAt = SystemClock.Instance.GetCurrentInstant()
                 },
                 transaction);
 
