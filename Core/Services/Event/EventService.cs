@@ -187,7 +187,7 @@ public class EventService : IEventService
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
-            queryBuilder.FilterCreatedBy(userId, InternalAccessFilter.IncludeShared);
+            queryBuilder.FilterByInternalAccessFilter(userId, InternalAccessFilter.IncludeShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {

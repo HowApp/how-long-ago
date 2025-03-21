@@ -36,7 +36,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
         _parameters.Add("@eventId", eventId);
     }
 
-    public void FilterCreatedBy(int userId, InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy)
+    public void FilterByInternalAccessFilter(int userId, InternalAccessFilter internalAccessFilter = InternalAccessFilter.IncludeCreatedBy)
     {
         _parameters.Add("@createdById", userId);
 
@@ -63,6 +63,8 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
         )
 ");
                 break;
+            case InternalAccessFilter.None:
+                throw new InvalidOperationException($"The inner filter for {nameof(EventAccessQueryAccessBuilder)} is not supported.");
             default:
                 throw new ArgumentOutOfRangeException(nameof(internalAccessFilter), internalAccessFilter, null);
         }

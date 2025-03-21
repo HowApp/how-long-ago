@@ -76,7 +76,7 @@ public class EventController : BaseController
     }
 
     [HttpGet]
-    [SwaggerOperation("Get public active Events list with pagination")]
+    [SwaggerOperation("Get public active Events list with pagination for HOME page")]
     [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
     [Route("api/dashboard/event/list-pagination/public-active")]
     public async Task<IActionResult> GetPublicActiveEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
@@ -139,7 +139,7 @@ public class EventController : BaseController
 
         return HttpResult(result);
     }
-    
+
     [HttpPatch]
     [SwaggerOperation("Update like event state")]
     [ProducesResponseType<Result<LikeState>>(200)]
