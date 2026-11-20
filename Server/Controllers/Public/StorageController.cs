@@ -1,4 +1,4 @@
-﻿namespace How.Server.Controllers.Public;
+namespace How.Server.Controllers.Public;
 
 using Common.Constants;
 using Core.Services.Storage.FileStorage;
@@ -21,6 +21,10 @@ public class StorageController : BaseController
     public async Task<IActionResult> GetByte([FromRoute] string fileHash)
     {
         var result = await _fileStorageService.GetFileFromDatabaseByte(fileHash);
+        if (result.Failed)
+        {
+            return HttpResult(result);
+        }
 
         return File(result.Data.Content, result.Data.MimeType, result.Data.FileName);
     }
@@ -31,8 +35,15 @@ public class StorageController : BaseController
     public async Task<IActionResult> GetStream([FromRoute] string fileHash)
     {
         var result = await _fileStorageService.GetFileFromDatabaseStream(fileHash);
+        if (result.Failed)
+        {
+            return HttpResult(result);
+        }
 
-        return new FileStreamResult(result.Data.Content, result.Data.MimeType);
+        return new FileStreamResult(result.Data.Content, result.Data.MimeType)
+        {
+            FileDownloadName = result.Data.FileName
+        };
     }
 }
 

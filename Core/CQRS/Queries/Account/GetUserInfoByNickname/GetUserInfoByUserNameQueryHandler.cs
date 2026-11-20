@@ -37,7 +37,9 @@ FROM {nameof(BaseDbContext.Users).ToSnake()} u
 LEFT JOIN {nameof(BaseDbContext.StorageImages).ToSnake()} si ON u.{nameof(HowUser.StorageImageId).ToSnake()} = si.id
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} main_image ON main_image.id = si.{nameof(StorageImage.MainId).ToSnake()}
 LEFT JOIN {nameof(BaseDbContext.StorageFiles).ToSnake()} thumbnail on thumbnail.id = si.{nameof(StorageImage.ThumbnailId).ToSnake()}
-WHERE u.{nameof(HowUser.FirstName).ToSnake()} || u.{nameof(HowUser.LastName).ToSnake()} ILIKE '%' || @search || '%'
+WHERE u.{nameof(HowUser.IsDeleted).ToSnake()} = FALSE
+  AND u.{nameof(HowUser.IsSuspended).ToSnake()} = FALSE
+  AND coalesce(u.{nameof(HowUser.FirstName).ToSnake()}, '') || coalesce(u.{nameof(HowUser.LastName).ToSnake()}, '') ILIKE '%' || @search || '%'
 LIMIT 50;
 ";
 

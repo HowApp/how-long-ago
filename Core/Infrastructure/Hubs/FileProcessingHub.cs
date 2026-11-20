@@ -17,7 +17,8 @@ public class FileProcessingHub : Hub
     {
         try
         {
-            var userId = Context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = Context.User?.FindFirstValue("sub")
+                         ?? Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!string.IsNullOrEmpty(userId))
             {

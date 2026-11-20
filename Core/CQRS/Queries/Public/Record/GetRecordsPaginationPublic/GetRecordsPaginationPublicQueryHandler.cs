@@ -36,10 +36,11 @@ SELECT
     r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemPublicModelDTO.Id)},
     r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemPublicModelDTO.Description)},
     r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemPublicModelDTO.CreatedAt)},
-    user_likes.likes AS {nameof(RecordItemPublicModelDTO.Likes)},
-    user_likes.dislikes AS {nameof(RecordItemPublicModelDTO.Dislikes)},
+    coalesce(user_likes.likes, 0) AS {nameof(RecordItemPublicModelDTO.Likes)},
+    coalesce(user_likes.dislikes, 0) AS {nameof(RecordItemPublicModelDTO.Dislikes)},
     sf_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.MainHash)},
-    sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)}
+    sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)},
+    coalesce(ri.{nameof(PKey.Id).ToSnake()}, 0) AS {nameof(ImageModelDTO.Id)}
 FROM (
     SELECT rec.*
     FROM {nameof(BaseDbContext.Records).ToSnake()} rec
@@ -66,7 +67,7 @@ LEFT JOIN (
             COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 3 THEN 1 END) AS dislikes
         FROM {nameof(BaseDbContext.LikedRecords).ToSnake()} lr 
         GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
-ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC;
+ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC, ri.{nameof(RecordImage.Position).ToSnake()} ASC;
 ";
 
             var countQuery = $@"
@@ -105,10 +106,11 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
                 {
                     var currentRecord = recordDictionary.GetValueOrDefault(record.Id, record);
 
-                    if (image is not null)
+                    if (image is not null && !string.IsNullOrEmpty(image.MainHash))
                     {
                         currentRecord.Images.Add(new ImageModelDTO
                         {
+                            Id = image.Id,
                             MainHash = image.MainHash,
                             ThumbnailHash = image.ThumbnailHash
                         });
@@ -126,7 +128,7 @@ WHERE e.{nameof(PKey.Id).ToSnake()} = @eventId
                     size = request.Size,
                     offset = request.Offset
                 },
-                splitOn: $"id,{nameof(ImageModelDTO.MainHash)}");
+                splitOn: nameof(ImageModelDTO.MainHash));
 
             return Result.Success(new GetRecordsPaginationPublicResponseDTO
             {

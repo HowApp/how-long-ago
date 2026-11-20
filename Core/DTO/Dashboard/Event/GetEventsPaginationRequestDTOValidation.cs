@@ -12,8 +12,10 @@ public class GetEventsPaginationRequestDTOValidation : AbstractValidator<GetEven
             .WithMessage("Page must be greater than 0!");
 
         RuleFor(r => r.Size)
-            .LessThan(PaginationDTO.MaxSize)
-            .WithMessage($"Page Size must be less than {PaginationDTO.MaxSize}!");
+            .GreaterThan(0)
+            .WithMessage("Page Size must be greater than 0!")
+            .LessThanOrEqualTo(PaginationDTO.MaxSize)
+            .WithMessage($"Page Size must be less than or equal to {PaginationDTO.MaxSize}!");
 
         RuleFor(r => r.Search)
             .MaximumLength(100)

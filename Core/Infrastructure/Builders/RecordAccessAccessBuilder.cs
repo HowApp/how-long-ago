@@ -50,7 +50,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
             case InternalAccessFilter.IncludeCreatedBy:
                 _query.Append($@"
     AND
-    e.{nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
+    e.{nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
 ");
                 break;
             case InternalAccessFilter.IncludeShared:

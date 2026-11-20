@@ -189,7 +189,7 @@ public class EventController : BaseController
     }
 
     [HttpDelete]
-    [SwaggerOperation("Delete event")]
+    [SwaggerOperation("Delete Event from saved")]
     [ProducesResponseType<Result>(200)]
     [Route("api/dashboard/event/{id:int:min(1)}/saved/delete")]
     public async Task<IActionResult> DeleteEventFromSaved([FromRoute] int id)
@@ -199,5 +199,25 @@ public class EventController : BaseController
         return HttpResult(result);
     }
 
-    // TODO add ability to get saved events
+    [HttpGet]
+    [SwaggerOperation("Get saved Events list with pagination")]
+    [ProducesResponseType<Result<GetEventsPaginationResponseDTO>>(200)]
+    [Route("api/dashboard/event/list-pagination/saved")]
+    public async Task<IActionResult> GetSavedEventsPagination([FromQuery] GetEventsPaginationRequestDTO request)
+    {
+        var result = await _eventService.GetEventsPagination(request, InternalAccessFilter.IncludeSaved);
+
+        return HttpResult(result);
+    }
+
+    [HttpGet]
+    [SwaggerOperation("Get saved Event by ID")]
+    [ProducesResponseType<Result<GetEventByIdResponseDTO>>(200)]
+    [Route("api/dashboard/event/{eventId:int:min(1)}/saved")]
+    public async Task<IActionResult> GetSavedEventById([FromRoute] int eventId)
+    {
+        var result = await _eventService.GetEventById(eventId, InternalAccessFilter.IncludeSaved);
+
+        return HttpResult(result);
+    }
 }

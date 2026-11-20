@@ -31,7 +31,14 @@ public class QueueHostedService : BackgroundService
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            while (tasks.Count < MaxDegreeParallelism)
+            tasks.RemoveAll(t => t.IsCompleted);
+
+            if (tasks.Count >= MaxDegreeParallelism)
+            {
+                tasks.Remove(await Task.WhenAny(tasks));
+            }
+
+            try
             {
                 var workItem = await _backgroundTaskQueue.DequeueAsync(cancellationToken);
 
@@ -39,24 +46,29 @@ public class QueueHostedService : BackgroundService
                 {
                     var task = Task.Run(async () =>
                     {
-                        using (var scope = _scopeFactory.CreateScope())
+                        using var scope = _scopeFactory.CreateScope();
+                        try
                         {
-                            try
-                            {
-                                await workItem(scope, cancellationToken);
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.LogError(e, "Error occurred executing background work item.");
-                            }
+                            await workItem(scope, cancellationToken);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, "Error occurred executing background work item.");
                         }
                     }, cancellationToken);
 
                     tasks.Add(task);
                 }
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+        }
 
-            tasks.Remove(await Task.WhenAny(tasks));
+        if (tasks.Count > 0)
+        {
+            await Task.WhenAll(tasks);
         }
 
         _logger.LogInformation("QueueHostedService is stopping.");

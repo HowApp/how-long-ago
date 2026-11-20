@@ -45,7 +45,7 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
             case InternalAccessFilter.IncludeCreatedBy:
                 _query.Append($@"
     AND
-    e.{nameof(BaseCreated.CreatedById).ToSnake()} = @created_by_id
+    e.{nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
 ");
                 break;
             case InternalAccessFilter.IncludeShared:
@@ -61,6 +61,18 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
           AND 
             su.{nameof(SharedUser.UserSharedId).ToSnake()} = @createdById)
         )
+");
+                break;
+            case InternalAccessFilter.IncludeSaved:
+                _query.Append($@"
+    AND
+    EXISTS(
+        SELECT 1 
+        FROM {nameof(BaseDbContext.SavedEvents).ToSnake()} se 
+        WHERE 
+            se.{nameof(SavedEvent.EventId).ToSnake()} = e.{nameof(BaseCreated.Id).ToSnake()} 
+          AND 
+            se.{nameof(SavedEvent.UserId).ToSnake()} = @createdById)
 ");
                 break;
             case InternalAccessFilter.None:

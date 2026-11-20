@@ -42,6 +42,7 @@ WHERE EXISTS(
     SELECT 1 
     FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
     WHERE su.{nameof(SharedUser.UserOwnerId).ToSnake()} = @userId
+      AND su.{nameof(SharedUser.UserSharedId).ToSnake()} = u.{nameof(HowUser.UserId).ToSnake()}
     );
 ";
 
@@ -56,7 +57,7 @@ WHERE EXISTS(
         {
             _logger.LogError(e.Message);
             return Result.Failure<List<GetSharedUsersQueryResult>>(
-                new Error(ErrorType.Account, $"Error while executing {nameof(GetSharedUsersQuery)}"));
+                new Error(ErrorType.SharedUser, $"Error while executing {nameof(GetSharedUsersQuery)}"));
         }
     }
 }

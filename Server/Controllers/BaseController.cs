@@ -14,7 +14,8 @@ public class BaseController : ControllerBase
             return Ok(result);
         }
 
-        return StatusCode((int)HttpStatusCode.BadRequest, result);
+        var statusCode = result.Code >= 400 ? result.Code : (int)HttpStatusCode.BadRequest;
+        return StatusCode(statusCode, result);
     }
 
     protected IActionResult HttpResult<T>(Result<T> result)
@@ -24,6 +25,7 @@ public class BaseController : ControllerBase
             return Ok(result);
         }
 
-        return StatusCode((int)HttpStatusCode.BadRequest, result);
+        var statusCode = result.Code >= 400 ? result.Code : (int)HttpStatusCode.BadRequest;
+        return StatusCode(statusCode, result);
     }
 }

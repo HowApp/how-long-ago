@@ -55,6 +55,16 @@ EXISTS(
       AND 
         su.{nameof(SharedUser.UserSharedId).ToSnake()} = @created_by_id)";
                 break;
+                case InternalAccessFilter.IncludeSaved:
+                    innerFilter = $@"
+EXISTS(
+    SELECT 1 
+    FROM {nameof(BaseDbContext.SavedEvents).ToSnake()} se 
+    WHERE 
+        se.{nameof(SavedEvent.EventId).ToSnake()} = e.{nameof(PKey.Id).ToSnake()}
+      AND 
+        se.{nameof(SavedEvent.UserId).ToSnake()} = @created_by_id)";
+                break;
             default:
                 innerFilter = $@"
 true";

@@ -158,6 +158,21 @@ public static class ServiceCollectionExtensions
 
                 // if token does not contain a dot, it is a reference token
                 options.ForwardDefaultSelector = Selector.ForwardReferenceToken("introspection");
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            path.StartsWithSegments("/hubs/fileProcessing"))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             })
             .AddOAuth2Introspection("introspection", options =>
             {
@@ -203,14 +218,6 @@ public static class ServiceCollectionExtensions
 
             o.UseSnakeCaseNamingConvention();
         });
-
-        services.AddDbContextFactory<BaseDbContext>(o => 
-            o.UseNpgsql(connectionString), 
-            ServiceLifetime.Scoped);
-
-        services.AddDbContextFactory<TemporaryStorageDbContext>(o => 
-                o.UseNpgsql(connectionTemporaryString), 
-            ServiceLifetime.Scoped);
 
         services.AddSingleton<DapperConnection>(o => 
             new DapperConnection(connectionString, connectionTemporaryString));

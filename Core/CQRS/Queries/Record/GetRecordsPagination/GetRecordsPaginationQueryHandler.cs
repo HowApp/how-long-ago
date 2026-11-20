@@ -34,11 +34,12 @@ SELECT
     r.{nameof(PKey.Id).ToSnake()} AS {nameof(RecordItemPrivateModelDTO.Id)},
     r.{nameof(Record.Description).ToSnake()} AS {nameof(RecordItemPrivateModelDTO.Description)},
     r.{nameof(Record.CreatedAt).ToSnake()} AS {nameof(RecordItemPrivateModelDTO.CreatedAt)},
-    user_likes.likes AS {nameof(RecordItemPrivateModelDTO.Likes)},
-    user_likes.dislikes AS {nameof(RecordItemPrivateModelDTO.Dislikes)},
-    user_likes.current_user_state AS {nameof(RecordItemPrivateModelDTO.OwnLikeState)},
+    coalesce(user_likes.likes, 0) AS {nameof(RecordItemPrivateModelDTO.Likes)},
+    coalesce(user_likes.dislikes, 0) AS {nameof(RecordItemPrivateModelDTO.Dislikes)},
+    coalesce(user_likes.current_user_state, 1) AS {nameof(RecordItemPrivateModelDTO.OwnLikeState)},
     sf_main.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.MainHash)},
-    sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)}
+    sf_thumbnail.{nameof(StorageFile.Hash).ToSnake()} AS {nameof(ImageModelDTO.ThumbnailHash)},
+    coalesce(ri.{nameof(PKey.Id).ToSnake()}, 0) AS {nameof(ImageModelDTO.Id)}
 FROM (
     SELECT *
     FROM {nameof(BaseDbContext.Records).ToSnake()} rec
@@ -56,13 +57,10 @@ LEFT JOIN (
             lr.{nameof(LikedRecord.RecordId).ToSnake()} AS liked_record_id,
             COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 2 THEN 1 END) AS likes,
             COUNT(CASE WHEN lr.{nameof(LikedRecord.State).ToSnake()} = 3 THEN 1 END) AS dislikes,
-            coalesce(lr_u.{nameof(LikedRecord.State).ToSnake()}, 1) AS current_user_state
+            coalesce(MAX(CASE WHEN lr.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @createdById THEN lr.{nameof(LikedRecord.State).ToSnake()} END), 1) AS current_user_state
         FROM {nameof(BaseDbContext.LikedRecords).ToSnake()} lr 
-        LEFT JOIN {nameof(BaseDbContext.LikedRecords).ToSnake()} lr_u ON 
-            lr_u.{nameof(LikedRecord.RecordId).ToSnake()} = lr.{nameof(LikedRecord.RecordId).ToSnake()} AND 
-            lr_u.{nameof(LikedRecord.LikedByUserId).ToSnake()} = @createdById
-        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}, lr_u.{nameof(LikedRecord.State).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
-ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC;
+        GROUP BY lr.{nameof(LikedRecord.RecordId).ToSnake()}) user_likes ON r.{nameof(PKey.Id).ToSnake()} = user_likes.liked_record_id
+ORDER BY r.{nameof(Record.CreatedAt).ToSnake()} DESC, ri.{nameof(RecordImage.Position).ToSnake()} ASC;
 ";
 
             var countQuery = $@"
@@ -92,10 +90,11 @@ WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
                 {
                     var currentRecord = recordDictionary.GetValueOrDefault(record.Id, record);
 
-                    if (image is not null)
+                    if (image is not null && !string.IsNullOrEmpty(image.MainHash))
                     {
                         currentRecord.Images.Add(new ImageModelDTO
                         {
+                            Id = image.Id,
                             MainHash = image.MainHash,
                             ThumbnailHash = image.ThumbnailHash
                         });
@@ -112,7 +111,7 @@ WHERE r.{nameof(Record.EventId).ToSnake()} = @eventId;
                     size = request.Size,
                     offset = request.Offset
                 },
-                splitOn: $"id,{nameof(ImageModelDTO.MainHash)}");
+                splitOn: nameof(ImageModelDTO.MainHash));
 
             return Result.Success(new GetRecordsPaginationResponseDTO
             {

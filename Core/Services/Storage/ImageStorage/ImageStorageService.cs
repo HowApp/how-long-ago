@@ -51,14 +51,15 @@ public class ImageStorageService : IImageStorageService
             // the file name, HTML-encode the value.
             var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
 
+            var uniqueSuffix = Guid.NewGuid().ToString("N")[..8];
             var trustedImageNameForDisplay =
-                $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
+                $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{uniqueSuffix}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(file.FileName))}.{extensions}";
             var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
 
             var imageHash =
-                HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
+                HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{uniqueSuffix}-{trustedImageNameForDisplay}");
             var thumbnailHash =
-                HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
+                HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{uniqueSuffix}-{trustedThumbnailNameForDisplay}");
 
             var item = new StorageImage
             {
@@ -79,7 +80,7 @@ public class ImageStorageService : IImageStorageService
                 {
                     Hash = thumbnailHash,
                     Name = trustedThumbnailNameForDisplay,
-                    Path = StoragePathHelper.Images.Image(trustedThumbnailNameForDisplay),
+                    Path = StoragePathHelper.Images.Thumbnail(trustedThumbnailNameForDisplay),
                     Extension = extensions,
                     Size = reducedImage.ImageData.Length,
                     Content = reducedImage.ImageData
@@ -97,10 +98,6 @@ public class ImageStorageService : IImageStorageService
             return Result.Failure(new Error(
                 ErrorType.Storage,
                 $"Error while executing {nameof(PostImageToDatabase)}"));
-        }
-        finally
-        {
-            GC.Collect();
         }
     }
 
@@ -135,10 +132,6 @@ public class ImageStorageService : IImageStorageService
                 ErrorType.Storage,
                 $"Error while executing {nameof(CreateImageInternal)}"));
         }
-        finally
-        {
-            GC.Collect();
-        }
     }
 
     public async Task<Result<ImageInternalModel>> CreateImageInternal(byte[] file, string fileName)
@@ -171,10 +164,6 @@ public class ImageStorageService : IImageStorageService
                 ErrorType.Storage,
                 $"Error while executing {nameof(CreateImageInternal)}"));
         }
-        finally
-        {
-            GC.Collect();
-        }
     }
 
     private async Task ProcessImage(MemoryStream originalStream, string fileName, Result<ImageInternalModel> result)
@@ -188,11 +177,12 @@ public class ImageStorageService : IImageStorageService
         // the file name, HTML-encode the value.
         var extensions = AppFileTypeHelper.GetFileTypeFromExtensions(AppFileExt.WEBP);
 
-        var trustedImageNameForDisplay = $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(fileName))}.{extensions}";
+        var uniqueSuffix = Guid.NewGuid().ToString("N")[..8];
+        var trustedImageNameForDisplay = $"{SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()}-{uniqueSuffix}-{WebUtility.HtmlEncode(Path.GetFileNameWithoutExtension(fileName))}.{extensions}";
         var trustedThumbnailNameForDisplay = $"thumbnail-{trustedImageNameForDisplay}";
 
-        var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedImageNameForDisplay}");
-        var thumbnailHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{trustedThumbnailNameForDisplay}");
+        var imageHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{uniqueSuffix}-{trustedImageNameForDisplay}");
+        var thumbnailHash = HashHelper.ComputeMd5($"{SystemClock.Instance.GetCurrentInstant()}-{uniqueSuffix}-{trustedThumbnailNameForDisplay}");
 
         var imageModel = new ImageInternalModel
         {
@@ -213,7 +203,7 @@ public class ImageStorageService : IImageStorageService
             {
                 Hash = thumbnailHash,
                 Name = trustedThumbnailNameForDisplay,
-                Path = StoragePathHelper.Images.Image(trustedThumbnailNameForDisplay),
+                Path = StoragePathHelper.Images.Thumbnail(trustedThumbnailNameForDisplay),
                 Extension = extensions,
                 Size = reducedImage.ImageData.Length,
                 Content = reducedImage.ImageData

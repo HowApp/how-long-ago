@@ -4,5 +4,6 @@ public enum InternalAccessFilter
 {
     None = 1,
     IncludeCreatedBy = 2,
-    IncludeShared = 3
+    IncludeShared = 3,
+    IncludeSaved = 4
 }

@@ -23,8 +23,35 @@ public class CheckExistQueryHandler : IQueryHandler<CheckExistQuery, Result<bool
     {
         try
         {
+            var usersTable = nameof(BaseDbContext.Users).ToSnake();
+            var eventsTable = nameof(BaseDbContext.Events).ToSnake();
+            var recordsTable = nameof(BaseDbContext.Records).ToSnake();
+
+            string tableName;
+            string pkColumn;
+
+            if (string.Equals(request.Table, usersTable, StringComparison.OrdinalIgnoreCase))
+            {
+                tableName = usersTable;
+                pkColumn = "user_id";
+            }
+            else if (string.Equals(request.Table, eventsTable, StringComparison.OrdinalIgnoreCase))
+            {
+                tableName = eventsTable;
+                pkColumn = nameof(PKey.Id).ToSnake();
+            }
+            else if (string.Equals(request.Table, recordsTable, StringComparison.OrdinalIgnoreCase))
+            {
+                tableName = recordsTable;
+                pkColumn = nameof(PKey.Id).ToSnake();
+            }
+            else
+            {
+                throw new ArgumentException($"Unsupported table in {nameof(CheckExistQuery)}: {request.Table}");
+            }
+
             var query = $@"
-SELECT EXISTS(SELECT 1 FROM {request.Table} WHERE {nameof(PKey.Id).ToSnake()} = @id);
+SELECT EXISTS(SELECT 1 FROM {tableName} WHERE {pkColumn} = @id);
 ";
             await using var connection = _dapper.InitConnection();
 
@@ -32,8 +59,7 @@ SELECT EXISTS(SELECT 1 FROM {request.Table} WHERE {nameof(PKey.Id).ToSnake()} = 
                 query,
                 new
                 {
-                    id = request.Id,
-                    table_name = request.Table
+                    id = request.Id
                 });
 
             return Result.Success(result);

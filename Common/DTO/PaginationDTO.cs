@@ -11,12 +11,7 @@ public class PaginationDTO
         get => _page;
         set
         {
-            if (value < 1 )
-            {
-                _page = 1;
-            }
-
-            _page = value;
+            _page = value < 1 ? 1 : value;
         }
     }
 

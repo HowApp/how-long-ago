@@ -24,7 +24,7 @@ public class IdentityService : IIdentityService
         {
             var user = _currentUserService.User;
 
-            if (user.Identity is null)
+            if (user?.Identity is null)
             {
                 return Result.Failure<CurrentUserResponseDTO>(new Error(
                     ErrorType.Account,
@@ -35,7 +35,9 @@ public class IdentityService : IIdentityService
             {
                 IsAuthenticate = user.Identity.IsAuthenticated,
                 UserName = user.Identity.Name ?? string.Empty,
-                Claims = user.Claims.ToDictionary(c => c.Type, c => c.Value)
+                Claims = user.Claims
+                    .GroupBy(c => c.Type)
+                    .ToDictionary(g => g.Key, g => string.Join(", ", g.Select(c => c.Value)))
             };
 
             return Result.Success(result);

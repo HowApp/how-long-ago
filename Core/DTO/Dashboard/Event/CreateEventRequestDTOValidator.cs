@@ -8,6 +8,8 @@ public class CreateEventRequestDTOValidator : AbstractValidator<CreateEventReque
     {
         RuleFor(r => r.Name)
             .NotEmpty()
-            .WithMessage("Provide event Name!");
+            .WithMessage("Provide event Name!")
+            .MaximumLength(1024)
+            .WithMessage("Event Name is too long!");
     }
 }

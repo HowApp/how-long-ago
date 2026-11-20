@@ -2,33 +2,41 @@ namespace How.Core.Database;
 
 using Npgsql;
 
-public class DapperConnection
+public class DapperConnection : IDisposable, IAsyncDisposable
 {
-    private readonly string _connectionString;
-    private readonly string _temporaryConnectionString;
+    private readonly NpgsqlDataSource _mainDataSource;
+    private readonly NpgsqlDataSource _tempDataSource;
 
     public DapperConnection(string connectionString, string temporaryConnectionString)
     {
-        _connectionString = connectionString;
-        _temporaryConnectionString = temporaryConnectionString;
+        var mainBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        mainBuilder.UseNodaTime();
+        _mainDataSource = mainBuilder.Build();
+
+        var tempBuilder = new NpgsqlDataSourceBuilder(temporaryConnectionString);
+        tempBuilder.UseNodaTime();
+        _tempDataSource = tempBuilder.Build();
     }
 
     public NpgsqlConnection InitConnection()
     {
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
-        dataSourceBuilder.UseNodaTime();
-        var dataSource = dataSourceBuilder.Build();
-
-        var connection = dataSource.OpenConnection();
-        return connection;
+        return _mainDataSource.OpenConnection();
     }
 
     public NpgsqlConnection InitTemporaryConnection()
     {
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(_temporaryConnectionString);
-        var dataSource = dataSourceBuilder.Build();
+        return _tempDataSource.OpenConnection();
+    }
 
-        var connection = dataSource.OpenConnection();
-        return connection;
+    public void Dispose()
+    {
+        _mainDataSource.Dispose();
+        _tempDataSource.Dispose();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _mainDataSource.DisposeAsync();
+        await _tempDataSource.DisposeAsync();
     }
 }
