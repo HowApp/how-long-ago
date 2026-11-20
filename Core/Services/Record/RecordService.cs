@@ -105,7 +105,7 @@ public class RecordService : IRecordService
         try
         {
             var queryBuilder = new EventAccessQueryAccessBuilder(eventId);
-            queryBuilder.FilterByInternalAccessFilter(_userService.UserId, InternalAccessFilter.IncludeShared);
+            queryBuilder.FilterByInternalAccessFilter(_userService.UserId, InternalAccessFilter.IncludePublicAndShared);
 
             var eventExist = await _sender.Send(new CheckExistAccessQuery
             {

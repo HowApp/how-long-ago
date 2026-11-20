@@ -75,6 +75,24 @@ SELECT 1 FROM {nameof(BaseDbContext.Events).ToSnake()} e
             se.{nameof(SavedEvent.UserId).ToSnake()} = @createdById)
 ");
                 break;
+            case InternalAccessFilter.IncludePublicAndShared:
+                _query.Append($@"
+    AND
+    (
+        (e.{nameof(Event.Access).ToSnake()} = {(int)EventAccessType.Public} AND e.{nameof(Event.Status).ToSnake()} = {(int)EventStatus.Active})
+        OR
+        e.{nameof(BaseCreated.CreatedById).ToSnake()} = @createdById
+        OR
+        EXISTS(
+            SELECT 1 
+            FROM {nameof(BaseDbContext.SharedUsers).ToSnake()} su 
+            WHERE 
+                su.{nameof(SharedUser.UserOwnerId).ToSnake()} = e.{nameof(BaseCreated.CreatedById).ToSnake()} 
+              AND 
+                su.{nameof(SharedUser.UserSharedId).ToSnake()} = @createdById)
+    )
+");
+                break;
             case InternalAccessFilter.None:
                 throw new InvalidOperationException($"The inner filter for {nameof(EventAccessQueryAccessBuilder)} is not supported.");
             default:
