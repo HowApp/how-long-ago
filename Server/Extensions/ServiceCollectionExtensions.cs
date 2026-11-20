@@ -143,12 +143,23 @@ public static class ServiceCollectionExtensions
         var identityServerConfiguration = new IdentityServerConfiguration();
         configuration.Bind(nameof(IdentityServerConfiguration), identityServerConfiguration);
 
+        services.AddHttpClient(IdentityModel.AspNetCore.OAuth2Introspection.OAuth2IntrospectionDefaults.BackChannelHttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            });
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 // base-address of identity server
                 options.Authority = identityServerConfiguration.Authority;
                 options.Audience = identityServerConfiguration.Audience;
+
+                options.BackchannelHttpHandler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
 
                 options.TokenValidationParameters.ValidateAudience = true;
 

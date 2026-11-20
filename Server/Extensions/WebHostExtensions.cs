@@ -25,15 +25,14 @@ public static class WebHostExtensions
 
             options.ListenAnyIP(7061, listenOptions =>
             {
-                listenOptions.UseHttps(certificateManager.GetCertificate());
+                listenOptions.UseHttps(httpsOptions =>
+                {
+                    httpsOptions.ServerCertificate = certificateManager.GetCertificate();
+                    httpsOptions.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+                    httpsOptions.CheckCertificateRevocation = false;
+                    httpsOptions.AllowAnyClientCertificate();
+                });
                 listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-            });
-
-            options.ConfigureHttpsDefaults(h =>
-            {
-                h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
-                h.CheckCertificateRevocation = false;
-                h.ServerCertificate = certificateManager.GetCertificate();
             });
         });
 
